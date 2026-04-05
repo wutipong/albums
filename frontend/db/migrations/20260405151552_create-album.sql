@@ -1,3 +1,4 @@
+-- migrate:up
 CREATE TABLE
   albums (
     id BIGSERIAL PRIMARY KEY,
@@ -6,3 +7,6 @@ CREATE TABLE
     modified_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
     deleted_at TIMESTAMPTZ
   );
+
+-- migrate:down
+DROP TABLE albums;

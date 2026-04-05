@@ -6,11 +6,11 @@ plugins:
     sha256: 287df8f6cc06377d67ad5ba02c9e0f00c585509881434d15ea8bd9fc751a9368
 servers:
 - engine: postgresql
-  uri: "postgres://postgres:postgres@db:5432/postgres?sslmode=disable"
+  uri: ${DATABASE_URL}
 sql:
   - engine: "postgresql"
-    queries: "sqlc/query.sql"
-    schema: "sqlc/schema.sql"
+    queries: "db/query/query.sql"
+    schema: "db/migrations"
     database:
       managed: true
     codegen:
@@ -18,4 +18,4 @@ sql:
       plugin: ts
       options:
         runtime: node
-        driver: pg
+        driver: postgres

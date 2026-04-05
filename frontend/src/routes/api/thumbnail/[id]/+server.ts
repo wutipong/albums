@@ -1,5 +1,5 @@
 import type { RequestHandler } from "./$types";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 
 export const GET: RequestHandler = async ({ params }) => {
     const { id } = params;

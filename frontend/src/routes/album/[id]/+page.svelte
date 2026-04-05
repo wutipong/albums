@@ -4,7 +4,7 @@
 	let { params, data }: PageProps = $props();
 </script>
 
-<div class="text-xl font-bold">Album {params.id}</div>
+<div class="text-xl font-bold">Album {data.name}</div>
 
 <div class="flex flex-wrap">
 	{#each data.assets as asset (asset)}

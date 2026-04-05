@@ -5,6 +5,7 @@
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspaces/",
+	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
 		"ghcr.io/devcontainers/features/common-utils:2": {},
 		"ghcr.io/devcontainers/features/git:1": {},
@@ -13,20 +14,23 @@
 		"ghcr.io/devcontainers-extra/features/act:1": {}
 	},
 
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// This can be used to network with other containers or with the host.
-	"forwardPorts": [8080, 5432, 5173, 3000],
-
+	"forwardPorts": [
+		8080,
+		5432,
+		5173,
+		3000
+	],
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "cd /workspaces/frontend && bun install && go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest",
+	"postCreateCommand": ".devcontainer/post-create.sh",
 	"postStartCommand": "cd /workspaces/frontend && bun run dev --host 0.0.0.0",
-
 	// Configure tool-specific properties.
 	// "customizations": {},
-
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
+
+	"containerEnv": {
+		"DATABASE_URL": "postgres://postgres:postgres@db:5432/postgres?sslmode=disable"
+	}
 }

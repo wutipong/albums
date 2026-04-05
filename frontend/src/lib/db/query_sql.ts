@@ -1,8 +1,4 @@
-import { QueryArrayConfig, QueryArrayResult } from "pg";
-
-interface Client {
-    query: (config: QueryArrayConfig) => Promise<QueryArrayResult>;
-}
+import type { Sql } from "postgres";
 
 export const getAlbumQuery = `-- name: GetAlbum :one
 SELECT id, name, created_at, modified_at, deleted_at FROM albums
@@ -21,16 +17,12 @@ export interface GetAlbumRow {
     deletedAt: Date | null;
 }
 
-export async function getAlbum(client: Client, args: GetAlbumArgs): Promise<GetAlbumRow | null> {
-    const result = await client.query({
-        text: getAlbumQuery,
-        values: [args.id],
-        rowMode: "array"
-    });
-    if (result.rows.length !== 1) {
+export async function getAlbum(sql: Sql, args: GetAlbumArgs): Promise<GetAlbumRow | null> {
+    const rows = await sql.unsafe(getAlbumQuery, [args.id]).values();
+    if (rows.length !== 1) {
         return null;
     }
-    const row = result.rows[0];
+    const row = rows[0];
     return {
         id: row[0],
         name: row[1],
@@ -53,21 +45,14 @@ export interface ListAlbumsRow {
     deletedAt: Date | null;
 }
 
-export async function listAlbums(client: Client): Promise<ListAlbumsRow[]> {
-    const result = await client.query({
-        text: listAlbumsQuery,
-        values: [],
-        rowMode: "array"
-    });
-    return result.rows.map(row => {
-        return {
-            id: row[0],
-            name: row[1],
-            createdAt: row[2],
-            modifiedAt: row[3],
-            deletedAt: row[4]
-        };
-    });
+export async function listAlbums(sql: Sql): Promise<ListAlbumsRow[]> {
+    return (await sql.unsafe(listAlbumsQuery, []).values()).map(row => ({
+        id: row[0],
+        name: row[1],
+        createdAt: row[2],
+        modifiedAt: row[3],
+        deletedAt: row[4]
+    }));
 }
 
 export const createAlbumQuery = `-- name: CreateAlbum :one
@@ -90,16 +75,12 @@ export interface CreateAlbumRow {
     deletedAt: Date | null;
 }
 
-export async function createAlbum(client: Client, args: CreateAlbumArgs): Promise<CreateAlbumRow | null> {
-    const result = await client.query({
-        text: createAlbumQuery,
-        values: [args.name],
-        rowMode: "array"
-    });
-    if (result.rows.length !== 1) {
+export async function createAlbum(sql: Sql, args: CreateAlbumArgs): Promise<CreateAlbumRow | null> {
+    const rows = await sql.unsafe(createAlbumQuery, [args.name]).values();
+    if (rows.length !== 1) {
         return null;
     }
-    const row = result.rows[0];
+    const row = rows[0];
     return {
         id: row[0],
         name: row[1],
@@ -120,12 +101,8 @@ export interface UpdateAlbumArgs {
     name: string;
 }
 
-export async function updateAlbum(client: Client, args: UpdateAlbumArgs): Promise<void> {
-    await client.query({
-        text: updateAlbumQuery,
-        values: [args.id, args.name],
-        rowMode: "array"
-    });
+export async function updateAlbum(sql: Sql, args: UpdateAlbumArgs): Promise<void> {
+    await sql.unsafe(updateAlbumQuery, [args.id, args.name]);
 }
 
 export const deleteAlbumQuery = `-- name: DeleteAlbum :exec
@@ -139,11 +116,7 @@ export interface DeleteAlbumArgs {
     name: string;
 }
 
-export async function deleteAlbum(client: Client, args: DeleteAlbumArgs): Promise<void> {
-    await client.query({
-        text: deleteAlbumQuery,
-        values: [args.id, args.name],
-        rowMode: "array"
-    });
+export async function deleteAlbum(sql: Sql, args: DeleteAlbumArgs): Promise<void> {
+    await sql.unsafe(deleteAlbumQuery, [args.id, args.name]);
 }
 
