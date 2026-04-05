@@ -10,6 +10,7 @@ import (
 
 	"github.com/lmittmann/tint"
 	"github.com/urfave/cli/v3"
+	"github.com/wutipong/albums/albums-importer/album"
 	"github.com/wutipong/albums/albums-importer/profile"
 )
 
@@ -51,6 +52,7 @@ func main() {
 		},
 		Commands: []*cli.Command{
 			profile.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
+			album.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
 		},
 	}
 
