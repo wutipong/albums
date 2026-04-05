@@ -1,7 +1,7 @@
 -- migrate:up
 CREATE TABLE
   albums (
-    id BIGSERIAL PRIMARY KEY,
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     name text NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
     modified_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),

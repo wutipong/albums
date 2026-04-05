@@ -8,9 +8,20 @@ SELECT * FROM assets WHERE album_id = $1 AND deleted_at IS NULL ORDER BY filenam
 INSERT INTO assets (
   album_id,
   filename,
-  size,
   checksum
 ) VALUES (
-  $1, $2, $3, $4
+  $1, $2, $3
 )
 RETURNING *;
+
+-- name: GetAlbumAssetsByFilename :many
+SELECT * 
+    FROM assets 
+    WHERE album_id = $1 AND filename = $2 AND deleted_at IS NULL 
+    ORDER BY id ASC;
+
+-- name: GetAlbumAssetByChecksum :one
+SELECT * 
+    FROM assets 
+    WHERE album_id = $1 AND checksum = $2 AND deleted_at IS NULL 
+    LIMIT 1;
