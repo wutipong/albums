@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  pgvector:
+    image: ankane/pgvector:latest
+    restart: always
+    environment:
+      POSTGRES_DB: albums
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: builder
+    depends_on:
+      - pgvector
+    volumes:
+      - .:/workspace:cached
+      - frontend_node_modules:/workspace/frontend/node_modules
+    working_dir: /workspace/frontend
+    ports:
+      - '5173:5173'
+      - '3000:3000'
+    command: ["sh", "-lc", "while sleep 1000; do :; done"]
+    environment:
+      - NODE_ENV=development
+
+volumes:
+  frontend_node_modules:
+  pgvector_data:
