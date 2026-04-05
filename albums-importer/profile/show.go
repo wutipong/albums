@@ -1,15 +1,20 @@
 package profile
 
-import "fmt"
+import (
+	"context"
+	"log/slog"
+)
 
-func showProfile(profile string) (err error) {
-	config, err := LoadProfile(profile)
+func showProfile(ctx context.Context, profile string) (err error) {
+	config, err := LoadProfile(ctx, profile)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Profile [%s]:\n", profile)
-	fmt.Printf("  Server URL: %s\n", config.URL)
+	slog.Info("profile",
+		slog.String("name", profile),
+		slog.String("url", config.URL),
+	)
 
 	return nil
 }

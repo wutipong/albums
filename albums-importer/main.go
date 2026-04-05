@@ -5,6 +5,7 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"os/signal"
 	"time"
 
 	"github.com/lmittmann/tint"
@@ -14,7 +15,7 @@ import (
 
 func main() {
 	slog.SetDefault(slog.New(tint.NewHandler(os.Stderr, &tint.Options{
-		Level:      slog.LevelError,
+		Level:      slog.LevelInfo,
 		TimeFormat: time.Kitchen,
 	})))
 
@@ -53,7 +54,10 @@ func main() {
 		},
 	}
 
-	if err := cmd.Run(context.Background(), os.Args); err != nil {
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+
+	if err := cmd.Run(ctx, os.Args); err != nil {
 		log.Fatal(err)
 	}
 }
