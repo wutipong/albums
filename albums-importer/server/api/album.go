@@ -25,3 +25,13 @@ func GetAlbumDetail(ctx context.Context, server ServerConfig, albumID string) (r
 	resp, err = Get[AlbumDetailResponse](ctx, server, path.Join("api", "album", albumID))
 	return
 }
+
+type CreateAlbumRequest struct {
+	Name string `json:"name"`
+}
+
+func CreateAlbum(ctx context.Context, server ServerConfig, name string) (resp types.Album, err error) {
+	req := CreateAlbumRequest{Name: name}
+	resp, err = Post[types.Album](ctx, server, path.Join("api", "album"), req)
+	return
+}

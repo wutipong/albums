@@ -31,6 +31,7 @@ func Post[R any](
 		return result, err
 	}
 
+	slog.Debug("request body", slog.String("body", string(jsonData)))
 	body := bytes.NewBuffer(jsonData)
 
 	return DoRequestWithReturnObject[R](
@@ -67,6 +68,7 @@ func DoRequestWithReturnObject[R any](
 		return
 	}
 
+	slog.Debug("response body", slog.String("body", string(respBuff)))
 	err = json.Unmarshal(respBuff, &result)
 	if err != nil {
 		return
