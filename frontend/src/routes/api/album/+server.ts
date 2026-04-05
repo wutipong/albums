@@ -1,6 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import { createAlbum, listAlbums } from '$lib/db/query_sql';
+import { createAlbum, listAlbums } from '$lib/db/albums_sql';
 import { getDb } from '$lib/db/db';
 
 export const POST: RequestHandler = async ({ request }) => {

@@ -9,8 +9,10 @@ servers:
   uri: ${DATABASE_URL}
 sql:
   - engine: "postgresql"
-    queries: "db/query/query.sql"
-    schema: "db/migrations"
+    queries: 
+      - "db/queries/albums.sql"
+      - "db/queries/assets.sql"
+    schema: "db/migrations/"
     database:
       managed: true
     codegen:

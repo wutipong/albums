@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import {json} from "@sveltejs/kit";
 
 import { getDb } from "$lib/db/db";
-import { getAlbum } from "$lib/db/query_sql";
+import { getAlbum } from "$lib/db/albums_sql";
 
 
 export const GET: RequestHandler = async ({ params }) => {
