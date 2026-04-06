@@ -42,6 +42,7 @@
 	},
 	"dependencies": {
 		"@types/pg": "^8.20.0",
+		"bree": "^9.2.9",
 		"dbmate": "^2.32.0",
 		"postgres": "^3.4.8",
 		"sharp": "^0.34.5",

@@ -41,7 +41,10 @@ func ProcessArchive(
 		return fmt.Errorf("failed to create album for archive %s: %w", albumPath, err)
 	}
 
-	_, err = WalkArchive(ctx, server, album.ID, albumPath, archiveFile)
+	err = WalkArchive(ctx, server, album.ID, albumPath, archiveFile)
+	if err != nil {
+		return fmt.Errorf("failed to process archive %s: %w", albumPath, err)
+	}
 
 	return nil
 }
@@ -62,21 +65,19 @@ func WalkArchive(
 	albumID string,
 	archivePath string,
 	archive io.Reader,
-) (assetIds []string, err error) {
+) error {
 	if ctx.Err() != nil {
-		err = fmt.Errorf("context error: %w", ctx.Err())
-		return
+		return fmt.Errorf("context error: %w", ctx.Err())
 	}
 
 	format, stream, err := archives.Identify(ctx, archivePath, archive)
 	if err != nil {
-		return
+		return fmt.Errorf("failed to identify archive format: %w", err)
 	}
 
 	extractor, ok := format.(archives.Extractor)
 	if !ok {
-		err = fmt.Errorf("format does not support extraction")
-		return
+		return fmt.Errorf("format does not support extraction")
 	}
 
 	var decoder *encoding.Decoder = nil
@@ -145,13 +146,13 @@ func WalkArchive(
 
 				reader := bytes.NewReader(buffer.Bytes())
 
-				nestedAssetIds, err := WalkArchive(
+				err = WalkArchive(
 					ctx, server, albumID, filepath.Join(archivePath, filename), reader,
 				)
 				if err != nil {
 					return fmt.Errorf("failed to process nested archive %s: %w", filename, err)
 				}
-				assetIds = append(assetIds, nestedAssetIds...)
+
 				return nil
 			}
 
@@ -162,15 +163,16 @@ func WalkArchive(
 				}
 
 				slog.Info("uploaded asset", slog.Any("asset", asset))
-
-				assetIds = append(assetIds, asset.ID)
-
 			}
 
 			return nil
 		})
 
-	return assetIds, err
+	if err != nil {
+		return fmt.Errorf("failed to extract archive: %w", err)
+	}
+
+	return nil
 }
 
 func uploadArchiveAsset(

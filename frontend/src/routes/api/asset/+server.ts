@@ -5,9 +5,10 @@ import sharp from "sharp";
 import { json } from "@sveltejs/kit";
 import { getDb } from "$lib/db/db";
 import { getAlbum } from "$lib/db/albums_sql";
-import { createAsset, getAlbumAssetByChecksum } from "$lib/db/assets_sql";
+import { createAsset, getDuplicatedAlbumAsset } from "$lib/db/assets_sql";
 import { createHash } from 'node:crypto';
 import { createCacheAssetPath } from "$lib/cache";
+import path from "node:path";
 
 const THUMBNAIL_SIZE = 500;
 const VIEW_SIZE = 2000;
@@ -29,32 +30,27 @@ export const POST: RequestHandler = async ({ request, params }) => {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     try {
-        const s = sharp(buffer)
-
         const checksum = calculateChecksum(buffer);
 
-        if (await checkDuplicate(checksum, albumId)) {
+        if (await checkDuplicate(albumId, checksum, buffer.length.toString())) {
             return json({ success: false, error: "Duplicate asset" }, { status: 400 });
         }
 
+        const basename = path.basename(file.name);
         const asset = await createAsset(getDb(), {
             albumId,
             filename: file.name,
-            checksum
+            checksum,
+            type: "image",
+            original: path.join("original", basename),
+            size: buffer.length.toString()
         });
         if (!asset) {
             return json({ success: false, error: "Failed to create asset" }, { status: 500 });
         }
 
-        await fs.mkdir(createCacheAssetPath(asset.id, ""), { recursive: true });
-
-        s.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, {
-            fit: "inside"
-        }).toFormat("webp").toFile(createCacheAssetPath(asset.id, "thumbnail.webp"));
-
-        s.resize(VIEW_SIZE, VIEW_SIZE, {
-            fit: "inside"
-        }).toFormat("webp").toFile(createCacheAssetPath(asset.id, "view.webp"));
+        await fs.mkdir(createCacheAssetPath(asset.id, "original"), { recursive: true });
+        await fs.writeFile(createCacheAssetPath(asset.id, "original", basename), buffer);
 
         return json({ asset, success: true });
     } catch (err) {
@@ -70,7 +66,7 @@ function calculateChecksum(buffer: Buffer): string {
     return hash.digest('hex');
 }
 
-async function checkDuplicate(checksum: string, albumId: string): Promise<boolean> {
-    const existingAsset = await getAlbumAssetByChecksum(getDb(), { albumId, checksum });
+async function checkDuplicate(albumId: string, checksum: string, size: string): Promise<boolean> {
+    const existingAsset = await getDuplicatedAlbumAsset(getDb(), { albumId, checksum, size });
     return existingAsset !== null;
 }
