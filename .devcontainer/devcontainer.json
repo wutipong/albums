@@ -11,7 +11,8 @@
 		"ghcr.io/devcontainers/features/git:1": {},
 		"ghcr.io/devcontainers/features/go:1": {},
 		"ghcr.io/robbert229/devcontainer-features/postgresql-client:1": {},
-		"ghcr.io/devcontainers-extra/features/act:1": {}
+		"ghcr.io/devcontainers-extra/features/act:1": {},
+		"ghcr.io/42atomys/devcontainers-features/redis-cli:1": {}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
