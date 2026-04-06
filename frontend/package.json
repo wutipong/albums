@@ -12,9 +12,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"dbmate:up": "dbmate up",
-		"dbmate:down": "dbmate down",
-		"codegen": "kysely-codegen"
+		"codegen": "kysely-codegen --out-file ./src/lib/server/db_types.d.ts"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.3",
@@ -46,7 +44,6 @@
 	"dependencies": {
 		"@types/pg": "^8.20.0",
 		"bree": "^9.2.9",
-		"dbmate": "^2.32.0",
 		"kysely": "^0.28.15",
 		"sharp": "^0.34.5",
 		"svelte-adapter-bun": "^1.0.1"
