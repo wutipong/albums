@@ -187,6 +187,12 @@ func Process(
 					)
 					return nil
 				}
+				if !IsArchiveFile(path) {
+					slog.Debug("skipping unsupported file",
+						slog.String("path", path),
+					)
+					return nil
+				}
 
 				err = ProcessArchive(ctx, server, sourceDir, albumPath)
 			}
