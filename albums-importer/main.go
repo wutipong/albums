@@ -12,6 +12,7 @@ import (
 	"github.com/urfave/cli/v3"
 	"github.com/wutipong/albums/albums-importer/album"
 	"github.com/wutipong/albums/albums-importer/asset"
+	"github.com/wutipong/albums/albums-importer/importing"
 	"github.com/wutipong/albums/albums-importer/profile"
 )
 
@@ -55,6 +56,7 @@ func main() {
 			profile.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
 			album.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
 			asset.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
+			importing.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
 		},
 	}
 

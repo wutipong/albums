@@ -23,6 +23,7 @@ func Command(profile *string, displayLogLevel *string, fileLogLevel *string) *cl
 				Name:    "create",
 				Aliases: []string{"new", "n"},
 				Usage:   "Create a new asset",
+				Hidden:  true,
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:        "dry-run",
