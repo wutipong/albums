@@ -5,7 +5,6 @@ go 1.26.1
 require (
 	github.com/manifoldco/promptui v0.9.0
 	github.com/mholt/archives v0.1.5
-	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d
 	golang.org/x/text v0.35.0
 )
 
@@ -33,6 +32,7 @@ require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/google/uuid v1.6.0
 	github.com/lmittmann/tint v1.1.3
+	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d
 	github.com/urfave/cli/v3 v3.8.0
 	go.yaml.in/yaml/v4 v4.0.0-rc.4
 	golang.org/x/sys v0.5.0 // indirect
