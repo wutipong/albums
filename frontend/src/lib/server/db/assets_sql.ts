@@ -199,16 +199,12 @@ export async function getDuplicatedAlbumAsset(sql: Sql, args: GetDuplicatedAlbum
     };
 }
 
-export const getAlbumAssetWithoutPreviewQuery = `-- name: GetAlbumAssetWithoutPreview :many
+export const getAssetsWithoutPreviewQuery = `-- name: GetAssetsWithoutPreview :many
 SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view 
     FROM assets 
-    WHERE album_id = $1 AND preview = '' AND deleted_at IS NULL`;
+    WHERE preview = '' AND deleted_at IS NULL`;
 
-export interface GetAlbumAssetWithoutPreviewArgs {
-    albumId: string;
-}
-
-export interface GetAlbumAssetWithoutPreviewRow {
+export interface GetAssetsWithoutPreviewRow {
     id: string;
     albumId: string;
     filename: string;
@@ -224,8 +220,8 @@ export interface GetAlbumAssetWithoutPreviewRow {
     view: string;
 }
 
-export async function getAlbumAssetWithoutPreview(sql: Sql, args: GetAlbumAssetWithoutPreviewArgs): Promise<GetAlbumAssetWithoutPreviewRow[]> {
-    return (await sql.unsafe(getAlbumAssetWithoutPreviewQuery, [args.albumId]).values()).map(row => ({
+export async function getAssetsWithoutPreview(sql: Sql): Promise<GetAssetsWithoutPreviewRow[]> {
+    return (await sql.unsafe(getAssetsWithoutPreviewQuery, []).values()).map(row => ({
         id: row[0],
         albumId: row[1],
         filename: row[2],
@@ -242,16 +238,12 @@ export async function getAlbumAssetWithoutPreview(sql: Sql, args: GetAlbumAssetW
     }));
 }
 
-export const getAlbumAssetWithoutThumbnailQuery = `-- name: GetAlbumAssetWithoutThumbnail :many
+export const getAssetsWithoutThumbnailQuery = `-- name: GetAssetsWithoutThumbnail :many
 SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view 
     FROM assets 
-    WHERE album_id = $1 AND thumbnail = '' AND deleted_at IS NULL`;
+    WHERE thumbnail = '' AND deleted_at IS NULL`;
 
-export interface GetAlbumAssetWithoutThumbnailArgs {
-    albumId: string;
-}
-
-export interface GetAlbumAssetWithoutThumbnailRow {
+export interface GetAssetsWithoutThumbnailRow {
     id: string;
     albumId: string;
     filename: string;
@@ -267,8 +259,8 @@ export interface GetAlbumAssetWithoutThumbnailRow {
     view: string;
 }
 
-export async function getAlbumAssetWithoutThumbnail(sql: Sql, args: GetAlbumAssetWithoutThumbnailArgs): Promise<GetAlbumAssetWithoutThumbnailRow[]> {
-    return (await sql.unsafe(getAlbumAssetWithoutThumbnailQuery, [args.albumId]).values()).map(row => ({
+export async function getAssetsWithoutThumbnail(sql: Sql): Promise<GetAssetsWithoutThumbnailRow[]> {
+    return (await sql.unsafe(getAssetsWithoutThumbnailQuery, []).values()).map(row => ({
         id: row[0],
         albumId: row[1],
         filename: row[2],
@@ -285,16 +277,12 @@ export async function getAlbumAssetWithoutThumbnail(sql: Sql, args: GetAlbumAsse
     }));
 }
 
-export const getAlbumAssetWithoutViewQuery = `-- name: GetAlbumAssetWithoutView :many
+export const getAssetsWithoutViewQuery = `-- name: GetAssetsWithoutView :many
 SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view 
     FROM assets 
-    WHERE album_id = $1 AND view = '' AND deleted_at IS NULL`;
+    WHERE view = '' AND deleted_at IS NULL`;
 
-export interface GetAlbumAssetWithoutViewArgs {
-    albumId: string;
-}
-
-export interface GetAlbumAssetWithoutViewRow {
+export interface GetAssetsWithoutViewRow {
     id: string;
     albumId: string;
     filename: string;
@@ -310,8 +298,8 @@ export interface GetAlbumAssetWithoutViewRow {
     view: string;
 }
 
-export async function getAlbumAssetWithoutView(sql: Sql, args: GetAlbumAssetWithoutViewArgs): Promise<GetAlbumAssetWithoutViewRow[]> {
-    return (await sql.unsafe(getAlbumAssetWithoutViewQuery, [args.albumId]).values()).map(row => ({
+export async function getAssetsWithoutView(sql: Sql): Promise<GetAssetsWithoutViewRow[]> {
+    return (await sql.unsafe(getAssetsWithoutViewQuery, []).values()).map(row => ({
         id: row[0],
         albumId: row[1],
         filename: row[2],

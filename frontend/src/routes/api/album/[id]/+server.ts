@@ -3,9 +3,9 @@ import type { RequestHandler } from "./$types";
 import fs from "node:fs/promises";
 import {json} from "@sveltejs/kit";
 
-import { getDb } from "$lib/db/db";
-import { getAlbum } from "$lib/db/albums_sql";
-import { listAssetsByAlbum } from "$lib/db/assets_sql";
+import { getDb } from "$lib/server/db/db";
+import { getAlbum } from "$lib/server/db/albums_sql";
+import { listAssetsByAlbum } from "$lib/server/db/assets_sql";
 
 export const GET: RequestHandler = async ({ params }) => {
     const { id } = params;

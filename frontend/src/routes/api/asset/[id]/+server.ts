@@ -1,5 +1,5 @@
-import { getAsset } from "$lib/db/assets_sql";
-import { getDb } from "$lib/db/db";
+import { getAsset } from "$lib/server/db/assets_sql";
+import { getDb } from "$lib/server/db/db";
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 

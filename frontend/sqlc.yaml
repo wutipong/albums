@@ -16,7 +16,7 @@ sql:
     database:
       managed: true
     codegen:
-    - out: src/lib/db
+    - out: src/lib/server/db
       plugin: ts
       options:
         runtime: node

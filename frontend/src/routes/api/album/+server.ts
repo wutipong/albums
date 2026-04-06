@@ -1,7 +1,7 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import { createAlbum, listAlbums } from '$lib/db/albums_sql';
-import { getDb } from '$lib/db/db';
+import { createAlbum, listAlbums } from '$lib/server/db/albums_sql';
+import { getDb } from '$lib/server/db/db';
 
 export const POST: RequestHandler = async ({ request }) => {
   const body = await request.json();

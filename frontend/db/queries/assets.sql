@@ -23,20 +23,20 @@ SELECT *
     WHERE album_id = $1 AND checksum = $2 AND size = $3 AND deleted_at IS NULL 
     LIMIT 1;
 
--- name: GetAlbumAssetWithoutPreview :many
+-- name: GetAssetsWithoutPreview :many
 SELECT * 
     FROM assets 
-    WHERE album_id = $1 AND preview = '' AND deleted_at IS NULL;
+    WHERE preview = '' AND deleted_at IS NULL;
 
--- name: GetAlbumAssetWithoutThumbnail :many
+-- name: GetAssetsWithoutThumbnail :many
 SELECT * 
     FROM assets 
-    WHERE album_id = $1 AND thumbnail = '' AND deleted_at IS NULL;
+    WHERE thumbnail = '' AND deleted_at IS NULL;
 
--- name: GetAlbumAssetWithoutView :many
+-- name: GetAssetsWithoutView :many
 SELECT * 
     FROM assets 
-    WHERE album_id = $1 AND view = '' AND deleted_at IS NULL;
+    WHERE view = '' AND deleted_at IS NULL;
 
 -- name: UpdateAsset :one
 UPDATE assets SET

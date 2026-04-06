@@ -3,16 +3,12 @@ import fs from "node:fs/promises";
 import type { File } from "node:buffer";
 import sharp from "sharp";
 import { json } from "@sveltejs/kit";
-import { getDb } from "$lib/db/db";
-import { getAlbum } from "$lib/db/albums_sql";
-import { createAsset, getDuplicatedAlbumAsset } from "$lib/db/assets_sql";
+import { getDb } from "$lib/server/db/db";
+import { getAlbum } from "$lib/server/db/albums_sql";
+import { createAsset, getDuplicatedAlbumAsset } from "$lib/server/db/assets_sql";
 import { createHash } from 'node:crypto';
 import { createCacheAssetPath } from "$lib/cache";
 import path from "node:path";
-
-const THUMBNAIL_SIZE = 500;
-const VIEW_SIZE = 2000;
-
 
 export const POST: RequestHandler = async ({ request, params }) => {
     const data = await request.formData();
