@@ -1,20 +1,27 @@
-import path from "node:path";
 import type { RequestHandler } from "./$types";
-import fs from "node:fs/promises";
-import {json} from "@sveltejs/kit";
-
-import { getDb } from "$lib/server/db/db";
-import { getAlbum } from "$lib/server/db/albums_sql";
-import { listAssetsByAlbum } from "$lib/server/db/assets_sql";
+import { json } from "@sveltejs/kit";
+import { db } from "$lib/server/db/db";
 
 export const GET: RequestHandler = async ({ params }) => {
     const { id } = params;
-    const album = await getAlbum(getDb(), { id });
+
+    const album = await db.selectFrom('albums')
+        .selectAll()
+        .where('albums.id', '=', id)
+        .where('albums.deleted_at', 'is', null)
+        .limit(1)
+        .executeTakeFirst()
+
     if (!album) {
         return new Response("Album not found", { status: 404 });
     }
-    
-    const assets = await listAssetsByAlbum(getDb(), { albumId: id });
+
+    const assets = await db.selectFrom('assets')
+        .selectAll()
+        .where('album_id', '=', album.id)
+        .where('deleted_at', 'is', null)
+        .execute()
+
     const ids = assets.map(asset => asset.id);
 
     return json({

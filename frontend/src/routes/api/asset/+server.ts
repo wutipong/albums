@@ -1,11 +1,9 @@
 import type { RequestHandler } from "./$types";
 import fs from "node:fs/promises";
 import type { File } from "node:buffer";
-import sharp from "sharp";
 import { json } from "@sveltejs/kit";
-import { getDb } from "$lib/server/db/db";
-import { getAlbum } from "$lib/server/db/albums_sql";
-import { createAsset, getDuplicatedAlbumAsset } from "$lib/server/db/assets_sql";
+import { db } from "$lib/server/db/db";
+
 import { createHash } from 'node:crypto';
 import { createCacheAssetPath } from "$lib/cache";
 import path from "node:path";
@@ -15,7 +13,13 @@ export const POST: RequestHandler = async ({ request, params }) => {
     const file = data.get("file") as File;
     const albumId = data.get("albumId") as string;
 
-    const album = await getAlbum(getDb(), { id: albumId });
+    const album = await db.selectFrom('albums')
+        .selectAll()
+        .where('albums.id', '=', albumId)
+        .where('albums.deleted_at', 'is', null)
+        .limit(1)
+        .executeTakeFirst()
+
     if (!album) {
         return json({ success: false, error: "Album not found" }, { status: 404 });
     }
@@ -33,14 +37,18 @@ export const POST: RequestHandler = async ({ request, params }) => {
         }
 
         const basename = path.basename(file.name);
-        const asset = await createAsset(getDb(), {
-            albumId,
-            filename: file.name,
-            checksum,
-            type: "image",
-            original: path.join("original", basename),
-            size: buffer.length.toString()
-        });
+        const asset = await db.insertInto("assets")
+            .values({
+                album_id: albumId,
+                filename: file.name,
+                checksum,
+                type: "image",
+                original: path.join("original", basename),
+                size: buffer.length.toString()
+            })
+            .returningAll()
+            .executeTakeFirstOrThrow();
+
         if (!asset) {
             return json({ success: false, error: "Failed to create asset" }, { status: 500 });
         }
@@ -63,6 +71,13 @@ function calculateChecksum(buffer: Buffer): string {
 }
 
 async function checkDuplicate(albumId: string, checksum: string, size: string): Promise<boolean> {
-    const existingAsset = await getDuplicatedAlbumAsset(getDb(), { albumId, checksum, size });
+    const existingAsset = await db.selectFrom('assets')
+        .selectAll()
+        .where('album_id', '=', albumId)
+        .where('assets.checksum', '=', checksum)
+        .where('assets.size', '=', size)
+        .where('assets.deleted_at', 'is', null)
+        .executeTakeFirst()
+
     return existingAsset !== null;
 }

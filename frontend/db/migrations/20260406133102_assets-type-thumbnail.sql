@@ -1,8 +1,8 @@
 -- migrate:up
 ALTER TABLE assets ADD COLUMN size BIGINT NOT NULL DEFAULT 0;
 
-CREATE TYPE asset_type AS ENUM ('image', 'animated', 'video', 'audio');
-ALTER TABLE assets ADD COLUMN type asset_type NOT NULL DEFAULT 'image';
+CREATE TYPE asset_type_t AS ENUM ('image', 'animated', 'video', 'audio');
+ALTER TABLE assets ADD COLUMN type asset_type_t NOT NULL DEFAULT 'image';
 
 ALTER TABLE assets ADD COLUMN original TEXT NOT NULL DEFAULT '';
 ALTER TABLE assets ADD COLUMN preview TEXT NOT NULL DEFAULT '';
@@ -16,6 +16,6 @@ ALTER TABLE assets DROP COLUMN preview;
 ALTER TABLE assets DROP COLUMN original;
 
 ALTER TABLE assets DROP COLUMN type;
-DROP TYPE asset_type;
+DROP TYPE asset_type_t;
 
 ALTER TABLE assets DROP COLUMN size;

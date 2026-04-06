@@ -1,14 +1,21 @@
 import { createCacheAssetPath } from "$lib/cache";
-import { getAsset } from "$lib/server/db/assets_sql";
-import { getDb } from "$lib/server/db/db";
+import { db } from "$lib/server/db/db";
 import type { RequestHandler } from "./$types";
 import fs from "node:fs/promises";
 
 export const GET: RequestHandler = async ({ params }) => {
     const { id } = params;
-    const asset = await getAsset(getDb(), {id})
+    const asset = await db.selectFrom('assets')
+        .selectAll()
+        .where("id", "=", id)
+        .where("assets.deleted_at", "is", null)
+        .executeTakeFirst()
 
-    const data = await fs.readFile(createCacheAssetPath(id, asset?.thumbnail??""));
+    if (!asset || asset.thumbnail === "") {
+        return new Response("Asset not found", { status: 404 });
+    }
+
+    const data = await fs.readFile(createCacheAssetPath(id, asset.thumbnail));
 
     return new Response(data, {
         headers: {

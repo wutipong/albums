@@ -1,7 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import { createAlbum, listAlbums } from '$lib/server/db/albums_sql';
-import { getDb } from '$lib/server/db/db';
+import { db } from '$lib/server/db/db';
 
 export const POST: RequestHandler = async ({ request }) => {
   const body = await request.json();
@@ -11,11 +10,19 @@ export const POST: RequestHandler = async ({ request }) => {
     return json({ error: 'Missing or invalid name' }, { status: 400 });
   }
 
-  const album = await createAlbum(getDb(), { name });
+  const album = await db.insertInto("albums")
+    .values({ name })
+    .returningAll()
+    .executeTakeFirstOrThrow()
+
   return json(album, { status: 201 });
 };
 
 export const GET: RequestHandler = async () => {
-  const albums = await listAlbums(getDb());
+  const albums = await db.selectFrom('albums')
+    .selectAll()
+    .where('albums.deleted_at', 'is', null)
+    .execute()
+    
   return json({ albums });
 }
