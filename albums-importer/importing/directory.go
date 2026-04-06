@@ -79,7 +79,7 @@ func ProcessDirectory(
 		}
 
 		reader, e := os.Open(filepath.Join(sourceDir, path, file.Name()))
-		if err != nil {
+		if e != nil {
 			return fmt.Errorf(
 				"failed to open image file %s: %w",
 				file.Name(),
