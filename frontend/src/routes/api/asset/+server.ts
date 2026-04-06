@@ -2,10 +2,10 @@ import type { RequestHandler } from "./$types";
 import fs from "node:fs/promises";
 import type { File } from "node:buffer";
 import { json } from "@sveltejs/kit";
-import { db } from "$lib/server/db/db";
+import { db } from "$lib/server/db";
 
 import { createHash } from 'node:crypto';
-import { createCacheAssetPath } from "$lib/cache";
+import { createCacheAssetPath } from "$lib/server/cache";
 import path from "node:path";
 
 export const POST: RequestHandler = async ({ request, params }) => {

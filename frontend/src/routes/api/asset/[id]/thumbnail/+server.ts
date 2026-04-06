@@ -1,5 +1,5 @@
-import { createCacheAssetPath } from "$lib/cache";
-import { db } from "$lib/server/db/db";
+import { createCacheAssetPath } from "$lib/server/cache";
+import { db } from "$lib/server/db";
 import type { RequestHandler } from "./$types";
 import fs from "node:fs/promises";
 

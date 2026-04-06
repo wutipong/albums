@@ -1,6 +1,6 @@
-import { createCacheAssetPath } from "$lib/cache";
+import { createCacheAssetPath } from "$lib/server/cache";
 import type { RequestHandler } from "./$types";
-import {db} from "$lib/server/db/db"
+import {db} from "$lib/server/db"
 import fs from "node:fs/promises";
 
 export const GET: RequestHandler = async ({ params }) => {

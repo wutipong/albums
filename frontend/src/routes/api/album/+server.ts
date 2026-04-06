@@ -1,6 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import { db } from '$lib/server/db/db';
+import { db } from '$lib/server/db';
 
 export const POST: RequestHandler = async ({ request }) => {
   const body = await request.json();
@@ -23,6 +23,6 @@ export const GET: RequestHandler = async () => {
     .selectAll()
     .where('albums.deleted_at', 'is', null)
     .execute()
-    
+
   return json({ albums });
 }

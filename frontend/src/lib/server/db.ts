@@ -1,11 +1,11 @@
 import type { DB } from 'kysely-codegen' // this is the Database interface we defined earlier
 import { Pool } from 'pg'
 import { Kysely, PostgresDialect } from 'kysely'
-import { DATABASE_URL } from '$env/static/private'
+import { env } from '$env/dynamic/private'
 
 const dialect = new PostgresDialect({
   pool: new Pool({
-    connectionString: DATABASE_URL,
+    connectionString: env.DATABASE_URL,
     max: 10,
   })
 })

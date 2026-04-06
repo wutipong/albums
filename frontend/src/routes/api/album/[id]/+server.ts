@@ -1,6 +1,6 @@
 import type { RequestHandler } from "./$types";
 import { json } from "@sveltejs/kit";
-import { db } from "$lib/server/db/db";
+import { db } from "$lib/server/db";
 
 export const GET: RequestHandler = async ({ params }) => {
     const { id } = params;

@@ -24,13 +24,13 @@
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": ".devcontainer/post-create.sh",
-	"postStartCommand": "cd /workspaces/frontend && bun run dev --host 0.0.0.0",
 	// Configure tool-specific properties.
 	// "customizations": {},
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 
 	"containerEnv": {
-		"DATABASE_URL": "postgres://postgres:postgres@db:5432/postgres?sslmode=disable"
+		"DATABASE_URL": "postgres://postgres:postgres@db:5432/postgres?sslmode=disable",
+		"CACHE_DIR": "/workspaces/cache"
 	}
 }
