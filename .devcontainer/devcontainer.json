@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/marcosgomesneto/bun-devcontainers/tree/main/src/bun-postgresql
 {
-	"name": "Bun & PostgreSQL",
+	"name": "github/wutipong/albums",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspaces/",
@@ -10,7 +10,9 @@
 		"ghcr.io/devcontainers/features/common-utils:2": {},
 		"ghcr.io/devcontainers/features/git:1": {},
 		"ghcr.io/devcontainers/features/go:1": {},
-		"ghcr.io/robbert229/devcontainer-features/postgresql-client:1": {},
+		"ghcr.io/robbert229/devcontainer-features/postgresql-client:1": {
+			"version" : 18
+		},
 		"ghcr.io/devcontainers-extra/features/act:1": {},
 		"ghcr.io/42atomys/devcontainers-features/redis-cli:1": {}
 	},
