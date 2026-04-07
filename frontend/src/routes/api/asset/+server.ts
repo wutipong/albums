@@ -7,6 +7,7 @@ import { db } from "$lib/server/db";
 import { createHash } from 'node:crypto';
 import { createCacheAssetPath } from "$lib/server/cache";
 import path from "node:path";
+import { notifyProcessAsset } from "$lib/server/grpc/worker";
 
 export const POST: RequestHandler = async ({ request }) => {
     const data = await request.formData();
@@ -56,6 +57,8 @@ export const POST: RequestHandler = async ({ request }) => {
         await fs.mkdir(createCacheAssetPath(asset.id, "original"), { recursive: true });
         await fs.writeFile(createCacheAssetPath(asset.id, "original", basename), buffer);
 
+        notifyProcessAsset(asset.id)
+
         return json({ asset, success: true });
     } catch (err) {
         console.error(err);
@@ -79,5 +82,5 @@ async function checkDuplicate(albumId: string, checksum: string, size: string): 
         .where('assets.deleted_at', 'is', null)
         .executeTakeFirst()
 
-    return existingAsset !== null;
+    return existingAsset !== undefined;
 }

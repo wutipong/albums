@@ -16,6 +16,7 @@ import (
 //go:generate sqlc generate
 
 func main() {
+	slog.SetLogLoggerLevel(slog.LevelDebug)
 	ctx := context.Background()
 	err := db.Connect(ctx, os.Getenv("DATABASE_URL"))
 	if err != nil {
