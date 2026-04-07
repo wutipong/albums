@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+option go_package = "/grpc";
+
+// Worker service definition.
+service WorkerService {
+
+  // Notify worker to process specific asset.
+  rpc NotifyProcessAsset(NotifyProcessAssetResquest) returns (NotifyProcessAssetResponse);
+
+  // Notify worker to queue unprocessed asset to processing queue.
+  rpc NotifyScanCache(NotifyScanCacheRequest) returns (NotifyScanCacheResponse);
+}
+
+//Status of the asset.
+enum AssetStatus {
+  PENDING    = 0;
+  PROCESSING = 1;
+  PROCESSED  = 2;
+}
+
+// NotifyProcessAssetRequest
+message NotifyProcessAssetResquest {
+  string id = 1;
+}
+
+// NotifyProcessAssetResponse
+message NotifyProcessAssetResponse {
+  string      id     = 1;
+  AssetStatus status = 2;
+}
+
+// NotifyScanCacheRequest
+message NotifyScanCacheRequest {
+  // empty
+}
+
+// NotifyScanCacheResponse
+message NotifyScanCacheResponse {
+  // empty
+}
+
+

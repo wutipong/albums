@@ -7,6 +7,8 @@ import (
 	"github.com/go-co-op/gocron/v2"
 )
 
+//go:generate protoc --go_out=. -I/workspaces/grpc worker.proto
+
 func main() {
 	// create a scheduler
 	s, err := gocron.NewScheduler()
