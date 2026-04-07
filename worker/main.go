@@ -1,40 +1,47 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"log"
-	"os"
+	"time"
 
-	"github.com/ktbsomen/gobullmq"
-	"github.com/ktbsomen/gobullmq/types"
-	"github.com/redis/go-redis/v9"
+	"github.com/go-co-op/gocron/v2"
 )
 
 func main() {
-	ctx := context.Background()
-	params, err := redis.ParseURL(os.Getenv("REDIS_URL"))
+	// create a scheduler
+	s, err := gocron.NewScheduler()
 	if err != nil {
-		log.Fatal(err)
-	}
-	workerClient := redis.NewClient(params)
-
-	workerProcess := func(ctx context.Context, job *types.Job, api gobullmq.WorkerProcessAPI) (interface{}, error) {
-		fmt.Printf("Processing job: %s\n", job.Name)
-		return "ok", nil
+		// handle error
 	}
 
-	worker, err := gobullmq.NewWorker(ctx, "process-asset", gobullmq.WorkerOptions{
-		Concurrency:     1,
-		StalledInterval: 300000000,
-		Backoff:         &gobullmq.BackoffOptions{Type: "exponential", Delay: 500},
-	}, workerClient, workerProcess)
+	// add a job to the scheduler
+	j, err := s.NewJob(
+		gocron.OneTimeJob(gocron.OneTimeJobStartImmediately()),
+		gocron.NewTask(
+			func(a string, b int) {
+				fmt.Printf("I'm a task %s/%d.", a, b)
+			},
+			"hello",
+			1,
+		),
+	)
 	if err != nil {
-		log.Fatal(err)
+		// handle error
 	}
+	// each job has a unique id
+	fmt.Println(j.ID())
 
-	// Run blocks until ctx is cancelled
-	if err := worker.Run(); err != nil {
-		log.Printf("Worker error: %v", err)
+	// start the scheduler
+	s.Start()
+
+	// block until you are ready to shut down
+	time.Sleep(time.Minute)
+
+	// when you're done, shut it down
+	err = s.Shutdown()
+	// or for context-aware teardown:
+	// err = s.ShutdownWithContext(ctx)
+	if err != nil {
+		// handle error
 	}
 }

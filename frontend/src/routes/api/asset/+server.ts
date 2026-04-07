@@ -7,9 +7,8 @@ import { db } from "$lib/server/db";
 import { createHash } from 'node:crypto';
 import { createCacheAssetPath } from "$lib/server/cache";
 import path from "node:path";
-import { processAssetQueue } from "$lib/server/queue";
 
-export const POST: RequestHandler = async ({ request, params }) => {
+export const POST: RequestHandler = async ({ request }) => {
     const data = await request.formData();
     const file = data.get("file") as File;
     const albumId = data.get("albumId") as string;
@@ -56,8 +55,6 @@ export const POST: RequestHandler = async ({ request, params }) => {
 
         await fs.mkdir(createCacheAssetPath(asset.id, "original"), { recursive: true });
         await fs.writeFile(createCacheAssetPath(asset.id, "original", basename), buffer);
-
-        processAssetQueue.add("new-asset", {id: asset.id})
 
         return json({ asset, success: true });
     } catch (err) {
