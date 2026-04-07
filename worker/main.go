@@ -1,15 +1,13 @@
 package main
 
 import (
-	"log"
 	"log/slog"
 	"net"
 	"os"
 
 	"github.com/wutipong/albums/worker/service"
+	"github.com/wutipong/albums/worker/service/pb"
 	"google.golang.org/grpc"
-
-	pb "github.com/wutipong/albums/worker/service/definition"
 )
 
 //go:generate protoc --go_out=. --go-grpc_out=. -I/workspaces/grpc worker.proto
@@ -22,7 +20,8 @@ func main() {
 	}
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		slog.Error("unable to start server", slog.String("error", err.Error()))
+		return
 	}
 	var opts []grpc.ServerOption
 

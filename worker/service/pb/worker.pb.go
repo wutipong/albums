@@ -4,7 +4,7 @@
 // 	protoc        v7.34.1
 // source: worker.proto
 
-package definition
+package pb
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -262,7 +262,7 @@ const file_worker_proto_rawDesc = "" +
 	"\tPROCESSED\x10\x022\xa5\x01\n" +
 	"\rWorkerService\x12N\n" +
 	"\x12NotifyProcessAsset\x12\x1b.NotifyProcessAssetResquest\x1a\x1b.NotifyProcessAssetResponse\x12D\n" +
-	"\x0fNotifyScanCache\x12\x17.NotifyScanCacheRequest\x1a\x18.NotifyScanCacheResponseB\x15Z\x13/service/definitionb\x06proto3"
+	"\x0fNotifyScanCache\x12\x17.NotifyScanCacheRequest\x1a\x18.NotifyScanCacheResponseB\rZ\v/service/pbb\x06proto3"
 
 var (
 	file_worker_proto_rawDescOnce sync.Once

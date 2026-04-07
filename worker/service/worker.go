@@ -3,18 +3,18 @@ package service
 import (
 	"context"
 
-	"github.com/wutipong/albums/worker/service/definition"
+	"github.com/wutipong/albums/worker/service/pb"
 )
 
 type WorkerServiceServer struct {
-	definition.UnimplementedWorkerServiceServer
+	pb.UnimplementedWorkerServiceServer
 }
 
 // Notify worker to process specific asset.
 func (s *WorkerServiceServer) NotifyProcessAsset(
 	ctx context.Context,
-	req *definition.NotifyProcessAssetResquest,
-) (resp *definition.NotifyProcessAssetResponse, err error) {
+	req *pb.NotifyProcessAssetResquest,
+) (resp *pb.NotifyProcessAssetResponse, err error) {
 
 	return
 }
@@ -22,7 +22,7 @@ func (s *WorkerServiceServer) NotifyProcessAsset(
 // Notify worker to queue unprocessed asset to processing queue.
 func (s *WorkerServiceServer) NotifyScanCache(
 	context.Context,
-	*definition.NotifyScanCacheRequest,
-) (resp *definition.NotifyScanCacheResponse, err error) {
+	*pb.NotifyScanCacheRequest,
+) (resp *pb.NotifyScanCacheResponse, err error) {
 	return
 }

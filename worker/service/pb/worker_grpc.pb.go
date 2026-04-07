@@ -4,7 +4,7 @@
 // - protoc             v7.34.1
 // source: worker.proto
 
-package definition
+package pb
 
 import (
 	context "context"
