@@ -1,0 +1,12 @@
+version: "2"
+servers:
+- engine: postgresql
+  uri: ${DATABASE_URL}
+sql:
+  - engine: "postgresql"
+    queries: 
+      - "/workspaces/db/queries/albums.sql"
+      - "/workspaces/db/queries/assets.sql"
+    schema: "/workspaces/db/migrations/"
+    database:
+      managed: true

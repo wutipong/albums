@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "/grpc";
+option go_package = "/service/definition";
 
 // Worker service definition.
 service WorkerService {

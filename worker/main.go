@@ -1,49 +1,32 @@
 package main
 
 import (
-	"fmt"
-	"time"
+	"log"
+	"log/slog"
+	"net"
+	"os"
 
-	"github.com/go-co-op/gocron/v2"
+	"github.com/wutipong/albums/worker/service"
+	"google.golang.org/grpc"
+
+	pb "github.com/wutipong/albums/worker/service/definition"
 )
 
-//go:generate protoc --go_out=. -I/workspaces/grpc worker.proto
+//go:generate protoc --go_out=. --go-grpc_out=. -I/workspaces/grpc worker.proto
 
 func main() {
-	// create a scheduler
-	s, err := gocron.NewScheduler()
-	if err != nil {
-		// handle error
+	address := os.Getenv("WORKER_ADDRESS")
+	if address == "" {
+		slog.Error("invalid address")
+		return
 	}
-
-	// add a job to the scheduler
-	j, err := s.NewJob(
-		gocron.OneTimeJob(gocron.OneTimeJobStartImmediately()),
-		gocron.NewTask(
-			func(a string, b int) {
-				fmt.Printf("I'm a task %s/%d.", a, b)
-			},
-			"hello",
-			1,
-		),
-	)
+	lis, err := net.Listen("tcp", address)
 	if err != nil {
-		// handle error
+		log.Fatalf("failed to listen: %v", err)
 	}
-	// each job has a unique id
-	fmt.Println(j.ID())
+	var opts []grpc.ServerOption
 
-	// start the scheduler
-	s.Start()
-
-	// block until you are ready to shut down
-	time.Sleep(time.Minute)
-
-	// when you're done, shut it down
-	err = s.Shutdown()
-	// or for context-aware teardown:
-	// err = s.ShutdownWithContext(ctx)
-	if err != nil {
-		// handle error
-	}
+	grpcServer := grpc.NewServer(opts...)
+	pb.RegisterWorkerServiceServer(grpcServer, &service.WorkerServiceServer{})
+	grpcServer.Serve(lis)
 }
