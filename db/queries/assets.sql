@@ -1,9 +1,6 @@
 -- name: GetAsset :one
 SELECT * FROM assets WHERE id = $1 AND deleted_at IS NULL LIMIT 1; 
 
--- name: ListAssetsByAlbum :many
-SELECT * FROM assets WHERE album_id = $1 AND deleted_at IS NULL ORDER BY filename ASC;
-
 -- name: CreateAsset :one
 INSERT INTO assets (
   album_id,
@@ -17,26 +14,10 @@ INSERT INTO assets (
 )
 RETURNING *;
 
--- name: GetDuplicatedAlbumAsset :one
+-- name: GetPendingAssets :many
 SELECT * 
     FROM assets 
-    WHERE album_id = $1 AND checksum = $2 AND size = $3 AND deleted_at IS NULL 
-    LIMIT 1;
-
--- name: GetAssetsWithoutPreview :many
-SELECT * 
-    FROM assets 
-    WHERE preview = '' AND deleted_at IS NULL;
-
--- name: GetAssetsWithoutThumbnail :many
-SELECT * 
-    FROM assets 
-    WHERE thumbnail = '' AND deleted_at IS NULL;
-
--- name: GetAssetsWithoutView :many
-SELECT * 
-    FROM assets 
-    WHERE view = '' AND deleted_at IS NULL;
+    WHERE process_status = 'pending' AND deleted_at IS NULL;
 
 -- name: UpdateAsset :one
 UPDATE assets SET
@@ -47,6 +28,18 @@ UPDATE assets SET
   preview = $6,
   thumbnail = $7,
   view = $8,
+  process_status = $9,
   modified_at = NOW ()
+WHERE id = $1 AND deleted_at IS NULL
+RETURNING *;
+
+-- name: GetAssetProcessStatus :one
+SELECT process_status
+  FROM assets
+  WHERE id = $1 AND deleted_at IS NULL;
+
+-- name: UpdateAssetProcessStatus :one
+UPDATE assets SET
+  process_status = $2
 WHERE id = $1 AND deleted_at IS NULL
 RETURNING *;

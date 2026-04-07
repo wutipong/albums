@@ -5,8 +5,12 @@ servers:
 sql:
   - engine: "postgresql"
     queries: 
-      - "/workspaces/db/queries/albums.sql"
-      - "/workspaces/db/queries/assets.sql"
-    schema: "/workspaces/db/migrations/"
+      - "../db/queries/assets.sql"
+    schema: "../db/migrations/"
     database:
       managed: true
+    gen:
+      go:
+        package: "db"
+        out: "db"
+        sql_package: "pgx/v5"
