@@ -34,5 +34,6 @@
 	"containerEnv": {
 		"DATABASE_URL": "postgres://postgres:postgres@db:5432/postgres?sslmode=disable",
 		"CACHE_DIR": "/workspaces/cache",
+		"REDIS_URL": "redis://redis:6379"
 	}
 }
