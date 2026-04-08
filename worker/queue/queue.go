@@ -54,7 +54,6 @@ func Init(ctx context.Context) error {
 			return fmt.Errorf("unable to parse id: %w", err)
 		}
 		queries, _ := db.Get()
-		defer db.Release()
 
 		asset, err := queries.GetAsset(ctx, uuid)
 		if err != nil {
@@ -99,7 +98,6 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 
 	{
 		queries, _ := db.Get()
-		defer db.Release()
 
 		status, err = queries.GetAssetProcessStatus(ctx, uuid)
 		slog.Info("asset status", slog.Any("status", status))

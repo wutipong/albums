@@ -35,7 +35,6 @@ func (s *WorkerServiceServer) NotifyProcessAsset(
 	}
 
 	quries, _ := db.Get()
-	defer db.Release()
 
 	processStatus, err := quries.GetAssetProcessStatus(ctx, uuid)
 	if err != nil {
@@ -69,7 +68,6 @@ func (s *WorkerServiceServer) NotifyScanCache(
 	req *pb.NotifyScanCacheRequest,
 ) (resp *pb.NotifyScanCacheResponse, err error) {
 	quries, _ := db.Get()
-	defer db.Release()
 
 	assets, err := quries.GetPendingAssets(ctx)
 

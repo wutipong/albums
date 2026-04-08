@@ -3,21 +3,18 @@ package db
 import (
 	"context"
 	"fmt"
-	"sync"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-var conn *pgx.Conn
+var conn *pgxpool.Pool
 var queries *Queries
 
 func Connect(ctx context.Context, connection string) error {
-	c, err := pgx.Connect(ctx, connection)
+	conn, err := pgxpool.New(ctx, connection)
 	if err != nil {
 		return fmt.Errorf("unable to open database connection: %w", err)
 	}
-
-	conn = c
 
 	queries = New(conn)
 
@@ -25,17 +22,9 @@ func Connect(ctx context.Context, connection string) error {
 }
 
 func Close(ctx context.Context) {
-	defer conn.Close(ctx)
+	defer conn.Close()
 }
 
-var mutex sync.Mutex
-
-func Get() (*Queries, *pgx.Conn) {
-	mutex.Lock()
-
+func Get() (*Queries, *pgxpool.Pool) {
 	return queries, conn
-}
-
-func Release() {
-	mutex.Unlock()
 }
