@@ -3,6 +3,7 @@ package queue
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -22,16 +23,26 @@ const VIEW_SIZE = 2000
 const VIEW_QUALITY = 80
 
 func ProcessAsset(ctx context.Context, id string) error {
+	slog.Info("processing asset", slog.String("id", id))
+
+	err := ctx.Err()
+	if err != nil {
+		return fmt.Errorf("context cancelled: %w", err)
+	}
+
 	var uuid pgtype.UUID
+	queries := db.New(db.Connection())
 
 	uuid.Scan(id)
-	queries := db.New(db.Connection())
+
 	asset, err := queries.GetAsset(ctx, uuid)
 	if err != nil {
 		return fmt.Errorf("unable to read asset data: %w", err)
 	}
 
 	originalPath := createCacheAssetPath(id, asset.Original)
+	slog.Info("original asset path", slog.String("path", originalPath))
+
 	original, err := vips.NewImageFromFile(originalPath)
 	if err != nil {
 		return fmt.Errorf("unable to read original image: %w", err)
@@ -77,6 +88,8 @@ func populateView(
 	original *vips.ImageRef,
 	originalMeta *vips.ImageMetadata,
 ) error {
+	slog.Info("populating view media for asset", slog.String("id", asset.ID.String()))
+
 	err := ctx.Err()
 	if err != nil {
 		return fmt.Errorf("context cancelled: %w", err)
@@ -130,6 +143,8 @@ func populatePreview(
 	original *vips.ImageRef,
 	originalMeta *vips.ImageMetadata,
 ) error {
+	slog.Info("populating preview media for asset", slog.String("id", asset.ID.String()))
+
 	err := ctx.Err()
 	if err != nil {
 		return fmt.Errorf("context cancelled: %w", err)
@@ -183,6 +198,8 @@ func populateThumbnail(
 	original *vips.ImageRef,
 	originalMeta *vips.ImageMetadata,
 ) error {
+	slog.Info("populating thumbnail media for asset", slog.String("id", asset.ID.String()))
+
 	err := ctx.Err()
 	if err != nil {
 		return fmt.Errorf("context cancelled: %w", err)

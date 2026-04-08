@@ -5,7 +5,9 @@ import (
 	"log/slog"
 	"net"
 	"os"
+	"time"
 
+	"github.com/lmittmann/tint"
 	"github.com/wutipong/albums/worker/db"
 	"github.com/wutipong/albums/worker/queue"
 	"github.com/wutipong/albums/worker/service"
@@ -17,7 +19,11 @@ import (
 //go:generate sqlc generate
 
 func main() {
-	slog.SetLogLoggerLevel(slog.LevelDebug)
+	slog.SetDefault(slog.New(tint.NewHandler(os.Stderr, &tint.Options{
+		Level:      slog.LevelDebug,
+		TimeFormat: time.Kitchen,
+	})))
+
 	ctx := context.Background()
 	err := db.Connect(ctx, os.Getenv("DATABASE_URL"))
 	if err != nil {
