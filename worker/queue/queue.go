@@ -24,26 +24,39 @@ func Init(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("unable to initialize vips")
 	}
-	queue, err = neoq.New(ctx, neoq.WithBackend(memory.Backend))
+	queue, err = neoq.New(ctx,
+		neoq.WithBackend(memory.Backend),
+		// neoq.WithRecoveryCallback(func(ctx context.Context, err error) error {
+		// 	slog.Error("error processing task", slog.String("error", err.Error()))
+		// 	return nil
+		// }),
+	)
 	if err != nil {
 		return fmt.Errorf("unable to initialize queue")
 	}
 
 	// create a handler that listens for new job on the "greetings" queue
 	h := handler.New("asset-processing", func(ctx context.Context) (err error) {
+
 		j, _ := jobs.FromContext(ctx)
 		id := j.Payload["id"]
-		idStr, ok := id.(string)
+		slog.Info("processing asset", slog.Any("id", id))
 
+		idStr, ok := id.(string)
 		if !ok {
 			return fmt.Errorf("invalid id")
 		}
 
 		var uuid pgtype.UUID
-		uuid.Scan(id)
+		err = uuid.Scan(idStr)
+		if err != nil {
+			slog.Info("error parsing uuid", slog.String("id", idStr))
+			return fmt.Errorf("unable to parse id: %w", err)
+		}
 		queries := db.New(db.Connection())
 		asset, err := queries.GetAsset(ctx, uuid)
 		if err != nil {
+			slog.Info("error reading asset.", slog.String("id", idStr))
 			return fmt.Errorf("unable to read asset data: %w", err)
 		}
 
@@ -53,17 +66,12 @@ func Init(ctx context.Context) error {
 
 		asset.ProcessStatus = db.ProcessStatusTProcessing
 
-		_, err = queries.UpdateAsset(ctx, db.UpdateAssetParams{
-			ID:            uuid,
-			Filename:      asset.Filename,
-			Checksum:      asset.Checksum,
-			Type:          asset.Type,
-			Original:      asset.Original,
-			Preview:       asset.Preview,
-			Thumbnail:     asset.Thumbnail,
-			View:          asset.View,
-			ProcessStatus: asset.ProcessStatus,
-		})
+		_, err = queries.UpdateAssetProcessStatus(ctx,
+			db.UpdateAssetProcessStatusParams{
+				ID:            uuid,
+				ProcessStatus: db.ProcessStatusTProcessing,
+			},
+		)
 
 		if err != nil {
 			return fmt.Errorf("unable to save image metadata: %w", err)
@@ -73,7 +81,7 @@ func Init(ctx context.Context) error {
 
 		//done <- true
 		return
-	})
+	}, handler.Concurrency(1))
 	return queue.Start(ctx, h)
 }
 
@@ -88,27 +96,17 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 	uuid.Scan(id)
 	quries := db.New(db.Connection())
 	status, err = quries.GetAssetProcessStatus(ctx, uuid)
+	slog.Info("asset status", slog.Any("status", status))
+
+	slog.Info("enqueueing asset", slog.String("id", id))
 
 	if status != db.ProcessStatusTPending {
 		return
 	}
 
-	status = db.ProcessStatusTProcessing
-	_, err = quries.UpdateAssetProcessStatus(ctx,
-		db.UpdateAssetProcessStatusParams{
-			ID:            uuid,
-			ProcessStatus: status,
-		},
-	)
-
-	if err != nil {
-		err = fmt.Errorf("unable to update status: %w", err)
-		return
-	}
-
 	j := &jobs.Job{Queue: "asset-processing", Payload: map[string]any{"id": id}}
 
-	jobId, err := queue.Enqueue(context.Background(), j)
+	jobId, err := queue.Enqueue(ctx, j)
 	if err != nil {
 		err = fmt.Errorf("unable to add job: %w", err)
 		return

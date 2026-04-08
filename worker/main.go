@@ -25,6 +25,7 @@ func main() {
 	})))
 
 	ctx := context.Background()
+
 	err := db.Connect(ctx, os.Getenv("DATABASE_URL"))
 	if err != nil {
 		slog.Error("unable to conect to database", slog.String("error", err.Error()))
@@ -53,5 +54,9 @@ func main() {
 
 	grpcServer := grpc.NewServer(opts...)
 	pb.RegisterWorkerServiceServer(grpcServer, &service.WorkerServiceServer{})
-	grpcServer.Serve(lis)
+
+	if err := grpcServer.Serve(lis); err != nil {
+		slog.Error("error running grpc server.", slog.String("error", err.Error()))
+	}
+
 }

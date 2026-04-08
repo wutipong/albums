@@ -25,6 +25,8 @@ func (s *WorkerServiceServer) NotifyProcessAsset(
 		Id: id,
 	}
 
+	slog.Info("enqueue asset to asset-processing queue", slog.String("id", id))
+
 	uuid := pgtype.UUID{}
 	err = uuid.Scan(id)
 	if err != nil {
@@ -39,10 +41,12 @@ func (s *WorkerServiceServer) NotifyProcessAsset(
 		return
 	}
 
-	if processStatus != db.ProcessStatusTPending {
-		slog.Info("adding asset", slog.String("id", id))
+	slog.Info("adding asset", slog.String("id", id))
 
-		queue.EnqueueAssetProcessing(ctx, id)
+	_, err = queue.EnqueueAssetProcessing(ctx, id)
+	if err != nil {
+		err = fmt.Errorf("unable to enqueue a new job: %w", err)
+		return
 	}
 
 	switch processStatus {
@@ -64,6 +68,8 @@ func (s *WorkerServiceServer) NotifyScanCache(
 ) (resp *pb.NotifyScanCacheResponse, err error) {
 	quries := db.New(db.Connection())
 	assets, err := quries.GetPendingAssets(ctx)
+
+	slog.Info("scan library for unprocessed asset.")
 
 	resp = &pb.NotifyScanCacheResponse{}
 	if len(assets) == 0 {

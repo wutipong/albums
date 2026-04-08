@@ -27,13 +27,22 @@ func ProcessAsset(ctx context.Context, id string) error {
 
 	err := ctx.Err()
 	if err != nil {
+		slog.Info("context.", slog.String("error", err.Error()))
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
 	var uuid pgtype.UUID
 	queries := db.New(db.Connection())
 
-	uuid.Scan(id)
+	slog.Info("parsing task id.")
+
+	err = uuid.Scan(id)
+	if err != nil {
+		slog.Info("error parsing uuid.", slog.String("error", err.Error()))
+		return fmt.Errorf("invalid asset id %s: %w", id, err)
+	}
+
+	slog.Info("get current asset data.")
 
 	asset, err := queries.GetAsset(ctx, uuid)
 	if err != nil {
@@ -42,6 +51,8 @@ func ProcessAsset(ctx context.Context, id string) error {
 
 	originalPath := createCacheAssetPath(id, asset.Original)
 	slog.Info("original asset path", slog.String("path", originalPath))
+
+	slog.Info("read original image file.")
 
 	original, err := vips.NewImageFromFile(originalPath)
 	if err != nil {
@@ -72,7 +83,7 @@ func ProcessAsset(ctx context.Context, id string) error {
 		Preview:       asset.Preview,
 		Thumbnail:     asset.Thumbnail,
 		View:          asset.View,
-		ProcessStatus: asset.ProcessStatus,
+		ProcessStatus: db.ProcessStatusTProcessed,
 	})
 
 	if err != nil {
@@ -113,7 +124,7 @@ func populateView(
 	}
 
 	err = view.ThumbnailWithSize(
-		THUMBNAIL_SIZE, THUMBNAIL_SIZE, vips.InterestingNone, vips.SizeUp,
+		VIEW_SIZE, VIEW_SIZE, vips.InterestingNone, vips.SizeDown,
 	)
 	if err != nil {
 		return fmt.Errorf("unable to resize preview image")
@@ -168,7 +179,7 @@ func populatePreview(
 	}
 
 	err = preview.ThumbnailWithSize(
-		THUMBNAIL_SIZE, THUMBNAIL_SIZE, vips.InterestingNone, vips.SizeUp,
+		THUMBNAIL_SIZE, THUMBNAIL_SIZE, vips.InterestingNone, vips.SizeDown,
 	)
 	if err != nil {
 		return fmt.Errorf("unable to resize preview image")
@@ -229,7 +240,7 @@ func populateThumbnail(
 	}
 
 	err = thumbnail.ThumbnailWithSize(
-		THUMBNAIL_SIZE, THUMBNAIL_SIZE, vips.InterestingNone, vips.SizeUp,
+		THUMBNAIL_SIZE, THUMBNAIL_SIZE, vips.InterestingNone, vips.SizeDown,
 	)
 	if err != nil {
 		return fmt.Errorf("unable to resize preview image")
@@ -257,7 +268,7 @@ func createCacheAssetPath(id string, args ...string) string {
 	topLevelDir := id[0:2]
 	secondLevelDir := id[2:4]
 
-	combined := []string{topLevelDir, secondLevelDir}
+	combined := []string{os.Getenv("CACHE_DIR"), topLevelDir, secondLevelDir, id}
 	combined = append(combined, args...)
 
 	return filepath.Join(combined...)
