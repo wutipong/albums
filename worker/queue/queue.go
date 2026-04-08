@@ -3,7 +3,6 @@ package queue
 import (
 	"context"
 	"fmt"
-	"log"
 	"log/slog"
 
 	"github.com/acaloiaro/neoq"
@@ -72,7 +71,6 @@ func Init(ctx context.Context) error {
 
 		ProcessAsset(ctx, idStr)
 
-		log.Printf("Hello, %s!", j.Payload["Name"])
 		//done <- true
 		return
 	})
@@ -81,6 +79,7 @@ func Init(ctx context.Context) error {
 
 func Shutdown(ctx context.Context) {
 	queue.Shutdown(ctx)
+	vips.Shutdown()
 }
 
 func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessStatusT, err error) {
@@ -116,8 +115,6 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 	}
 
 	slog.Info("job added", slog.String("job", jobId))
-	vips.Shutdown()
 
 	return
-
 }

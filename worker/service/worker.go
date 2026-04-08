@@ -7,6 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/wutipong/albums/worker/db"
+	"github.com/wutipong/albums/worker/queue"
 	"github.com/wutipong/albums/worker/service/pb"
 )
 
@@ -39,8 +40,9 @@ func (s *WorkerServiceServer) NotifyProcessAsset(
 	}
 
 	if processStatus != db.ProcessStatusTPending {
-		slog.Debug("adding asset", slog.String("id", id))
-		// TODO: add to asset process queue
+		slog.Info("adding asset", slog.String("id", id))
+
+		queue.EnqueueAssetProcessing(ctx, id)
 	}
 
 	switch processStatus {
@@ -69,8 +71,9 @@ func (s *WorkerServiceServer) NotifyScanCache(
 	}
 
 	for _, asset := range assets {
-		slog.Debug("adding asset", slog.String("id", asset.ID.String()))
-		//TODO: Add asset to the processing queue.
+		slog.Info("adding asset", slog.String("id", asset.ID.String()))
+
+		queue.EnqueueAssetProcessing(ctx, asset.ID.String())
 	}
 
 	return

@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/wutipong/albums/worker/db"
+	"github.com/wutipong/albums/worker/queue"
 	"github.com/wutipong/albums/worker/service"
 	"github.com/wutipong/albums/worker/service/pb"
 	"google.golang.org/grpc"
@@ -24,6 +25,13 @@ func main() {
 		return
 	}
 	defer db.Close(ctx)
+
+	err = queue.Init(ctx)
+	if err != nil {
+		slog.Error("unable to start job queue", slog.String("error", err.Error()))
+		return
+	}
+	defer queue.Shutdown(ctx)
 
 	address := os.Getenv("WORKER_ADDRESS")
 	if address == "" {
