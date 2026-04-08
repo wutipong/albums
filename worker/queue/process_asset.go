@@ -22,7 +22,7 @@ const VIEW_FILE = "view.webp"
 const VIEW_SIZE = 2000
 const VIEW_QUALITY = 80
 
-func ProcessAsset(ctx context.Context, id string) error {
+func ProcessAsset(ctx context.Context, id string, queries *db.Queries) error {
 	slog.Info("processing asset", slog.String("id", id))
 
 	err := ctx.Err()
@@ -32,7 +32,6 @@ func ProcessAsset(ctx context.Context, id string) error {
 	}
 
 	var uuid pgtype.UUID
-	queries := db.New(db.Connection())
 
 	slog.Info("parsing task id.")
 

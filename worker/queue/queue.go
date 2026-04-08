@@ -53,7 +53,9 @@ func Init(ctx context.Context) error {
 			slog.Info("error parsing uuid", slog.String("id", idStr))
 			return fmt.Errorf("unable to parse id: %w", err)
 		}
-		queries := db.New(db.Connection())
+		queries, _ := db.Get()
+		defer db.Release()
+
 		asset, err := queries.GetAsset(ctx, uuid)
 		if err != nil {
 			slog.Info("error reading asset.", slog.String("id", idStr))
@@ -77,7 +79,7 @@ func Init(ctx context.Context) error {
 			return fmt.Errorf("unable to save image metadata: %w", err)
 		}
 
-		ProcessAsset(ctx, idStr)
+		ProcessAsset(ctx, idStr, queries)
 
 		//done <- true
 		return
@@ -94,14 +96,19 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 	var uuid pgtype.UUID
 
 	uuid.Scan(id)
-	quries := db.New(db.Connection())
-	status, err = quries.GetAssetProcessStatus(ctx, uuid)
-	slog.Info("asset status", slog.Any("status", status))
 
-	slog.Info("enqueueing asset", slog.String("id", id))
+	{
+		queries, _ := db.Get()
+		defer db.Release()
 
-	if status != db.ProcessStatusTPending {
-		return
+		status, err = queries.GetAssetProcessStatus(ctx, uuid)
+		slog.Info("asset status", slog.Any("status", status))
+
+		slog.Info("enqueueing asset", slog.String("id", id))
+
+		if status != db.ProcessStatusTPending {
+			return
+		}
 	}
 
 	j := &jobs.Job{Queue: "asset-processing", Payload: map[string]any{"id": id}}

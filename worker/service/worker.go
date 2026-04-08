@@ -34,7 +34,9 @@ func (s *WorkerServiceServer) NotifyProcessAsset(
 		return
 	}
 
-	quries := db.New(db.Connection())
+	quries, _ := db.Get()
+	defer db.Release()
+
 	processStatus, err := quries.GetAssetProcessStatus(ctx, uuid)
 	if err != nil {
 		err = fmt.Errorf("unable to find asset: %w", err)
@@ -66,7 +68,9 @@ func (s *WorkerServiceServer) NotifyScanCache(
 	ctx context.Context,
 	req *pb.NotifyScanCacheRequest,
 ) (resp *pb.NotifyScanCacheResponse, err error) {
-	quries := db.New(db.Connection())
+	quries, _ := db.Get()
+	defer db.Release()
+
 	assets, err := quries.GetPendingAssets(ctx)
 
 	slog.Info("scan library for unprocessed asset.")
