@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"slices"
+	"time"
 
 	"github.com/davidbyttow/govips/v2/vips"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -21,6 +23,22 @@ const PREVIEW_FILE = "preview.webp"
 const VIEW_FILE = "view.webp"
 const VIEW_SIZE = 2000
 const VIEW_QUALITY = 80
+
+var imageExts = []string{
+	".jpg",
+	".jpeg",
+	".png",
+	".gif",
+	".svg",
+	".tiff",
+	".webp",
+}
+
+var videoExts = []string{
+	".mp4",
+	".m4v",
+	".webm",
+}
 
 func ProcessAsset(ctx context.Context, id string, queries *db.Queries) error {
 	slog.Info("processing asset", slog.String("id", id))
@@ -48,29 +66,19 @@ func ProcessAsset(ctx context.Context, id string, queries *db.Queries) error {
 		return fmt.Errorf("unable to read asset data: %w", err)
 	}
 
-	originalPath := createCacheAssetPath(id, asset.Original)
-	slog.Info("original asset path", slog.String("path", originalPath))
-
-	slog.Info("read original image file.")
-
-	original, err := vips.NewImageFromFile(originalPath)
-	if err != nil {
-		return fmt.Errorf("unable to read original image: %w", err)
-	}
-	originalMeta := original.Metadata()
-	err = populateThumbnail(ctx, &asset, original, originalMeta)
-	if err != nil {
-		return fmt.Errorf("unable to populate thumbnail: %e", err)
-	}
-
-	err = populatePreview(ctx, &asset, original, originalMeta)
-	if err != nil {
-		return fmt.Errorf("unable to populate preview image: %e", err)
-	}
-
-	err = populateView(ctx, &asset, original, originalMeta)
-	if err != nil {
-		return fmt.Errorf("unable to populate view image: %e", err)
+	ext := filepath.Ext(asset.Original)
+	if slices.Contains(imageExts, ext) {
+		err = processImageAsset(ctx, &asset)
+		if err != nil {
+			return fmt.Errorf("unable to process image asset: %w", err)
+		}
+	} else if slices.Contains(videoExts, ext) {
+		err = processVideoAsset(ctx, &asset)
+		if err != nil {
+			return fmt.Errorf("unable to process video asset: %w", err)
+		}
+	} else {
+		asset.DeletedAt = pgtype.Timestamptz{Time: time.Now(), Valid: true}
 	}
 
 	_, err = queries.UpdateAsset(ctx, db.UpdateAssetParams{
@@ -87,6 +95,44 @@ func ProcessAsset(ctx context.Context, id string, queries *db.Queries) error {
 
 	if err != nil {
 		return fmt.Errorf("unable to save image metadata: %w", err)
+	}
+
+	return nil
+}
+
+func processImageAsset(ctx context.Context, asset *db.Asset) error {
+	slog.Info("processing image asset", slog.String("id", asset.ID.String()))
+
+	err := ctx.Err()
+	if err != nil {
+		slog.Info("context.", slog.String("error", err.Error()))
+		return fmt.Errorf("context cancelled: %w", err)
+	}
+
+	id := asset.ID.String()
+	originalPath := createCacheAssetPath(id, asset.Original)
+	slog.Info("original asset path", slog.String("path", originalPath))
+
+	slog.Info("read original image file.")
+
+	original, err := vips.NewImageFromFile(originalPath)
+	if err != nil {
+		return fmt.Errorf("unable to read original image: %w", err)
+	}
+	originalMeta := original.Metadata()
+	err = populateThumbnail(ctx, asset, original, originalMeta)
+	if err != nil {
+		return fmt.Errorf("unable to populate thumbnail: %e", err)
+	}
+
+	err = populatePreview(ctx, asset, original, originalMeta)
+	if err != nil {
+		return fmt.Errorf("unable to populate preview image: %e", err)
+	}
+
+	err = populateView(ctx, asset, original, originalMeta)
+	if err != nil {
+		return fmt.Errorf("unable to populate view image: %e", err)
 	}
 
 	return nil

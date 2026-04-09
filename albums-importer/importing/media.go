@@ -14,6 +14,11 @@ var mediaExtensions = []string{
 	".svg",
 	".tiff",
 	".webp",
+
+	// movie
+	".mp4",
+	".m4v",
+	".webm",
 }
 
 func IsMediaFile(path string) bool {
