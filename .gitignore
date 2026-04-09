@@ -1,3 +1,4 @@
 cache/
 albums-importer/.input
 worker/worker
+db/schema.sql
