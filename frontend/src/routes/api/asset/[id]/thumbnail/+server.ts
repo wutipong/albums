@@ -3,6 +3,8 @@ import { db } from "$lib/server/db";
 import type { RequestHandler } from "./$types";
 import fs from "node:fs/promises";
 
+import notAvailableSvg from "$lib/assets/not-available.svg?raw"
+
 export const GET: RequestHandler = async ({ params }) => {
     const { id } = params;
     const asset = await db.selectFrom('assets')
@@ -12,7 +14,11 @@ export const GET: RequestHandler = async ({ params }) => {
         .executeTakeFirst()
 
     if (!asset || asset.thumbnail === "") {
-        return new Response("Asset not found", { status: 404 });
+        return new Response(notAvailableSvg, {
+            headers: {
+                "Content-Type": "image/svg+xml",
+            }
+        });
     }
 
     const data = await fs.readFile(createCacheAssetPath(id, asset.thumbnail));

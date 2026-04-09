@@ -1,4 +1,4 @@
-\restrict Dbld5d5cf7iYaBNIMge8HnzpstH2NPhAcNax29MLKbboJU6dEixX7LV86laQldO
+\restrict 5r1xhIlseTKWRoykfMnbCd5hYsAfbo5LNhjPHP4aOfzGghGXU1QcKZyinvsFk9q
 
 -- Dumped from database version 18.3 (Debian 18.3-1.pgdg12+1)
 -- Dumped by pg_dump version 18.3 (Debian 18.3-1.pgdg13+1)
@@ -82,7 +82,7 @@ CREATE TABLE public.assets (
 --
 
 CREATE TABLE public.schema_migrations (
-    version character varying(255) NOT NULL
+    version character varying NOT NULL
 );
 
 
@@ -122,7 +122,7 @@ ALTER TABLE ONLY public.assets
 -- PostgreSQL database dump complete
 --
 
-\unrestrict Dbld5d5cf7iYaBNIMge8HnzpstH2NPhAcNax29MLKbboJU6dEixX7LV86laQldO
+\unrestrict 5r1xhIlseTKWRoykfMnbCd5hYsAfbo5LNhjPHP4aOfzGghGXU1QcKZyinvsFk9q
 
 
 --
