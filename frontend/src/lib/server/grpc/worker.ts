@@ -15,3 +15,7 @@ const client: WorkerServiceClient = createClient(
 export async function notifyProcessAsset(id: string){
     return await client.notifyProcessAsset({id: id})
 }
+
+export async function notifyScanCache() {
+    return await client.notifyScanCache({})
+}
