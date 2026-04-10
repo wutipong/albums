@@ -8,6 +8,8 @@
     let thumbnailHeight = $state(0)
     let available = $state(false)
 
+    let preview = $state(false)
+
     onMount( async()=> {
         const resp = await fetch(`/api/asset/${id}/thumbnail/meta/`)
         const obj = await resp.json()
@@ -22,8 +24,12 @@
 </script>
 
 <div 
+    role='button'
+    tabindex='0'
     class={`h-[${thumbnailHeight}px] rounded-xl m-1 overflow-hidden`} 
     style={`width: ${thumbnailWidth}px;`}
+    onmouseenter={()=>preview = true}
+    onmouseleave={()=>preview = false}
 >
     <a 
         href={available? `/api/asset/${id}/view/`: ''} 
@@ -34,7 +40,16 @@
         width={thumbnailWidth}
         height={thumbnailHeight}  
         src={`/api/asset/${id}/thumbnail`} 
-        alt='{id}'>
+        alt='{id}'
+        class:hidden={!preview}
+    >
 
+    <img 
+        width={thumbnailWidth}
+        height={thumbnailHeight}  
+        src={`/api/asset/${id}/preview`} 
+        alt='{id}'
+        class:hidden={preview}
+    >
     </a>
 </div>
