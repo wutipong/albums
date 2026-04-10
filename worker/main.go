@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net"
 	"os"
@@ -40,6 +41,11 @@ func main() {
 	}
 	defer queue.Shutdown(ctx)
 
+	err = processExistingItems(ctx)
+	if err != nil {
+		slog.Error("unable to processing pending items", slog.String("error", err.Error()))
+	}
+
 	address := os.Getenv("WORKER_ADDRESS")
 	if address == "" {
 		slog.Error("invalid address")
@@ -59,4 +65,28 @@ func main() {
 		slog.Error("error running grpc server.", slog.String("error", err.Error()))
 	}
 
+}
+
+func processExistingItems(ctx context.Context) error {
+	quries, _ := db.Get()
+
+	assets, err := quries.GetPendingAssets(ctx)
+	if err != nil {
+		return fmt.Errorf("unable to query pending items: %w", err)
+	}
+
+	slog.Info("scan library for unprocessed asset.")
+
+	slog.Info("pending tasks found", slog.Int("count", len(assets)))
+	if len(assets) == 0 {
+		return nil
+	}
+
+	for _, asset := range assets {
+		slog.Info("adding asset", slog.String("id", asset.ID.String()))
+
+		queue.EnqueueAssetProcessing(ctx, asset.ID.String())
+	}
+
+	return nil
 }

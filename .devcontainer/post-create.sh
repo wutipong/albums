@@ -1,5 +1,5 @@
 apt update -y
-apt install -y libvips-dev libvpx9 libopus0
+apt install -y libvips-dev libvpx9 libopus0 ffmpeg
 
 go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 go install github.com/amacneil/dbmate@latest

@@ -40,41 +40,49 @@ var videoExts = []string{
 	".webm",
 }
 
-func ProcessAsset(ctx context.Context, id string, queries *db.Queries) error {
+func ProcessAsset(ctx context.Context, id string) error {
 	slog.Info("processing asset", slog.String("id", id))
-
-	err := ctx.Err()
-	if err != nil {
-		slog.Info("context.", slog.String("error", err.Error()))
-		return fmt.Errorf("context cancelled: %w", err)
-	}
-
 	var uuid pgtype.UUID
-
-	slog.Info("parsing task id.")
-
-	err = uuid.Scan(id)
+	err := uuid.Scan(id)
 	if err != nil {
-		slog.Info("error parsing uuid.", slog.String("error", err.Error()))
-		return fmt.Errorf("invalid asset id %s: %w", id, err)
+		return fmt.Errorf("unable to parse id: %w", err)
 	}
 
-	slog.Info("get current asset data.")
+	queries, _ := db.Get()
 
 	asset, err := queries.GetAsset(ctx, uuid)
 	if err != nil {
 		return fmt.Errorf("unable to read asset data: %w", err)
 	}
 
+	if asset.ProcessStatus != db.ProcessStatusTPending {
+		return nil
+	}
+
+	asset.ProcessStatus = db.ProcessStatusTProcessing
+
+	asset, err = queries.UpdateAssetProcessStatus(ctx,
+		db.UpdateAssetProcessStatusParams{
+			ID:            uuid,
+			ProcessStatus: db.ProcessStatusTProcessing,
+		},
+	)
+
+	if err != nil {
+		return fmt.Errorf("unable to save image metadata: %w", err)
+	}
+
 	ext := filepath.Ext(asset.Original)
 	if slices.Contains(imageExts, ext) {
 		err = processImageAsset(ctx, &asset)
 		if err != nil {
+			slog.Info("error processing image asset.", slog.String("error", err.Error()))
 			return fmt.Errorf("unable to process image asset: %w", err)
 		}
 	} else if slices.Contains(videoExts, ext) {
 		err = processVideoAsset(ctx, &asset)
 		if err != nil {
+			slog.Info("error proessing video.", slog.String("error", err.Error()))
 			return fmt.Errorf("unable to process video asset: %w", err)
 		}
 	} else {
@@ -94,6 +102,7 @@ func ProcessAsset(ctx context.Context, id string, queries *db.Queries) error {
 	})
 
 	if err != nil {
+		slog.Info("error parsing uuid.", slog.String("error", err.Error()))
 		return fmt.Errorf("unable to save image metadata: %w", err)
 	}
 

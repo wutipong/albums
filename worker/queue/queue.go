@@ -47,38 +47,10 @@ func Init(ctx context.Context) error {
 			return fmt.Errorf("invalid id")
 		}
 
-		var uuid pgtype.UUID
-		err = uuid.Scan(idStr)
+		err = ProcessAsset(ctx, idStr)
 		if err != nil {
-			slog.Info("error parsing uuid", slog.String("id", idStr))
-			return fmt.Errorf("unable to parse id: %w", err)
+			slog.Error("failed to process asset:", slog.String("error", err.Error()))
 		}
-		queries, _ := db.Get()
-
-		asset, err := queries.GetAsset(ctx, uuid)
-		if err != nil {
-			slog.Info("error reading asset.", slog.String("id", idStr))
-			return fmt.Errorf("unable to read asset data: %w", err)
-		}
-
-		if asset.ProcessStatus != db.ProcessStatusTPending {
-			return nil
-		}
-
-		asset.ProcessStatus = db.ProcessStatusTProcessing
-
-		_, err = queries.UpdateAssetProcessStatus(ctx,
-			db.UpdateAssetProcessStatusParams{
-				ID:            uuid,
-				ProcessStatus: db.ProcessStatusTProcessing,
-			},
-		)
-
-		if err != nil {
-			return fmt.Errorf("unable to save image metadata: %w", err)
-		}
-
-		ProcessAsset(ctx, idStr, queries)
 
 		//done <- true
 		return
