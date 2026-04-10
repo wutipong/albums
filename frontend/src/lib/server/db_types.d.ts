@@ -38,8 +38,12 @@ export interface Assets {
   process_status: Generated<ProcessStatusT>;
   size: Generated<Int8>;
   thumbnail: Generated<string>;
+  thumbnail_height: Generated<number>;
+  thumbnail_width: Generated<number>;
   type: Generated<AssetTypeT>;
   view: Generated<string>;
+  view_height: Generated<number>;
+  view_width: Generated<number>;
 }
 
 export interface SchemaMigrations {

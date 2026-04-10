@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+	import AssetThumbnail from '$lib/components/AssetThumbnail.svelte';
 	import type { PageProps } from './$types';
 
 	let { params, data }: PageProps = $props();
@@ -41,8 +42,8 @@
 
 <div class="flex flex-wrap">
 	{#each data.assets as asset (asset)}
-		<div class="m-1 block h-40 grow object-cover">
-			<img src={`/api/asset/${asset}/thumbnail`} alt={asset} class="h-full max-w-full" />
+		<div class="m-1 block h-[200px] grow object-cover">
+			<AssetThumbnail id={asset}></AssetThumbnail>
 		</div>
 	{/each}
 </div>
