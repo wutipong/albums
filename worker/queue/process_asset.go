@@ -128,7 +128,10 @@ func processImageAsset(ctx context.Context, asset *db.Asset) error {
 
 	slog.Info("read original image file.")
 
-	original, err := vips.NewImageFromFile(originalPath)
+	params := vips.NewImportParams()
+	params.NumPages.Set(-1)
+
+	original, err := vips.LoadImageFromFile(originalPath, params)
 	if err != nil {
 		return fmt.Errorf("unable to read original image: %w", err)
 	}
