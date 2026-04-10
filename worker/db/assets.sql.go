@@ -22,7 +22,7 @@ INSERT INTO assets (
 ) VALUES (
   $1, $2, $3, $4, $5, $6
 )
-RETURNING id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status
+RETURNING id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height
 `
 
 type CreateAssetParams struct {
@@ -59,12 +59,16 @@ func (q *Queries) CreateAsset(ctx context.Context, arg CreateAssetParams) (Asset
 		&i.Thumbnail,
 		&i.View,
 		&i.ProcessStatus,
+		&i.ThumbnailWidth,
+		&i.ThumbnailHeight,
+		&i.ViewWidth,
+		&i.ViewHeight,
 	)
 	return i, err
 }
 
 const getAsset = `-- name: GetAsset :one
-SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status FROM assets WHERE id = $1 AND deleted_at IS NULL LIMIT 1
+SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height FROM assets WHERE id = $1 AND deleted_at IS NULL LIMIT 1
 `
 
 func (q *Queries) GetAsset(ctx context.Context, id pgtype.UUID) (Asset, error) {
@@ -85,6 +89,10 @@ func (q *Queries) GetAsset(ctx context.Context, id pgtype.UUID) (Asset, error) {
 		&i.Thumbnail,
 		&i.View,
 		&i.ProcessStatus,
+		&i.ThumbnailWidth,
+		&i.ThumbnailHeight,
+		&i.ViewWidth,
+		&i.ViewHeight,
 	)
 	return i, err
 }
@@ -103,7 +111,7 @@ func (q *Queries) GetAssetProcessStatus(ctx context.Context, id pgtype.UUID) (Pr
 }
 
 const getPendingAssets = `-- name: GetPendingAssets :many
-SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status 
+SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height 
     FROM assets 
     WHERE process_status = 'pending' AND deleted_at IS NULL
 `
@@ -132,6 +140,10 @@ func (q *Queries) GetPendingAssets(ctx context.Context) ([]Asset, error) {
 			&i.Thumbnail,
 			&i.View,
 			&i.ProcessStatus,
+			&i.ThumbnailWidth,
+			&i.ThumbnailHeight,
+			&i.ViewWidth,
+			&i.ViewHeight,
 		); err != nil {
 			return nil, err
 		}
@@ -153,21 +165,29 @@ UPDATE assets SET
   thumbnail = $7,
   view = $8,
   process_status = $9,
-  modified_at = NOW ()
+  modified_at = NOW (),
+  thumbnail_width = $10,
+  thumbnail_height = $11,
+  view_width = $12,
+  view_height = $13
 WHERE id = $1 AND deleted_at IS NULL
-RETURNING id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status
+RETURNING id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height
 `
 
 type UpdateAssetParams struct {
-	ID            pgtype.UUID
-	Filename      string
-	Checksum      string
-	Type          AssetTypeT
-	Original      string
-	Preview       string
-	Thumbnail     string
-	View          string
-	ProcessStatus ProcessStatusT
+	ID              pgtype.UUID
+	Filename        string
+	Checksum        string
+	Type            AssetTypeT
+	Original        string
+	Preview         string
+	Thumbnail       string
+	View            string
+	ProcessStatus   ProcessStatusT
+	ThumbnailWidth  int32
+	ThumbnailHeight int32
+	ViewWidth       int32
+	ViewHeight      int32
 }
 
 func (q *Queries) UpdateAsset(ctx context.Context, arg UpdateAssetParams) (Asset, error) {
@@ -181,6 +201,10 @@ func (q *Queries) UpdateAsset(ctx context.Context, arg UpdateAssetParams) (Asset
 		arg.Thumbnail,
 		arg.View,
 		arg.ProcessStatus,
+		arg.ThumbnailWidth,
+		arg.ThumbnailHeight,
+		arg.ViewWidth,
+		arg.ViewHeight,
 	)
 	var i Asset
 	err := row.Scan(
@@ -198,6 +222,10 @@ func (q *Queries) UpdateAsset(ctx context.Context, arg UpdateAssetParams) (Asset
 		&i.Thumbnail,
 		&i.View,
 		&i.ProcessStatus,
+		&i.ThumbnailWidth,
+		&i.ThumbnailHeight,
+		&i.ViewWidth,
+		&i.ViewHeight,
 	)
 	return i, err
 }
@@ -206,7 +234,7 @@ const updateAssetProcessStatus = `-- name: UpdateAssetProcessStatus :one
 UPDATE assets SET
   process_status = $2
 WHERE id = $1 AND deleted_at IS NULL
-RETURNING id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status
+RETURNING id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height
 `
 
 type UpdateAssetProcessStatusParams struct {
@@ -232,6 +260,10 @@ func (q *Queries) UpdateAssetProcessStatus(ctx context.Context, arg UpdateAssetP
 		&i.Thumbnail,
 		&i.View,
 		&i.ProcessStatus,
+		&i.ThumbnailWidth,
+		&i.ThumbnailHeight,
+		&i.ViewWidth,
+		&i.ViewHeight,
 	)
 	return i, err
 }

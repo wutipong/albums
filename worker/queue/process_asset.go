@@ -90,15 +90,19 @@ func ProcessAsset(ctx context.Context, id string) error {
 	}
 
 	_, err = queries.UpdateAsset(ctx, db.UpdateAssetParams{
-		ID:            uuid,
-		Filename:      asset.Filename,
-		Checksum:      asset.Checksum,
-		Type:          asset.Type,
-		Original:      asset.Original,
-		Preview:       asset.Preview,
-		Thumbnail:     asset.Thumbnail,
-		View:          asset.View,
-		ProcessStatus: db.ProcessStatusTProcessed,
+		ID:              uuid,
+		Filename:        asset.Filename,
+		Checksum:        asset.Checksum,
+		Type:            asset.Type,
+		Original:        asset.Original,
+		Preview:         asset.Preview,
+		Thumbnail:       asset.Thumbnail,
+		View:            asset.View,
+		ProcessStatus:   db.ProcessStatusTProcessed,
+		ThumbnailWidth:  asset.ThumbnailWidth,
+		ThumbnailHeight: asset.ThumbnailHeight,
+		ViewWidth:       asset.ViewWidth,
+		ViewHeight:      asset.ViewHeight,
 	})
 
 	if err != nil {
@@ -163,6 +167,8 @@ func populateView(
 	if originalMeta.Width <= VIEW_SIZE &&
 		originalMeta.Height <= VIEW_SIZE {
 		asset.View = asset.Original
+		asset.ViewWidth = int32(originalMeta.Width)
+		asset.ViewHeight = int32(originalMeta.Height)
 
 		return nil
 	}
@@ -199,6 +205,9 @@ func populateView(
 	}
 
 	asset.View = VIEW_FILE
+	asset.ViewWidth = int32(view.Width())
+	asset.ViewHeight = int32(view.Height())
+
 	return nil
 }
 
@@ -274,6 +283,8 @@ func populateThumbnail(
 		originalMeta.Height <= THUMBNAIL_SIZE &&
 		originalMeta.Pages > 1 {
 		asset.Thumbnail = asset.Original
+		asset.ThumbnailWidth = int32(originalMeta.Width)
+		asset.ThumbnailHeight = int32(originalMeta.Height)
 
 		return nil
 	}
@@ -315,6 +326,9 @@ func populateThumbnail(
 	}
 
 	asset.Thumbnail = THUMBNAIL_FILE
+	asset.ThumbnailWidth = int32(thumbnail.Width())
+	asset.ThumbnailHeight = int32(thumbnail.Height())
+
 	return nil
 }
 

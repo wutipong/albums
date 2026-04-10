@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"strconv"
 
+	"github.com/davidbyttow/govips/v2/vips"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"github.com/wutipong/albums/worker/db"
 )
@@ -71,7 +72,11 @@ func processVideoView(ctx context.Context, asset *db.Asset, info Probe) error {
 	if width <= VIDEO_WIDTH &&
 		height <= VIDEO_HEIGHT &&
 		validateVideo(ctx, info) {
+
 		asset.View = asset.Original
+		asset.ViewWidth = int32(width)
+		asset.ViewHeight = int32(height)
+
 		return nil
 	}
 
@@ -82,7 +87,10 @@ func processVideoView(ctx context.Context, asset *db.Asset, info Probe) error {
 
 	err = ffmpeg.Input(originalPath).
 		Output(viewPath, ffmpeg.KwArgs{
-			"vf":       fmt.Sprintf("scale=%d:%d:force_original_aspect_ratio=decrease", VIDEO_WIDTH, VIDEO_HEIGHT),
+			"vf": fmt.Sprintf(
+				"scale=%d:%d:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2",
+				VIDEO_WIDTH, VIDEO_HEIGHT,
+			),
 			"c:v":      "libx264",
 			"preset":   "superfast",
 			"crf":      "30",
@@ -95,6 +103,20 @@ func processVideoView(ctx context.Context, asset *db.Asset, info Probe) error {
 		return fmt.Errorf("unable to create view asset for video asset: %w", err)
 	}
 
+	probe, err := ffmpeg.Probe(viewPath)
+	if err != nil {
+		return fmt.Errorf("unable to probe original video: %w", err)
+	}
+
+	var viewInfo Probe
+	json.Unmarshal([]byte(probe), &info)
+
+	viewVideoStream, err := viewInfo.Video()
+	if err != nil {
+		return fmt.Errorf("unable to get video stream from video asset: %w", err)
+	}
+	asset.ViewWidth = int32(viewVideoStream.Width)
+	asset.ViewHeight = int32(viewVideoStream.Height)
 	return nil
 }
 
@@ -133,6 +155,14 @@ func processVideoThumbnail(ctx context.Context, asset *db.Asset, info Probe) err
 	if err != nil {
 		return fmt.Errorf("unable to create thumbnail asset for video asset: %w", err)
 	}
+
+	thumbnail, err := vips.NewImageFromFile(thumbnailPath)
+	if err != nil {
+		return fmt.Errorf("unable to read thumbnail image: %w")
+	}
+
+	asset.ThumbnailWidth = int32(thumbnail.Width())
+	asset.ThumbnailHeight = int32(thumbnail.Height())
 
 	return nil
 }

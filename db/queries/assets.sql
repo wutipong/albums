@@ -29,7 +29,11 @@ UPDATE assets SET
   thumbnail = $7,
   view = $8,
   process_status = $9,
-  modified_at = NOW ()
+  modified_at = NOW (),
+  thumbnail_width = $10,
+  thumbnail_height = $11,
+  view_width = $12,
+  view_height = $13
 WHERE id = $1 AND deleted_at IS NULL
 RETURNING *;
 

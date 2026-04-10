@@ -1,4 +1,4 @@
-\restrict 5r1xhIlseTKWRoykfMnbCd5hYsAfbo5LNhjPHP4aOfzGghGXU1QcKZyinvsFk9q
+\restrict duDcUS8ZfdNGhYd08uAB02R3a2awFLnzBkd4dss285tY9y1JlOYCqqe9GuG0hF2
 
 -- Dumped from database version 18.3 (Debian 18.3-1.pgdg12+1)
 -- Dumped by pg_dump version 18.3 (Debian 18.3-1.pgdg13+1)
@@ -73,7 +73,11 @@ CREATE TABLE public.assets (
     preview text DEFAULT ''::text NOT NULL,
     thumbnail text DEFAULT ''::text NOT NULL,
     view text DEFAULT ''::text NOT NULL,
-    process_status public.process_status_t DEFAULT 'pending'::public.process_status_t NOT NULL
+    process_status public.process_status_t DEFAULT 'pending'::public.process_status_t NOT NULL,
+    thumbnail_width integer DEFAULT 0 NOT NULL,
+    thumbnail_height integer DEFAULT 0 NOT NULL,
+    view_width integer DEFAULT 0 NOT NULL,
+    view_height integer DEFAULT 0 NOT NULL
 );
 
 
@@ -122,7 +126,7 @@ ALTER TABLE ONLY public.assets
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 5r1xhIlseTKWRoykfMnbCd5hYsAfbo5LNhjPHP4aOfzGghGXU1QcKZyinvsFk9q
+\unrestrict duDcUS8ZfdNGhYd08uAB02R3a2awFLnzBkd4dss285tY9y1JlOYCqqe9GuG0hF2
 
 
 --
@@ -133,4 +137,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20260405151552'),
     ('20260405162721'),
     ('20260406133102'),
-    ('20260406213309');
+    ('20260406213309'),
+    ('20260410152556');

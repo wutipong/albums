@@ -107,18 +107,22 @@ type Album struct {
 }
 
 type Asset struct {
-	ID            pgtype.UUID
-	AlbumID       pgtype.UUID
-	Filename      string
-	Checksum      string
-	CreatedAt     pgtype.Timestamptz
-	ModifiedAt    pgtype.Timestamptz
-	DeletedAt     pgtype.Timestamptz
-	Size          int64
-	Type          AssetTypeT
-	Original      string
-	Preview       string
-	Thumbnail     string
-	View          string
-	ProcessStatus ProcessStatusT
+	ID              pgtype.UUID
+	AlbumID         pgtype.UUID
+	Filename        string
+	Checksum        string
+	CreatedAt       pgtype.Timestamptz
+	ModifiedAt      pgtype.Timestamptz
+	DeletedAt       pgtype.Timestamptz
+	Size            int64
+	Type            AssetTypeT
+	Original        string
+	Preview         string
+	Thumbnail       string
+	View            string
+	ProcessStatus   ProcessStatusT
+	ThumbnailWidth  int32
+	ThumbnailHeight int32
+	ViewWidth       int32
+	ViewHeight      int32
 }
