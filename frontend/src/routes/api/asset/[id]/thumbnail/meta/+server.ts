@@ -14,11 +14,16 @@ export const GET: RequestHandler = async ({ params }) => {
         .where("assets.deleted_at", "is", null)
         .executeTakeFirst()
 
-    if (!asset || asset.thumbnail === "") {
-        return json({"error": "unable to read asset data"})
+    if (!asset || asset.process_status !== "processed") {
+        return json({
+            "available": false,
+            "thumbnail_width": 267,
+            "thumbnail_height": 200,
+        })
     }
 
     return json({
+        "available": true,
         "thumbnail_width": asset.thumbnail_width,
         "thumbnail_height": asset.thumbnail_height,
     })
