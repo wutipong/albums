@@ -41,7 +41,7 @@
         height={thumbnailHeight}  
         src={`/api/asset/${id}/thumbnail`} 
         alt='{id}'
-        class:hidden={!preview}
+        class:hidden={preview}
     >
 
     <img 
@@ -49,7 +49,7 @@
         height={thumbnailHeight}  
         src={`/api/asset/${id}/preview`} 
         alt='{id}'
-        class:hidden={preview}
+        class:hidden={!preview}
     >
     </a>
 </div>

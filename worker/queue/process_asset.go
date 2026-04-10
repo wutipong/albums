@@ -15,13 +15,15 @@ import (
 )
 
 const THUMBNAIL_FILE = "thumbnail.webp"
-const THUMBNAIL_SIZE = 200
+const THUMBNAIL_WIDTH = 100_000_000 // don't consider the width
+const THUMBNAIL_HEIGHT = 200
 const THUMBNAIL_QUALITY = 60
 
 const PREVIEW_FILE = "preview.webp"
 
 const VIEW_FILE = "view.webp"
-const VIEW_SIZE = 2000
+const VIEW_HEIGHT = 1000
+const VIEW_WIDTH = 100_000_000 // don't consider the width
 const VIEW_QUALITY = 80
 
 var imageExts = []string{
@@ -167,8 +169,7 @@ func populateView(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	if originalMeta.Width <= VIEW_SIZE &&
-		originalMeta.Height <= VIEW_SIZE {
+	if originalMeta.Height <= VIEW_HEIGHT {
 		asset.View = asset.Original
 		asset.ViewWidth = int32(originalMeta.Width)
 		asset.ViewHeight = int32(originalMeta.Height)
@@ -186,11 +187,9 @@ func populateView(
 		return fmt.Errorf("unable to perform auto rotating: %w", err)
 	}
 
-	err = view.ThumbnailWithSize(
-		VIEW_SIZE, VIEW_SIZE, vips.InterestingNone, vips.SizeDown,
-	)
+	err = view.ThumbnailWithSize(VIEW_WIDTH, VIEW_HEIGHT, vips.InterestingNone, vips.SizeDown)
 	if err != nil {
-		return fmt.Errorf("unable to resize preview image")
+		return fmt.Errorf("unable to resize preview image: %w")
 	}
 
 	params := vips.NewWebpExportParams()
@@ -198,7 +197,7 @@ func populateView(
 
 	buf, _, err := view.ExportWebp(params)
 	if err != nil {
-		return fmt.Errorf("unable to write preview image: %w", err)
+		return fmt.Errorf("unable to write view image: %w", err)
 	}
 
 	viewPath := createCacheAssetPath(asset.ID.String(), VIEW_FILE)
@@ -227,10 +226,14 @@ func populatePreview(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	if originalMeta.Width <= THUMBNAIL_SIZE &&
-		originalMeta.Height <= THUMBNAIL_SIZE {
+	if originalMeta.Height <= THUMBNAIL_HEIGHT {
 		asset.Preview = asset.Original
 
+		return nil
+	}
+
+	if originalMeta.Pages == 1 {
+		asset.Preview = asset.Thumbnail
 		return nil
 	}
 
@@ -245,11 +248,9 @@ func populatePreview(
 	}
 
 	err = preview.ThumbnailWithSize(
-		THUMBNAIL_SIZE, THUMBNAIL_SIZE, vips.InterestingNone, vips.SizeDown,
+		THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT,
+		vips.InterestingNone, vips.SizeDown,
 	)
-	if err != nil {
-		return fmt.Errorf("unable to resize preview image")
-	}
 
 	params := vips.NewWebpExportParams()
 	params.Quality = THUMBNAIL_QUALITY
@@ -282,17 +283,19 @@ func populateThumbnail(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	if originalMeta.Width <= THUMBNAIL_SIZE &&
-		originalMeta.Height <= THUMBNAIL_SIZE &&
-		originalMeta.Pages > 1 {
+	if originalMeta.Height <= THUMBNAIL_HEIGHT &&
+		originalMeta.Pages == 1 {
 		asset.Thumbnail = asset.Original
 		asset.ThumbnailWidth = int32(originalMeta.Width)
 		asset.ThumbnailHeight = int32(originalMeta.Height)
 
 		return nil
 	}
-
-	thumbnail, err := original.Copy()
+	originalPath := createCacheAssetPath(asset.ID.String(), asset.Original)
+	thumbnail, err := vips.LoadImageFromFile(originalPath, vips.NewImportParams())
+	if err != nil {
+		return fmt.Errorf("unable to read original image: %w", err)
+	}
 	if err != nil {
 		return fmt.Errorf("unable to copy original: %w", err)
 	}
@@ -302,16 +305,22 @@ func populateThumbnail(
 		return fmt.Errorf("unable to perform auto rotating: %w", err)
 	}
 
+	err = thumbnail.ThumbnailWithSize(
+		THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT,
+		vips.InterestingNone, vips.SizeDown,
+	)
+	if err != nil {
+		return fmt.Errorf("unable to resize image: %w", err)
+	}
+
+	err = thumbnail.ExtractArea(0, 0, thumbnail.Width(), thumbnail.PageHeight())
+	if err != nil {
+		return fmt.Errorf("unable to crop image: %w", err)
+	}
+
 	err = thumbnail.SetPages(1)
 	if err != nil {
 		return fmt.Errorf("unable to set page count: %w", err)
-	}
-
-	err = thumbnail.ThumbnailWithSize(
-		THUMBNAIL_SIZE, THUMBNAIL_SIZE, vips.InterestingNone, vips.SizeDown,
-	)
-	if err != nil {
-		return fmt.Errorf("unable to resize preview image")
 	}
 
 	params := vips.NewWebpExportParams()
