@@ -13,7 +13,7 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"kysely": "kysely-codegen --out-file ./src/lib/server/db_types.d.ts",
-		"protoc" :"protoc --ts_proto_out=./src/lib/server/grpc/proto --ts_proto_opt=outputServices=nice-grpc,outputServices=generic-definitions,useExactTypes=false  -I /workspaces/grpc worker.proto",
+		"protoc": "protoc --ts_proto_out=./src/lib/server/grpc/proto --ts_proto_opt=outputServices=nice-grpc,outputServices=generic-definitions,useExactTypes=false  -I /workspaces/grpc worker.proto",
 		"codegen": "bun run kysely && bun run protoc"
 	},
 	"devDependencies": {
@@ -46,11 +46,13 @@
 		"vite": "^7.3.1"
 	},
 	"dependencies": {
+		"@types/mime-types": "^3.0.1",
 		"@types/pg": "^8.20.0",
 		"bree": "^9.2.9",
 		"bullmq": "^5.73.0",
 		"ioredis": "^5.10.1",
 		"kysely": "^0.28.15",
+		"mime-types": "^3.0.2",
 		"nice-grpc": "^2.1.14",
 		"sharp": "^0.34.5",
 		"svelte-adapter-bun": "^1.0.1"
