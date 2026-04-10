@@ -26,7 +26,7 @@
 <div 
     role='button'
     tabindex='0'
-    class={`h-[${thumbnailHeight}px] rounded-xl m-1 overflow-hidden`} 
+    class={`h-[${thumbnailHeight}px] rounded-xl m-1 overflow-hidden `} 
     style={`width: ${thumbnailWidth}px;`}
     onmouseenter={()=>preview = true}
     onmouseleave={()=>preview = false}
@@ -44,12 +44,17 @@
         class:hidden={preview}
     >
 
+   
+  <div 
+    class:hidden={!preview} 
+    class='border-4 rounded-xl overflow-hidden w-full h-full'>
     <img 
         width={thumbnailWidth}
         height={thumbnailHeight}  
         src={`/api/asset/${id}/preview`} 
         alt='{id}'
-        class:hidden={!preview}
+        class='w-full h-full'
     >
+    </div>
     </a>
 </div>
