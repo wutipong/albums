@@ -26,11 +26,29 @@ func main() {
 		TimeFormat: time.Kitchen,
 	})))
 
+	id := ""
+
 	cmd := &cli.Command{
 		Name:  "albums-importer",
 		Usage: "import assets to albums",
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			return performWork(ctx)
+		},
+		Commands: []*cli.Command{
+			{
+				Name:  "single",
+				Usage: "immediately process single asset",
+				Arguments: []cli.Argument{
+					&cli.StringArg{
+						Name:        "id",
+						UsageText:   "id of the asset to process",
+						Destination: &id,
+					},
+				},
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					return processSingle(ctx, id)
+				},
+			},
 		},
 	}
 
@@ -99,4 +117,14 @@ func processExistingItems(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func processSingle(ctx context.Context, id string) error {
+	err := db.Connect(ctx, os.Getenv("DATABASE_URL"))
+	if err != nil {
+		return fmt.Errorf("unable to connect to the database: %w", err)
+	}
+	defer db.Close(ctx)
+
+	return queue.ProcessAsset(ctx, id)
 }
