@@ -57,10 +57,6 @@ func ProcessAsset(ctx context.Context, id string) error {
 		return fmt.Errorf("unable to read asset data: %w", err)
 	}
 
-	if asset.ProcessStatus != db.ProcessStatusTPending {
-		return nil
-	}
-
 	asset.ProcessStatus = db.ProcessStatusTProcessing
 
 	asset, err = queries.UpdateAssetProcessStatus(ctx,
