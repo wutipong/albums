@@ -69,6 +69,16 @@ export interface NotifyScanCacheRequest {
 export interface NotifyScanCacheResponse {
 }
 
+export interface UpdateAlbumThumbnailRequest {
+  id: string;
+  assetId?: string | undefined;
+}
+
+export interface UpdateAlbumThumbnailResponse {
+  id: string;
+  assetId: string;
+}
+
 function createBaseNotifyProcessAssetResquest(): NotifyProcessAssetResquest {
   return { id: "" };
 }
@@ -289,6 +299,166 @@ export const NotifyScanCacheResponse: MessageFns<NotifyScanCacheResponse> = {
   },
 };
 
+function createBaseUpdateAlbumThumbnailRequest(): UpdateAlbumThumbnailRequest {
+  return { id: "", assetId: undefined };
+}
+
+export const UpdateAlbumThumbnailRequest: MessageFns<UpdateAlbumThumbnailRequest> = {
+  encode(message: UpdateAlbumThumbnailRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.assetId !== undefined) {
+      writer.uint32(18).string(message.assetId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAlbumThumbnailRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAlbumThumbnailRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.assetId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateAlbumThumbnailRequest {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      assetId: isSet(object.assetId)
+        ? globalThis.String(object.assetId)
+        : isSet(object.asset_id)
+        ? globalThis.String(object.asset_id)
+        : undefined,
+    };
+  },
+
+  toJSON(message: UpdateAlbumThumbnailRequest): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.assetId !== undefined) {
+      obj.assetId = message.assetId;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateAlbumThumbnailRequest>): UpdateAlbumThumbnailRequest {
+    return UpdateAlbumThumbnailRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateAlbumThumbnailRequest>): UpdateAlbumThumbnailRequest {
+    const message = createBaseUpdateAlbumThumbnailRequest();
+    message.id = object.id ?? "";
+    message.assetId = object.assetId ?? undefined;
+    return message;
+  },
+};
+
+function createBaseUpdateAlbumThumbnailResponse(): UpdateAlbumThumbnailResponse {
+  return { id: "", assetId: "" };
+}
+
+export const UpdateAlbumThumbnailResponse: MessageFns<UpdateAlbumThumbnailResponse> = {
+  encode(message: UpdateAlbumThumbnailResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.assetId !== "") {
+      writer.uint32(18).string(message.assetId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAlbumThumbnailResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAlbumThumbnailResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.assetId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateAlbumThumbnailResponse {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      assetId: isSet(object.assetId)
+        ? globalThis.String(object.assetId)
+        : isSet(object.asset_id)
+        ? globalThis.String(object.asset_id)
+        : "",
+    };
+  },
+
+  toJSON(message: UpdateAlbumThumbnailResponse): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.assetId !== "") {
+      obj.assetId = message.assetId;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateAlbumThumbnailResponse>): UpdateAlbumThumbnailResponse {
+    return UpdateAlbumThumbnailResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateAlbumThumbnailResponse>): UpdateAlbumThumbnailResponse {
+    const message = createBaseUpdateAlbumThumbnailResponse();
+    message.id = object.id ?? "";
+    message.assetId = object.assetId ?? "";
+    return message;
+  },
+};
+
 /** Worker service definition. */
 export type WorkerServiceDefinition = typeof WorkerServiceDefinition;
 export const WorkerServiceDefinition = {
@@ -313,6 +483,15 @@ export const WorkerServiceDefinition = {
       responseStream: false,
       options: {},
     },
+    /** Update album thumbnail. */
+    updateAlbumThumbnail: {
+      name: "UpdateAlbumThumbnail",
+      requestType: UpdateAlbumThumbnailRequest as typeof UpdateAlbumThumbnailRequest,
+      requestStream: false,
+      responseType: UpdateAlbumThumbnailResponse as typeof UpdateAlbumThumbnailResponse,
+      responseStream: false,
+      options: {},
+    },
   },
 } as const;
 
@@ -327,6 +506,11 @@ export interface WorkerServiceImplementation<CallContextExt = {}> {
     request: NotifyScanCacheRequest,
     context: CallContext & CallContextExt,
   ): Promise<DeepPartial<NotifyScanCacheResponse>>;
+  /** Update album thumbnail. */
+  updateAlbumThumbnail(
+    request: UpdateAlbumThumbnailRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<UpdateAlbumThumbnailResponse>>;
 }
 
 export interface WorkerServiceClient<CallOptionsExt = {}> {
@@ -340,6 +524,11 @@ export interface WorkerServiceClient<CallOptionsExt = {}> {
     request: DeepPartial<NotifyScanCacheRequest>,
     options?: CallOptions & CallOptionsExt,
   ): Promise<NotifyScanCacheResponse>;
+  /** Update album thumbnail. */
+  updateAlbumThumbnail(
+    request: DeepPartial<UpdateAlbumThumbnailRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<UpdateAlbumThumbnailResponse>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;

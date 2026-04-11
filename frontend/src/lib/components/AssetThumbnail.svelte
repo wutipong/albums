@@ -1,5 +1,3 @@
-
-
 <script lang="ts>
     import { onMount } from 'svelte';
     let {id} = $props()
@@ -45,43 +43,44 @@
         href={available? `/api/asset/${id}/view/`: ''} 
         class:disabled={!available} 
     >
-    <div class='relative w-full h-full'>
-        <div 
-            class:hidden={preview} 
-            class='rounded-xl overflow-hidden w-full h-full box-border'
-            style={`width: ${thumbnailWidth}px; height: ${thumbnailHeight}px;`}
-            >
-            <img 
-                width={thumbnailWidth}
-                height={thumbnailHeight}  
-                src={`/api/asset/${id}/thumbnail`} 
-                alt='{id}'
-                class:hidden={preview}
-            >   
-        </div>
+        <div class='relative w-full h-full'>
+            <div 
+                class:hidden={preview} 
+                class='rounded-xl overflow-hidden w-full h-full box-border'
+                style={`width: ${thumbnailWidth}px; height: ${thumbnailHeight}px;`}
+                >
+                <img 
+                    width={thumbnailWidth}
+                    height={thumbnailHeight}  
+                    src={`/api/asset/${id}/thumbnail`} 
+                    alt='{id}'
+                    class:hidden={preview}
+                >   
+            </div>
 
-        <div 
-            class:hidden={!preview} 
-            class='border-4 rounded-xl overflow-hidden w-full h-full box-border'
-            style={`width: ${thumbnailWidth}px; height: ${thumbnailHeight}px;`}
-            >
-            <img 
-                width={thumbnailWidth}
-                height={thumbnailHeight}  
-                src={`/api/asset/${id}/preview`} 
-                alt='{id}'
-                class='w-full h-full'
-            >
-        </div>
+            <div 
+                class:hidden={!preview} 
+                class='border-4 rounded-xl overflow-hidden w-full h-full box-border'
+                style={`width: ${thumbnailWidth}px; height: ${thumbnailHeight}px;`}
+                >
+                <img 
+                    width={thumbnailWidth}
+                    height={thumbnailHeight}  
+                    src={`/api/asset/${id}/preview`} 
+                    alt='{id}'
+                    class='w-full h-full'
+                >
+            </div>
 
-        <div class='absolute top-1 right-2 place-items-end'>
-            {#if assetType === 'video'}
-                <div class='badge' >Video</div>
-            {/if}
+            <div class='absolute top-1 right-2 place-items-end'>
+                {#if assetType === 'video'}
+                    <div class='badge' >Video</div>
+                {/if}
 
-            {#if imageFrames > 1}
-                <div class='badge'> Animation</div>
-            {/if}
+                {#if imageFrames > 1}
+                    <div class='badge'> Animation</div>
+                {/if}
+            </div>
         </div>
     </a>
 </div>

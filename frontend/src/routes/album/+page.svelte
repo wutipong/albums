@@ -1,4 +1,5 @@
 <script lang="ts">
+	import AlbumItem from '$lib/components/AlbumItem.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -14,12 +15,8 @@
 	Scan Cache
 </button>
 
-<ul>
-	{#each data.albums as album (album.id)}
-		<li>
-			<a href={`/album/${album.id}`} class="mb-2 block rounded border p-2">
-				{album.name}
-			</a>
-		</li>
+<div class="grid grid-cols-3 gap-2 bg-base-200">
+  	{#each data.albums as album (album.id)}
+		<AlbumItem id={album.id} title={album.name} />
 	{/each}
-</ul>
+</div>
