@@ -15,7 +15,7 @@
 	Scan Cache
 </button>
 
-<div class="grid grid-cols-3 gap-2 bg-base-200">
+<div class="grid grid-cols-5 xs:grid-cols-1 gap-2 bg-base-200">
   	{#each data.albums as album (album.id)}
 		<AlbumItem {album}/>
 	{/each}
