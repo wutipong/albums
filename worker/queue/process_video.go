@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"log/slog"
 	"strconv"
+	"time"
 
 	"github.com/davidbyttow/govips/v2/vips"
+	"github.com/jackc/pgx/v5/pgtype"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"github.com/wutipong/albums/worker/db"
 )
@@ -36,14 +38,16 @@ func processVideoAsset(ctx context.Context, asset *db.Asset) error {
 	var info Probe
 	json.Unmarshal([]byte(probe), &info)
 
-	err = processVideoPreview(ctx, asset, info)
-	if err != nil {
-		return fmt.Errorf("unable to process video asset preview: %w", err)
-	}
 	err = processVideoThumbnail(ctx, asset, info)
 	if err != nil {
 		return fmt.Errorf("unable to process video asset thumbnail: %w", err)
 	}
+
+	err = processVideoPreview(ctx, asset, info)
+	if err != nil {
+		return fmt.Errorf("unable to process video asset preview: %w", err)
+	}
+
 	err = processVideoView(ctx, asset, info)
 	if err != nil {
 		return fmt.Errorf("unable to process video asset view: %w", err)
@@ -71,7 +75,7 @@ func processVideoView(ctx context.Context, asset *db.Asset, info Probe) error {
 
 	if width <= VIDEO_WIDTH &&
 		height <= VIDEO_HEIGHT &&
-		validateVideo(ctx, info) {
+		isVideoBrowserSafe(info) {
 
 		asset.View = asset.Original
 		asset.ViewWidth = int32(width)
@@ -109,7 +113,7 @@ func processVideoView(ctx context.Context, asset *db.Asset, info Probe) error {
 	}
 
 	var viewInfo Probe
-	json.Unmarshal([]byte(probe), &info)
+	json.Unmarshal([]byte(probe), &viewInfo)
 
 	viewVideoStream, err := viewInfo.Video()
 	if err != nil {
@@ -117,6 +121,7 @@ func processVideoView(ctx context.Context, asset *db.Asset, info Probe) error {
 	}
 	asset.ViewWidth = int32(viewVideoStream.Width)
 	asset.ViewHeight = int32(viewVideoStream.Height)
+
 	return nil
 }
 
@@ -148,7 +153,7 @@ func processVideoThumbnail(ctx context.Context, asset *db.Asset, info Probe) err
 			"quality": fmt.Sprintf("%d", THUMBNAIL_QUALITY),
 			"vf": fmt.Sprintf(
 				"scale=%d:%d:force_original_aspect_ratio=decrease",
-				THUMBNAIL_SIZE, THUMBNAIL_SIZE,
+				THUMBNAIL_HEIGHT, THUMBNAIL_HEIGHT,
 			),
 		}).OverWriteOutput().ErrorToStdOut().Run()
 
@@ -158,12 +163,17 @@ func processVideoThumbnail(ctx context.Context, asset *db.Asset, info Probe) err
 
 	thumbnail, err := vips.NewImageFromFile(thumbnailPath)
 	if err != nil {
-		return fmt.Errorf("unable to read thumbnail image: %w")
+		return fmt.Errorf("unable to read thumbnail image: %w", err)
 	}
 
 	asset.ThumbnailWidth = int32(thumbnail.Width())
 	asset.ThumbnailHeight = int32(thumbnail.Height())
 
+	videoDuration := time.Duration(duration) * time.Second
+	asset.VideoDuration = pgtype.Interval{
+		Microseconds: int64(videoDuration),
+		Valid:        true,
+	}
 	return nil
 }
 
@@ -174,10 +184,10 @@ func processVideoPreview(ctx context.Context, asset *db.Asset, info Probe) error
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	asset.Thumbnail = PREVIEW_FILE
+	asset.Preview = PREVIEW_FILE
 
 	originalPath := createCacheAssetPath(asset.ID.String(), asset.Original)
-	previewPath := createCacheAssetPath(asset.ID.String(), asset.Thumbnail)
+	previewPath := createCacheAssetPath(asset.ID.String(), asset.Preview)
 
 	duration, err := strconv.ParseFloat(info.Format.Duration, 10)
 	if err != nil {
@@ -196,7 +206,7 @@ func processVideoPreview(ctx context.Context, asset *db.Asset, info Probe) error
 			"quality": fmt.Sprintf("%d", THUMBNAIL_QUALITY),
 			"vf": fmt.Sprintf(
 				"fps=5,scale=%d:%d:force_original_aspect_ratio=decrease",
-				THUMBNAIL_SIZE, THUMBNAIL_SIZE,
+				THUMBNAIL_HEIGHT, THUMBNAIL_HEIGHT,
 			),
 		}).OverWriteOutput().ErrorToStdOut().Run()
 

@@ -104,6 +104,7 @@ type Album struct {
 	CreatedAt  pgtype.Timestamptz
 	ModifiedAt pgtype.Timestamptz
 	DeletedAt  pgtype.Timestamptz
+	Cover      pgtype.UUID
 }
 
 type Asset struct {
@@ -125,4 +126,6 @@ type Asset struct {
 	ThumbnailHeight int32
 	ViewWidth       int32
 	ViewHeight      int32
+	ImageFrames     int32
+	VideoDuration   pgtype.Interval
 }

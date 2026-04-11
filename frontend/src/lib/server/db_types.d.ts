@@ -4,6 +4,7 @@
  */
 
 import type { ColumnType } from "kysely";
+import type { IPostgresInterval } from "postgres-interval";
 
 export type AssetTypeT = "animated" | "audio" | "image" | "video";
 
@@ -13,11 +14,14 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
 
 export type Int8 = ColumnType<string, bigint | number | string, bigint | number | string>;
 
+export type Interval = ColumnType<IPostgresInterval, IPostgresInterval | number | string, IPostgresInterval | number | string>;
+
 export type ProcessStatusT = "pending" | "processed" | "processing";
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export interface Albums {
+  cover: string | null;
   created_at: Generated<Timestamp>;
   deleted_at: Timestamp | null;
   id: Generated<string>;
@@ -32,6 +36,7 @@ export interface Assets {
   deleted_at: Timestamp | null;
   filename: string;
   id: Generated<string>;
+  image_frames: Generated<number>;
   modified_at: Generated<Timestamp>;
   original: Generated<string>;
   preview: Generated<string>;
@@ -41,6 +46,7 @@ export interface Assets {
   thumbnail_height: Generated<number>;
   thumbnail_width: Generated<number>;
   type: Generated<AssetTypeT>;
+  video_duration: Generated<Interval>;
   view: Generated<string>;
   view_height: Generated<number>;
   view_width: Generated<number>;

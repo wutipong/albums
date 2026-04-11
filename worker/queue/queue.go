@@ -68,17 +68,15 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 
 	uuid.Scan(id)
 
-	{
-		queries, _ := db.Get()
+	queries, _ := db.Get()
 
-		status, err = queries.GetAssetProcessStatus(ctx, uuid)
-		slog.Info("asset status", slog.Any("status", status))
+	status, err = queries.GetAssetProcessStatus(ctx, uuid)
+	slog.Info("asset status", slog.Any("status", status))
 
-		slog.Info("enqueueing asset", slog.String("id", id))
+	slog.Info("enqueueing asset", slog.String("id", id))
 
-		if status != db.ProcessStatusTPending {
-			return
-		}
+	if status != db.ProcessStatusTPending {
+		return
 	}
 
 	j := &jobs.Job{Queue: "asset-processing", Payload: map[string]any{"id": id}}

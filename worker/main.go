@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/lmittmann/tint"
+	"github.com/urfave/cli/v3"
 	"github.com/wutipong/albums/worker/db"
 	"github.com/wutipong/albums/worker/queue"
 	"github.com/wutipong/albums/worker/service"
@@ -25,36 +26,63 @@ func main() {
 		TimeFormat: time.Kitchen,
 	})))
 
-	ctx := context.Background()
+	id := ""
 
+	cmd := &cli.Command{
+		Name:  "albums-importer",
+		Usage: "import assets to albums",
+		Action: func(ctx context.Context, cmd *cli.Command) error {
+			return performWork(ctx)
+		},
+		Commands: []*cli.Command{
+			{
+				Name:  "single",
+				Usage: "immediately process single asset",
+				Arguments: []cli.Argument{
+					&cli.StringArg{
+						Name:        "id",
+						UsageText:   "id of the asset to process",
+						Destination: &id,
+					},
+				},
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					return processSingle(ctx, id)
+				},
+			},
+		},
+	}
+
+	ctx := context.Background()
+	if err := cmd.Run(ctx, os.Args); err != nil {
+		slog.Error("operation failed", slog.String("error", err.Error()))
+	}
+}
+
+func performWork(ctx context.Context) error {
 	err := db.Connect(ctx, os.Getenv("DATABASE_URL"))
 	if err != nil {
-		slog.Error("unable to conect to database", slog.String("error", err.Error()))
-		return
+		return fmt.Errorf("unable to connect to the database: %w", err)
 	}
 	defer db.Close(ctx)
 
 	err = queue.Init(ctx)
 	if err != nil {
-		slog.Error("unable to start job queue", slog.String("error", err.Error()))
-		return
+		return fmt.Errorf("unable to start job queue: %w", err)
 	}
 	defer queue.Shutdown(ctx)
 
 	err = processExistingItems(ctx)
 	if err != nil {
-		slog.Error("unable to processing pending items", slog.String("error", err.Error()))
+		return fmt.Errorf("unable to processing pending items :%w", err)
 	}
 
 	address := os.Getenv("WORKER_ADDRESS")
 	if address == "" {
-		slog.Error("invalid address")
-		return
+		return fmt.Errorf("invalid worker address")
 	}
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
-		slog.Error("unable to start server", slog.String("error", err.Error()))
-		return
+		return fmt.Errorf("unable to start server: %w", err)
 	}
 	var opts []grpc.ServerOption
 
@@ -62,9 +90,9 @@ func main() {
 	pb.RegisterWorkerServiceServer(grpcServer, &service.WorkerServiceServer{})
 
 	if err := grpcServer.Serve(lis); err != nil {
-		slog.Error("error running grpc server.", slog.String("error", err.Error()))
+		return fmt.Errorf("error running grpc server: %w", err)
 	}
-
+	return nil
 }
 
 func processExistingItems(ctx context.Context) error {
@@ -89,4 +117,14 @@ func processExistingItems(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func processSingle(ctx context.Context, id string) error {
+	err := db.Connect(ctx, os.Getenv("DATABASE_URL"))
+	if err != nil {
+		return fmt.Errorf("unable to connect to the database: %w", err)
+	}
+	defer db.Close(ctx)
+
+	return queue.ProcessAsset(ctx, id)
 }

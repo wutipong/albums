@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"math/rand/v2"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/wutipong/albums/worker/db"
@@ -82,6 +83,67 @@ func (s *WorkerServiceServer) NotifyScanCache(
 		slog.Info("adding asset", slog.String("id", asset.ID.String()))
 
 		queue.EnqueueAssetProcessing(ctx, asset.ID.String())
+	}
+
+	return
+}
+
+func (s *WorkerServiceServer) UpdateAlbumThumbnail(
+	ctx context.Context,
+	req *pb.UpdateAlbumThumbnailRequest,
+) (resp *pb.UpdateAlbumThumbnailResponse, err error) {
+
+	resp = &pb.UpdateAlbumThumbnailResponse{
+		Id: req.Id,
+	}
+	var albumId pgtype.UUID
+	err = albumId.Scan(req.Id)
+	if err != nil {
+		err = fmt.Errorf("invalid album id: %w", err)
+		return
+	}
+	queries, _ := db.Get()
+	_, err = queries.GetAlbum(ctx, albumId)
+	if err != nil {
+		err = fmt.Errorf("album not found: %w", err)
+		return
+	}
+
+	var assetId pgtype.UUID
+
+	if req.AssetId == nil {
+		albumAssets, e := queries.GetAlbumAssets(ctx, albumId)
+		if e != nil {
+			err = fmt.Errorf("unable to retrieved album assets.: %w", e)
+			return
+		}
+
+		if len(albumAssets) == 0 {
+			return
+		}
+		idx := rand.Int() % len(albumAssets)
+		assetId.Scan(albumAssets[idx])
+
+		if err != nil {
+			err = fmt.Errorf("invalid asset id: %w", err)
+			return
+		}
+	} else {
+		err = assetId.Scan(req.AssetId)
+		if err != nil {
+			err = fmt.Errorf("invalid asset id: %w", err)
+			return
+		}
+	}
+
+	_, err = queries.UpdateAlbumThumbnail(ctx, db.UpdateAlbumThumbnailParams{
+		ID:    albumId,
+		Cover: assetId,
+	})
+
+	if err != nil {
+		err = fmt.Errorf("unable to update album data")
+		return
 	}
 
 	return

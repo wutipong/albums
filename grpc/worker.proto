@@ -10,6 +10,9 @@ service WorkerService {
 
   // Notify worker to queue unprocessed asset to processing queue.
   rpc NotifyScanCache(NotifyScanCacheRequest) returns (NotifyScanCacheResponse);
+
+  // Update album thumbnail.
+  rpc UpdateAlbumThumbnail(UpdateAlbumThumbnailRequest) returns (UpdateAlbumThumbnailResponse);
 }
 
 //Status of the asset.
@@ -40,4 +43,12 @@ message NotifyScanCacheResponse {
   // empty
 }
 
+message UpdateAlbumThumbnailRequest {
+  string          id       = 1;
+  optional string asset_id = 2 ;
+}
 
+message UpdateAlbumThumbnailResponse {
+  string id       = 1;
+  string asset_id = 2;
+}

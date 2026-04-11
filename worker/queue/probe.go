@@ -1,8 +1,8 @@
 package queue
 
 import (
-	"context"
 	"fmt"
+	"log/slog"
 	"slices"
 )
 
@@ -27,6 +27,7 @@ type Probe struct {
 }
 
 func (info Probe) Video() (s Stream, err error) {
+	slog.Debug("probe", "info", info)
 	idx := slices.IndexFunc(info.Streams, func(s Stream) bool {
 		return s.CodecType == "video"
 	})
@@ -41,6 +42,7 @@ func (info Probe) Video() (s Stream, err error) {
 }
 
 func (info Probe) Audio() (s Stream, err error) {
+	slog.Debug("probe", "info", info)
 	idx := slices.IndexFunc(info.Streams, func(s Stream) bool {
 		return s.CodecType == "audio"
 	})
@@ -54,18 +56,18 @@ func (info Probe) Audio() (s Stream, err error) {
 	return
 }
 
-func validateVideo(ctx context.Context, info Probe) bool {
+func isVideoBrowserSafe(info Probe) bool {
 	switch info.Format.FormatName {
 	case "mov,mp4,m4a,3gp,3g2,mj2":
-		return validateMP4(ctx, info)
+		return isMP4BrowserSafe(info)
 	case "matroska,webm":
-		return validateWebM(ctx, info)
+		return isWebMBrowserSafe(info)
 	}
 
 	return false
 }
 
-func validateWebM(ctx context.Context, info Probe) bool {
+func isWebMBrowserSafe(info Probe) bool {
 	videoStream, err := info.Video()
 	if err != nil {
 		return false
@@ -94,7 +96,7 @@ func validateWebM(ctx context.Context, info Probe) bool {
 
 }
 
-func validateMP4(ctx context.Context, info Probe) bool {
+func isMP4BrowserSafe(info Probe) bool {
 	videoStreamIdx := slices.IndexFunc(info.Streams, func(s Stream) bool {
 		return s.CodecType == "video"
 	})

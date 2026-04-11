@@ -11,7 +11,8 @@ var conn *pgxpool.Pool
 var queries *Queries
 
 func Connect(ctx context.Context, connection string) error {
-	conn, err := pgxpool.New(ctx, connection)
+	var err error
+	conn, err = pgxpool.New(ctx, connection)
 	if err != nil {
 		return fmt.Errorf("unable to open database connection: %w", err)
 	}
