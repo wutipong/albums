@@ -40,14 +40,20 @@ func Init(ctx context.Context) error {
 
 		j, _ := jobs.FromContext(ctx)
 		id := j.Payload["id"]
-		slog.Info("processing asset", slog.Any("id", id))
+		command := j.Payload["command"]
 
-		idStr, ok := id.(string)
-		if !ok {
-			return fmt.Errorf("invalid id")
+		slog.Info("job", slog.Any("id", id), slog.Any("command", command))
+
+		idStr := id.(string)
+
+		switch command {
+		case "process-asset":
+			err = ProcessAsset(ctx, idStr)
+
+		case "populate-albums-cover":
+			err = PopulateAlbumsCover(ctx)
 		}
 
-		err = ProcessAsset(ctx, idStr)
 		if err != nil {
 			slog.Error("failed to process asset:", slog.String("error", err.Error()))
 		}
@@ -79,7 +85,13 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 		return
 	}
 
-	j := &jobs.Job{Queue: "asset-processing", Payload: map[string]any{"id": id}}
+	j := &jobs.Job{
+		Queue: "asset-processing",
+		Payload: map[string]any{
+			"command": "process-asset",
+			"id":      id,
+		},
+	}
 
 	jobId, err := queue.Enqueue(ctx, j)
 	if err != nil {
@@ -87,7 +99,33 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 		return
 	}
 
-	slog.Info("job added", slog.String("job", jobId))
+	slog.Info(
+		"job added",
+		slog.String("job", jobId),
+		slog.String("command", "process-asset"),
+	)
 
 	return
+}
+
+func EnqueuePopulateAlbumsCover(ctx context.Context) error {
+	j := &jobs.Job{
+		Queue: "asset-processing",
+		Payload: map[string]any{
+			"command": "populate-albums-cover",
+		},
+	}
+
+	jobId, err := queue.Enqueue(ctx, j)
+	if err != nil {
+		return fmt.Errorf("unable to add job: %w", err)
+	}
+
+	slog.Info(
+		"job added",
+		slog.String("job", jobId),
+		slog.String("command", "populate-albums-cover"),
+	)
+
+	return nil
 }

@@ -17,6 +17,6 @@
 
 <div class="grid grid-cols-3 gap-2 bg-base-200">
   	{#each data.albums as album (album.id)}
-		<AlbumItem id={album.id} title={album.name} />
+		<AlbumItem {album}/>
 	{/each}
 </div>

@@ -1,7 +1,8 @@
-import { createCacheAssetPath } from "$lib/server/cache";
+import { createCacheAlbumPath } from "$lib/server/cache";
 import { db } from "$lib/server/db";
 import type { RequestHandler } from "./$types";
 import fs from "node:fs/promises";
+import * as mime from 'mime-types'
 
 import notAvailableSvg from "$lib/assets/not-available-small.svg?raw"
 
@@ -21,17 +22,20 @@ export const GET: RequestHandler = async ({ params }) => {
         });
     }
 
-    return new Response(notAvailableSvg, {
+    const path = createCacheAlbumPath(id, album.cover)
+    const contentType = mime.lookup(path)
+    if (!contentType) {
+        return new Response(notAvailableSvg, {
             headers: {
                 "Content-Type": "image/svg+xml",
             }
         });
+    }
+    const data = await fs.readFile(path);
 
-    // const data = await fs.readFile(createCacheAssetPath(id, album.id));
-
-    // return new Response(data, {
-    //     headers: {
-    //         "Content-Type": "image/webp"
-    //     }
-    // });
+    return new Response(data, {
+        headers: {
+            "Content-Type": contentType,
+        }
+    });
 };

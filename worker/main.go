@@ -29,8 +29,8 @@ func main() {
 	id := ""
 
 	cmd := &cli.Command{
-		Name:  "albums-importer",
-		Usage: "import assets to albums",
+		Name:  "worker",
+		Usage: "process assets to albums",
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			return performWork(ctx)
 		},
@@ -47,6 +47,17 @@ func main() {
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
 					return processSingle(ctx, id)
+				},
+			}, {
+				Name:  "populate-albums-cover",
+				Usage: "update albums without cover with one from randomly picked asset.",
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					err := db.Connect(ctx, os.Getenv("DATABASE_URL"))
+					if err != nil {
+						return fmt.Errorf("unable to connect to the database: %w", err)
+					}
+					defer db.Close(ctx)
+					return queue.PopulateAlbumsCover(ctx)
 				},
 			},
 		},

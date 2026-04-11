@@ -104,7 +104,7 @@ type Album struct {
 	CreatedAt  pgtype.Timestamptz
 	ModifiedAt pgtype.Timestamptz
 	DeletedAt  pgtype.Timestamptz
-	Cover      pgtype.UUID
+	Cover      string
 }
 
 type Asset struct {

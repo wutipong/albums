@@ -21,7 +21,7 @@ export type ProcessStatusT = "pending" | "processed" | "processing";
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export interface Albums {
-  cover: string | null;
+  cover: Generated<string>;
   created_at: Generated<Timestamp>;
   deleted_at: Timestamp | null;
   id: Generated<string>;

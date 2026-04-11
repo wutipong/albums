@@ -22,6 +22,7 @@ export const GET: RequestHandler = async () => {
   const albums = await db.selectFrom('albums')
     .selectAll()
     .where('albums.deleted_at', 'is', null)
+    .orderBy('name', 'asc')
     .execute()
 
   return json({ albums });

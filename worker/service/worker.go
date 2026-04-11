@@ -103,7 +103,7 @@ func (s *WorkerServiceServer) UpdateAlbumThumbnail(
 		return
 	}
 	queries, _ := db.Get()
-	_, err = queries.GetAlbum(ctx, albumId)
+	album, err := queries.GetAlbum(ctx, albumId)
 	if err != nil {
 		err = fmt.Errorf("album not found: %w", err)
 		return
@@ -136,11 +136,12 @@ func (s *WorkerServiceServer) UpdateAlbumThumbnail(
 		}
 	}
 
-	_, err = queries.UpdateAlbumThumbnail(ctx, db.UpdateAlbumThumbnailParams{
-		ID:    albumId,
-		Cover: assetId,
-	})
+	asset, err := queries.GetAsset(ctx, assetId)
+	if err != nil {
+		err = fmt.Errorf("unable to get asset: %w", err)
+	}
 
+	err = queue.SetAlbumCoverFromAsset(ctx, queries, asset, album)
 	if err != nil {
 		err = fmt.Errorf("unable to update album data")
 		return
