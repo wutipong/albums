@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	WorkerService_NotifyProcessAsset_FullMethodName = "/WorkerService/NotifyProcessAsset"
-	WorkerService_NotifyScanCache_FullMethodName    = "/WorkerService/NotifyScanCache"
+	WorkerService_NotifyProcessAsset_FullMethodName   = "/WorkerService/NotifyProcessAsset"
+	WorkerService_NotifyScanCache_FullMethodName      = "/WorkerService/NotifyScanCache"
+	WorkerService_UpdateAlbumThumbnail_FullMethodName = "/WorkerService/UpdateAlbumThumbnail"
 )
 
 // WorkerServiceClient is the client API for WorkerService service.
@@ -33,6 +34,8 @@ type WorkerServiceClient interface {
 	NotifyProcessAsset(ctx context.Context, in *NotifyProcessAssetResquest, opts ...grpc.CallOption) (*NotifyProcessAssetResponse, error)
 	// Notify worker to queue unprocessed asset to processing queue.
 	NotifyScanCache(ctx context.Context, in *NotifyScanCacheRequest, opts ...grpc.CallOption) (*NotifyScanCacheResponse, error)
+	// Update album thumbnail.
+	UpdateAlbumThumbnail(ctx context.Context, in *UpdateAlbumThumbnailRequest, opts ...grpc.CallOption) (*UpdateAlbumThumbnailResponse, error)
 }
 
 type workerServiceClient struct {
@@ -63,6 +66,16 @@ func (c *workerServiceClient) NotifyScanCache(ctx context.Context, in *NotifySca
 	return out, nil
 }
 
+func (c *workerServiceClient) UpdateAlbumThumbnail(ctx context.Context, in *UpdateAlbumThumbnailRequest, opts ...grpc.CallOption) (*UpdateAlbumThumbnailResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateAlbumThumbnailResponse)
+	err := c.cc.Invoke(ctx, WorkerService_UpdateAlbumThumbnail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkerServiceServer is the server API for WorkerService service.
 // All implementations must embed UnimplementedWorkerServiceServer
 // for forward compatibility.
@@ -73,6 +86,8 @@ type WorkerServiceServer interface {
 	NotifyProcessAsset(context.Context, *NotifyProcessAssetResquest) (*NotifyProcessAssetResponse, error)
 	// Notify worker to queue unprocessed asset to processing queue.
 	NotifyScanCache(context.Context, *NotifyScanCacheRequest) (*NotifyScanCacheResponse, error)
+	// Update album thumbnail.
+	UpdateAlbumThumbnail(context.Context, *UpdateAlbumThumbnailRequest) (*UpdateAlbumThumbnailResponse, error)
 	mustEmbedUnimplementedWorkerServiceServer()
 }
 
@@ -88,6 +103,9 @@ func (UnimplementedWorkerServiceServer) NotifyProcessAsset(context.Context, *Not
 }
 func (UnimplementedWorkerServiceServer) NotifyScanCache(context.Context, *NotifyScanCacheRequest) (*NotifyScanCacheResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method NotifyScanCache not implemented")
+}
+func (UnimplementedWorkerServiceServer) UpdateAlbumThumbnail(context.Context, *UpdateAlbumThumbnailRequest) (*UpdateAlbumThumbnailResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateAlbumThumbnail not implemented")
 }
 func (UnimplementedWorkerServiceServer) mustEmbedUnimplementedWorkerServiceServer() {}
 func (UnimplementedWorkerServiceServer) testEmbeddedByValue()                       {}
@@ -146,6 +164,24 @@ func _WorkerService_NotifyScanCache_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkerService_UpdateAlbumThumbnail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAlbumThumbnailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkerServiceServer).UpdateAlbumThumbnail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkerService_UpdateAlbumThumbnail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkerServiceServer).UpdateAlbumThumbnail(ctx, req.(*UpdateAlbumThumbnailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkerService_ServiceDesc is the grpc.ServiceDesc for WorkerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -160,6 +196,10 @@ var WorkerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NotifyScanCache",
 			Handler:    _WorkerService_NotifyScanCache_Handler,
+		},
+		{
+			MethodName: "UpdateAlbumThumbnail",
+			Handler:    _WorkerService_UpdateAlbumThumbnail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

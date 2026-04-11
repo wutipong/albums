@@ -46,6 +46,24 @@ SELECT process_status
 
 -- name: UpdateAssetProcessStatus :one
 UPDATE assets SET
-  process_status = $2
+  process_status = $2,
+  modified_at = NOW()
 WHERE id = $1 AND deleted_at IS NULL
+RETURNING *;
+
+-- name: GetAlbumAssets :many
+SELECT id 
+  FROM assets
+  WHERE album_id = $1 and deleted_at IS NULL;
+
+-- name: GetAlbum :one 
+SELECT * 
+  FROM albums
+  WHERE id = $1 and deleted_at IS NULL;
+
+-- name: UpdateAlbumThumbnail :one
+UPDATE albums SET 
+  cover = $1,
+  modified_at = NOW()
+  WHERE id = $2 AND deleted_at IS NULL
 RETURNING *;

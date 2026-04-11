@@ -352,7 +352,13 @@ func createCacheAssetPath(id string, args ...string) string {
 	topLevelDir := id[0:2]
 	secondLevelDir := id[2:4]
 
-	combined := []string{os.Getenv("CACHE_DIR"), topLevelDir, secondLevelDir, id}
+	combined := []string{
+		os.Getenv("CACHE_DIR"),
+		"assets",
+		topLevelDir,
+		secondLevelDir,
+		id,
+	}
 	combined = append(combined, args...)
 
 	return filepath.Join(combined...)

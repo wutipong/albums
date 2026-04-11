@@ -69,6 +69,52 @@ func (q *Queries) CreateAsset(ctx context.Context, arg CreateAssetParams) (Asset
 	return i, err
 }
 
+const getAlbum = `-- name: GetAlbum :one
+SELECT id, name, created_at, modified_at, deleted_at, cover 
+  FROM albums
+  WHERE id = $1 and deleted_at IS NULL
+`
+
+func (q *Queries) GetAlbum(ctx context.Context, id pgtype.UUID) (Album, error) {
+	row := q.db.QueryRow(ctx, getAlbum, id)
+	var i Album
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.ModifiedAt,
+		&i.DeletedAt,
+		&i.Cover,
+	)
+	return i, err
+}
+
+const getAlbumAssets = `-- name: GetAlbumAssets :many
+SELECT id 
+  FROM assets
+  WHERE album_id = $1 and deleted_at IS NULL
+`
+
+func (q *Queries) GetAlbumAssets(ctx context.Context, albumID pgtype.UUID) ([]pgtype.UUID, error) {
+	rows, err := q.db.Query(ctx, getAlbumAssets, albumID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []pgtype.UUID
+	for rows.Next() {
+		var id pgtype.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAsset = `-- name: GetAsset :one
 SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration FROM assets WHERE id = $1 AND deleted_at IS NULL LIMIT 1
 `
@@ -161,6 +207,33 @@ func (q *Queries) GetPendingAssets(ctx context.Context) ([]Asset, error) {
 	return items, nil
 }
 
+const updateAlbumThumbnail = `-- name: UpdateAlbumThumbnail :one
+UPDATE albums SET 
+  cover = $1,
+  modified_at = NOW()
+  WHERE id = $2 AND deleted_at IS NULL
+RETURNING id, name, created_at, modified_at, deleted_at, cover
+`
+
+type UpdateAlbumThumbnailParams struct {
+	Cover pgtype.UUID
+	ID    pgtype.UUID
+}
+
+func (q *Queries) UpdateAlbumThumbnail(ctx context.Context, arg UpdateAlbumThumbnailParams) (Album, error) {
+	row := q.db.QueryRow(ctx, updateAlbumThumbnail, arg.Cover, arg.ID)
+	var i Album
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.ModifiedAt,
+		&i.DeletedAt,
+		&i.Cover,
+	)
+	return i, err
+}
+
 const updateAsset = `-- name: UpdateAsset :one
 UPDATE assets SET
   filename = $2,
@@ -246,7 +319,8 @@ func (q *Queries) UpdateAsset(ctx context.Context, arg UpdateAssetParams) (Asset
 
 const updateAssetProcessStatus = `-- name: UpdateAssetProcessStatus :one
 UPDATE assets SET
-  process_status = $2
+  process_status = $2,
+  modified_at = NOW()
 WHERE id = $1 AND deleted_at IS NULL
 RETURNING id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration
 `

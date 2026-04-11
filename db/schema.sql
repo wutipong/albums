@@ -1,4 +1,4 @@
-\restrict ulfmImIc3qj9lj2bU63JckqyNP0qESK37lQgQ1FpPSKHHo4pRfib5AUHqIcaGjE
+\restrict gS2J33OkUIrV7I06wU83K5clmDBxKYL3o6tw9t3pEkEHrDf9hC4R7JvBUT8fuGh
 
 -- Dumped from database version 18.3 (Debian 18.3-1.pgdg12+1)
 -- Dumped by pg_dump version 18.3 (Debian 18.3-1.pgdg13+1)
@@ -51,7 +51,8 @@ CREATE TABLE public.albums (
     name text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     modified_at timestamp with time zone DEFAULT now() NOT NULL,
-    deleted_at timestamp with time zone
+    deleted_at timestamp with time zone,
+    cover uuid
 );
 
 
@@ -128,7 +129,7 @@ ALTER TABLE ONLY public.assets
 -- PostgreSQL database dump complete
 --
 
-\unrestrict ulfmImIc3qj9lj2bU63JckqyNP0qESK37lQgQ1FpPSKHHo4pRfib5AUHqIcaGjE
+\unrestrict gS2J33OkUIrV7I06wU83K5clmDBxKYL3o6tw9t3pEkEHrDf9hC4R7JvBUT8fuGh
 
 
 --
@@ -141,4 +142,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20260406133102'),
     ('20260406213309'),
     ('20260410152556'),
-    ('20260411114824');
+    ('20260411114824'),
+    ('20260411141831');
