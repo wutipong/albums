@@ -125,4 +125,6 @@ type Asset struct {
 	ThumbnailHeight int32
 	ViewWidth       int32
 	ViewHeight      int32
+	ImageFrames     int32
+	VideoDuration   pgtype.Interval
 }

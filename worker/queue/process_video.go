@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"log/slog"
 	"strconv"
+	"time"
 
 	"github.com/davidbyttow/govips/v2/vips"
+	"github.com/jackc/pgx/v5/pgtype"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"github.com/wutipong/albums/worker/db"
 )
@@ -119,6 +121,7 @@ func processVideoView(ctx context.Context, asset *db.Asset, info Probe) error {
 	}
 	asset.ViewWidth = int32(viewVideoStream.Width)
 	asset.ViewHeight = int32(viewVideoStream.Height)
+
 	return nil
 }
 
@@ -166,6 +169,11 @@ func processVideoThumbnail(ctx context.Context, asset *db.Asset, info Probe) err
 	asset.ThumbnailWidth = int32(thumbnail.Width())
 	asset.ThumbnailHeight = int32(thumbnail.Height())
 
+	videoDuration := time.Duration(duration) * time.Second
+	asset.VideoDuration = pgtype.Interval{
+		Microseconds: int64(videoDuration),
+		Valid:        true,
+	}
 	return nil
 }
 

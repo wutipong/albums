@@ -33,7 +33,9 @@ UPDATE assets SET
   thumbnail_width = $10,
   thumbnail_height = $11,
   view_width = $12,
-  view_height = $13
+  view_height = $13,
+  image_frames = $14,
+  video_duration = $15
 WHERE id = $1 AND deleted_at IS NULL
 RETURNING *;
 

@@ -101,6 +101,8 @@ func ProcessAsset(ctx context.Context, id string) error {
 		ThumbnailHeight: asset.ThumbnailHeight,
 		ViewWidth:       asset.ViewWidth,
 		ViewHeight:      asset.ViewHeight,
+		ImageFrames:     asset.ImageFrames,
+		VideoDuration:   asset.VideoDuration,
 	})
 
 	if err != nil {
@@ -224,14 +226,19 @@ func populatePreview(
 
 	if originalMeta.Height <= THUMBNAIL_HEIGHT {
 		asset.Preview = asset.Original
+		asset.ImageFrames = 1
 
 		return nil
 	}
 
 	if originalMeta.Pages == 1 {
 		asset.Preview = asset.Thumbnail
+		asset.ImageFrames = 1
+
 		return nil
 	}
+
+	asset.ImageFrames = int32(originalMeta.Pages)
 
 	preview, err := original.Copy()
 	if err != nil {
@@ -247,6 +254,10 @@ func populatePreview(
 		THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT,
 		vips.InterestingNone, vips.SizeDown,
 	)
+
+	if err != nil {
+		return fmt.Errorf("unable to resize image: %w", err)
+	}
 
 	params := vips.NewWebpExportParams()
 	params.Quality = THUMBNAIL_QUALITY
