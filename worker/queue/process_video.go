@@ -75,7 +75,7 @@ func processVideoView(ctx context.Context, asset *db.Asset, info Probe) error {
 
 	if width <= VIDEO_WIDTH &&
 		height <= VIDEO_HEIGHT &&
-		validateVideo(ctx, info) {
+		isVideoBrowserSafe(info) {
 
 		asset.View = asset.Original
 		asset.ViewWidth = int32(width)
@@ -163,7 +163,7 @@ func processVideoThumbnail(ctx context.Context, asset *db.Asset, info Probe) err
 
 	thumbnail, err := vips.NewImageFromFile(thumbnailPath)
 	if err != nil {
-		return fmt.Errorf("unable to read thumbnail image: %w")
+		return fmt.Errorf("unable to read thumbnail image: %w", err)
 	}
 
 	asset.ThumbnailWidth = int32(thumbnail.Width())

@@ -187,7 +187,7 @@ func populateView(
 
 	err = view.ThumbnailWithSize(VIEW_WIDTH, VIEW_HEIGHT, vips.InterestingNone, vips.SizeDown)
 	if err != nil {
-		return fmt.Errorf("unable to resize preview image: %w")
+		return fmt.Errorf("unable to resize preview image: %w", err)
 	}
 
 	params := vips.NewWebpExportParams()
@@ -280,7 +280,7 @@ func populatePreview(
 func populateThumbnail(
 	ctx context.Context,
 	asset *db.Asset,
-	original *vips.ImageRef,
+	_ *vips.ImageRef,
 	originalMeta *vips.ImageMetadata,
 ) error {
 	slog.Info("populating thumbnail media for asset", slog.String("id", asset.ID.String()))
@@ -302,9 +302,6 @@ func populateThumbnail(
 	thumbnail, err := vips.LoadImageFromFile(originalPath, vips.NewImportParams())
 	if err != nil {
 		return fmt.Errorf("unable to read original image: %w", err)
-	}
-	if err != nil {
-		return fmt.Errorf("unable to copy original: %w", err)
 	}
 
 	err = thumbnail.AutoRotate()
