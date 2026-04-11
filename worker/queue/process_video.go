@@ -36,14 +36,16 @@ func processVideoAsset(ctx context.Context, asset *db.Asset) error {
 	var info Probe
 	json.Unmarshal([]byte(probe), &info)
 
-	err = processVideoPreview(ctx, asset, info)
-	if err != nil {
-		return fmt.Errorf("unable to process video asset preview: %w", err)
-	}
 	err = processVideoThumbnail(ctx, asset, info)
 	if err != nil {
 		return fmt.Errorf("unable to process video asset thumbnail: %w", err)
 	}
+
+	err = processVideoPreview(ctx, asset, info)
+	if err != nil {
+		return fmt.Errorf("unable to process video asset preview: %w", err)
+	}
+
 	err = processVideoView(ctx, asset, info)
 	if err != nil {
 		return fmt.Errorf("unable to process video asset view: %w", err)
@@ -109,7 +111,7 @@ func processVideoView(ctx context.Context, asset *db.Asset, info Probe) error {
 	}
 
 	var viewInfo Probe
-	json.Unmarshal([]byte(probe), &info)
+	json.Unmarshal([]byte(probe), &viewInfo)
 
 	viewVideoStream, err := viewInfo.Video()
 	if err != nil {
@@ -174,10 +176,10 @@ func processVideoPreview(ctx context.Context, asset *db.Asset, info Probe) error
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	asset.Thumbnail = PREVIEW_FILE
+	asset.Preview = PREVIEW_FILE
 
 	originalPath := createCacheAssetPath(asset.ID.String(), asset.Original)
-	previewPath := createCacheAssetPath(asset.ID.String(), asset.Thumbnail)
+	previewPath := createCacheAssetPath(asset.ID.String(), asset.Preview)
 
 	duration, err := strconv.ParseFloat(info.Format.Duration, 10)
 	if err != nil {

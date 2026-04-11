@@ -3,6 +3,7 @@ package queue
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"slices"
 )
 
@@ -27,6 +28,7 @@ type Probe struct {
 }
 
 func (info Probe) Video() (s Stream, err error) {
+	slog.Debug("probe", "info", info)
 	idx := slices.IndexFunc(info.Streams, func(s Stream) bool {
 		return s.CodecType == "video"
 	})
@@ -41,6 +43,7 @@ func (info Probe) Video() (s Stream, err error) {
 }
 
 func (info Probe) Audio() (s Stream, err error) {
+	slog.Debug("probe", "info", info)
 	idx := slices.IndexFunc(info.Streams, func(s Stream) bool {
 		return s.CodecType == "audio"
 	})
