@@ -35,26 +35,25 @@
         href={available? `/api/asset/${id}/view/`: ''} 
         class:disabled={!available} 
     >
-        
-    <img 
-        width={thumbnailWidth}
-        height={thumbnailHeight}  
-        src={`/api/asset/${id}/thumbnail`} 
-        alt='{id}'
-        class:hidden={preview}
-    >
-
-   
-  <div 
-    class:hidden={!preview} 
-    class='border-4 rounded-xl overflow-hidden w-full h-full box-border'>
-    <img 
-        width={thumbnailWidth}
-        height={thumbnailHeight}  
-        src={`/api/asset/${id}/preview`} 
-        alt='{id}'
-        class='w-full h-full'
-    >
-    </div>
+        <img 
+            width={thumbnailWidth}
+            height={thumbnailHeight}  
+            src={`/api/asset/${id}/thumbnail`} 
+            alt='{id}'
+            class:hidden={preview}
+        >   
+        <div 
+            class:hidden={!preview} 
+            class='border-4 rounded-xl overflow-hidden w-full h-full box-border'
+            style={`width: ${thumbnailWidth}px; height: ${thumbnailHeight}px;`}
+            >
+            <img 
+                width={thumbnailWidth}
+                height={thumbnailHeight}  
+                src={`/api/asset/${id}/preview`} 
+                alt='{id}'
+                class='w-full h-full'
+            >
+        </div>
     </a>
 </div>
