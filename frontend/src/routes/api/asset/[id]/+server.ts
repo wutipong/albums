@@ -11,9 +11,13 @@ export const GET: RequestHandler = async ({ params }) => {
         .where("assets.deleted_at", "is", null)
         .executeTakeFirst()
 
-    if (!asset) {
-        return new Response("Asset not found", { status: 404 });
+    if (!asset || asset.process_status !== "processed") {
+        return json({
+            "available": false,
+            "thumbnail_width": 267,
+            "thumbnail_height": 200,
+        })
     }
 
-    return json(asset);
+    return json({...asset, available: true});
 };

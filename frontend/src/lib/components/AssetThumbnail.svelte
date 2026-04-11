@@ -11,7 +11,7 @@
     let preview = $state(false)
 
     onMount( async()=> {
-        const resp = await fetch(`/api/asset/${id}/thumbnail/meta/`)
+        const resp = await fetch(`/api/asset/${id}/`)
         const obj = await resp.json()
 
         const TARGET_HEIGHT = 200
@@ -26,7 +26,7 @@
 <div 
     role='button'
     tabindex='0'
-    class={`h-[${thumbnailHeight}px] rounded-xl m-1 overflow-hidden `} 
+    class={`h-[${thumbnailHeight}px] rounded-xl m-1 overflow-hidden`} 
     style={`width: ${thumbnailWidth}px;`}
     onmouseenter={()=>preview = true}
     onmouseleave={()=>preview = false}
@@ -47,7 +47,7 @@
    
   <div 
     class:hidden={!preview} 
-    class='border-4 rounded-xl overflow-hidden w-full h-full'>
+    class='border-4 rounded-xl overflow-hidden w-full h-full box-border'>
     <img 
         width={thumbnailWidth}
         height={thumbnailHeight}  
