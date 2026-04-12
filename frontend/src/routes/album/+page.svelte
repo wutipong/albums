@@ -9,14 +9,23 @@
 	}
 </script>
 
-<div>Album List</div>
+<div class="relative flex flex-col h-screen w-screen">
+	<div class="navbar bg-base-100 shadow-sm">
+		<div class="flex-1">
+			<div class="btn text-xl btn-ghost">Albums</div>
+		</div>
+		<div class="flex-none">
+			<ul class="menu menu-horizontal px-1">
+				<li><a href="/album">Albums</a></li>
+			</ul>
+		</div>
+	</div>
 
-<button onclick={notifyScanCache} class="mb-4 rounded bg-blue-500 px-4 py-2 text-white">
-	Scan Cache
-</button>
-
-<div class="grid grid-cols-3 xs:grid-cols-1 gap-2 bg-base-200">
-  	{#each data.albums as album (album.id)}
-		<AlbumItem {album}/>
-	{/each}
+	<div class="overflow-auto">
+		<div class="grid grid-cols-1 gap-2 bg-base-300 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 flex-wrap">
+			{#each data.albums as album (album.id)}
+				<AlbumItem {album} />
+			{/each}
+		</div>
+	</div>
 </div>
