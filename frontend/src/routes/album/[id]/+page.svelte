@@ -1,5 +1,6 @@
 <script lang="ts">
 	import AssetThumbnail from '$lib/components/AssetThumbnail.svelte';
+	import ItemViewer from '$lib/components/ItemViewer.svelte'
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -12,3 +13,5 @@
 		<AssetThumbnail id={asset}></AssetThumbnail>
 	{/each}
 </div>
+
+<ItemViewer id={data.assets[0]}></ItemViewer>
