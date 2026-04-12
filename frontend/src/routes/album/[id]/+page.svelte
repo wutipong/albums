@@ -4,17 +4,26 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	let currentId = $derived(data.assets[0]);
+	let viewer: ItemViewer;
+	let showViewer = $state(false)
 </script>
 
-<div class="relative h-screen w-screen flex flex-col">
+<div class="relative flex h-screen w-screen flex-col">
 	<div class="text-xl font-bold">Album {data.name}</div>
 
 	<div class="overflow-auto">
 		<div class="flex flex-wrap bg-base-300">
 			{#each data.assets as asset (asset)}
-				<AssetThumbnail id={asset}></AssetThumbnail>
+				<AssetThumbnail
+					id={asset}
+					onclick={(id: string) => {
+						currentId = id;
+						showViewer = true;
+					}}
+				/>
 			{/each}
 		</div>
 	</div>
-	<ItemViewer id={data.assets[0]}></ItemViewer>
+	<ItemViewer id={currentId} bind:show={showViewer} ></ItemViewer>
 </div>
