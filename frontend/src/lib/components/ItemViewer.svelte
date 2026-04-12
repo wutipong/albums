@@ -1,7 +1,15 @@
 <script lang="ts">
-	import { mdiClose, mdiDotsVertical, mdiDownload } from '@mdi/js';
+	import { mdiChevronLeft, mdiChevronRight, mdiClose, mdiDotsVertical } from '@mdi/js';
 	import Icon from 'mdi-svelte';
-	let { id = $bindable(''), show = $bindable(false), menu } = $props();
+	let {
+		id = $bindable(''),
+		show = $bindable(false),
+		next,
+		previous,
+		hasNext = false,
+		hasPrevious = false,
+		menu
+	} = $props();
 </script>
 
 {#if show}
@@ -12,6 +20,22 @@
 		<div class="h-full w-full">
 			<img src={`/api/asset/${id}/view`} alt={id} class="m-auto h-full w-full object-contain" />
 		</div>
+
+		<button
+			class="btn absolute top-1/2 left-4 btn-circle -translate-y-1/2 btn-ghost btn-lg"
+			class:btn-disabled={!hasPrevious}
+			onclick={() => {previous()}}
+		>
+			<Icon path={mdiChevronLeft} />
+		</button>
+
+		<button
+			class="btn absolute top-1/2 right-4 btn-circle -translate-y-1/2 btn-ghost btn-lg"
+			class:btn-disabled={!hasNext}
+			onclick={() => {next()}}
+		>
+			<Icon path={mdiChevronRight} />
+		</button>
 
 		<button
 			class="btn absolute top-4 right-4 btn-circle btn-ghost btn-lg"
