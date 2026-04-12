@@ -37,21 +37,23 @@ func Init(ctx context.Context) error {
 
 	// create a handler that listens for new job on the "greetings" queue
 	h := handler.New("asset-processing", func(ctx context.Context) (err error) {
-
 		j, _ := jobs.FromContext(ctx)
-		id := j.Payload["id"]
 		command := j.Payload["command"]
-
-		slog.Info("job", slog.Any("id", id), slog.Any("command", command))
-
-		idStr := id.(string)
-
 		switch command {
 		case "process-asset":
-			err = ProcessAsset(ctx, idStr)
+			{
+				id := j.Payload["id"]
+				idStr := id.(string)
+				slog.Info("job", slog.Any("id", id), slog.Any("command", command))
+				err = ProcessAsset(ctx, idStr)
+			}
 
-		case "populate-albums-cover":
-			err = PopulateAlbumsCover(ctx)
+		case "populate-album-cover":
+			err = PopulateAlbumCover(
+				ctx,
+				j.Payload["albumId"].(string),
+				j.Payload["assetId"].(string),
+			)
 		}
 
 		if err != nil {
@@ -108,11 +110,13 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 	return
 }
 
-func EnqueuePopulateAlbumsCover(ctx context.Context) error {
+func EnqueuePopulateAlbumsCover(ctx context.Context, albumId string, assetId string) error {
 	j := &jobs.Job{
 		Queue: "asset-processing",
 		Payload: map[string]any{
-			"command": "populate-albums-cover",
+			"command": "populate-album-cover",
+			"albumId": albumId,
+			"assetId": assetId,
 		},
 	}
 
@@ -124,7 +128,9 @@ func EnqueuePopulateAlbumsCover(ctx context.Context) error {
 	slog.Info(
 		"job added",
 		slog.String("job", jobId),
-		slog.String("command", "populate-albums-cover"),
+		slog.String("albumId", albumId),
+		slog.String("assetId", assetId),
+		slog.String("command", "populate-album-cover"),
 	)
 
 	return nil

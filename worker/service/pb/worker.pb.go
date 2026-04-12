@@ -246,7 +246,7 @@ func (*NotifyScanCacheResponse) Descriptor() ([]byte, []int) {
 type UpdateAlbumThumbnailRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	AssetId       *string                `protobuf:"bytes,2,opt,name=asset_id,json=assetId,proto3,oneof" json:"asset_id,omitempty"`
+	AssetId       string                 `protobuf:"bytes,2,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -289,8 +289,8 @@ func (x *UpdateAlbumThumbnailRequest) GetId() string {
 }
 
 func (x *UpdateAlbumThumbnailRequest) GetAssetId() string {
-	if x != nil && x.AssetId != nil {
-		return *x.AssetId
+	if x != nil {
+		return x.AssetId
 	}
 	return ""
 }
@@ -358,11 +358,10 @@ const file_worker_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12$\n" +
 	"\x06status\x18\x02 \x01(\x0e2\f.AssetStatusR\x06status\"\x18\n" +
 	"\x16NotifyScanCacheRequest\"\x19\n" +
-	"\x17NotifyScanCacheResponse\"Z\n" +
+	"\x17NotifyScanCacheResponse\"H\n" +
 	"\x1bUpdateAlbumThumbnailRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
-	"\basset_id\x18\x02 \x01(\tH\x00R\aassetId\x88\x01\x01B\v\n" +
-	"\t_asset_id\"I\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\basset_id\x18\x02 \x01(\tR\aassetId\"I\n" +
 	"\x1cUpdateAlbumThumbnailResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
 	"\basset_id\x18\x02 \x01(\tR\aassetId*9\n" +
@@ -419,7 +418,6 @@ func file_worker_proto_init() {
 	if File_worker_proto != nil {
 		return
 	}
-	file_worker_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

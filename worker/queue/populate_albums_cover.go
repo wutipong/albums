@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"github.com/davidbyttow/govips/v2/vips"
+	"github.com/jackc/pgx/v5/pgtype"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"github.com/wutipong/albums/worker/db"
 )
@@ -27,16 +28,7 @@ func PopulateAlbumsCover(ctx context.Context) error {
 	}
 
 	for _, album := range albums {
-		asset, err := queries.GetRandomAlbumAsset(ctx, album.ID)
-		if err != nil {
-			slog.Error(
-				"unable to retrive random asset",
-				slog.String("error", err.Error()),
-			)
-			continue
-		}
-
-		err = SetAlbumCoverFromAsset(ctx, queries, asset, album)
+		err = PopulateAlbumCover(ctx, album.ID.String(), "")
 
 		if err != nil {
 			slog.Error(
@@ -51,7 +43,52 @@ func PopulateAlbumsCover(ctx context.Context) error {
 	return nil
 }
 
-func SetAlbumCoverFromAsset(ctx context.Context, queries *db.Queries, asset db.Asset, album db.Album) error {
+func PopulateAlbumCover(ctx context.Context, albumId string, assetId string) error {
+	queries, _ := db.Get()
+
+	var albumIdUUID pgtype.UUID
+	err := albumIdUUID.Scan(albumId)
+	if err != nil {
+		return fmt.Errorf("unable to parse album id: %w")
+	}
+
+	album, err := queries.GetAlbum(ctx, albumIdUUID)
+
+	var asset db.Asset
+	if albumId == "" {
+		var assetIdUUID pgtype.UUID
+		err = assetIdUUID.Scan(assetId)
+		if err != nil {
+			return fmt.Errorf("unable to parse asset id: %w", err)
+		}
+		asset, err = queries.GetAsset(ctx, assetIdUUID)
+	} else {
+		asset, err = queries.GetRandomAlbumAsset(ctx, album.ID)
+		if err != nil {
+			return fmt.Errorf("unable to retrive random asset: %w", err)
+
+		}
+	}
+
+	err = SetAlbumCoverFromAsset(ctx, queries, asset, album)
+
+	if err != nil {
+		slog.Error(
+			"unable to update album cover",
+			slog.Any("id", album.ID),
+			slog.String("error", err.Error()),
+		)
+	}
+
+	return nil
+}
+
+func SetAlbumCoverFromAsset(
+	ctx context.Context,
+	queries *db.Queries,
+	asset db.Asset,
+	album db.Album,
+) error {
 	var err error
 	switch asset.Type {
 	case "image":

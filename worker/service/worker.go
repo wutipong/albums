@@ -93,45 +93,13 @@ func (s *WorkerServiceServer) UpdateAlbumThumbnail(
 ) (resp *pb.UpdateAlbumThumbnailResponse, err error) {
 
 	resp = &pb.UpdateAlbumThumbnailResponse{
-		Id: req.Id,
-	}
-	var albumId pgtype.UUID
-	err = albumId.Scan(req.Id)
-	if err != nil {
-		err = fmt.Errorf("invalid album id: %w", err)
-		return
-	}
-	queries, _ := db.Get()
-	album, err := queries.GetAlbum(ctx, albumId)
-	if err != nil {
-		err = fmt.Errorf("album not found: %w", err)
-		return
+		Id:      req.Id,
+		AssetId: req.AssetId,
 	}
 
-	var assetId pgtype.UUID
-	var asset db.Asset
-	if req.AssetId == nil || *req.AssetId == "" {
-		asset, err = queries.GetRandomAlbumAsset(ctx, albumId)
-		if err != nil {
-			err = fmt.Errorf("unable to retrieved album assets.: %w", err)
-			return
-		}
-	} else {
-		err = assetId.Scan(req.AssetId)
-		if err != nil {
-			err = fmt.Errorf("invalid asset id: %w", err)
-			return
-		}
-		asset, err = queries.GetAsset(ctx, assetId)
-		if err != nil {
-			err = fmt.Errorf("unable to retrieved album assets.: %w", err)
-			return
-		}
-	}
-
-	err = queue.SetAlbumCoverFromAsset(ctx, queries, asset, album)
+	err = queue.EnqueuePopulateAlbumsCover(ctx, req.Id, req.AssetId)
 	if err != nil {
-		err = fmt.Errorf("unable to update album data")
+		err = fmt.Errorf("unable to unque popluate album cover.")
 		return
 	}
 

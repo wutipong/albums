@@ -44,8 +44,8 @@ message NotifyScanCacheResponse {
 }
 
 message UpdateAlbumThumbnailRequest {
-  string          id       = 1;
-  optional string asset_id = 2 ;
+  string id       = 1;
+  string asset_id = 2 ;
 }
 
 message UpdateAlbumThumbnailResponse {
