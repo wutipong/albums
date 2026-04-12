@@ -1,12 +1,20 @@
 <script lang="ts">
 	import AssetThumbnail from '$lib/components/AssetThumbnail.svelte';
 	import ItemViewer from '$lib/components/ItemViewer.svelte';
+	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
+	import { mdiDownload, mdiImageAlbum } from '@mdi/js';
 
-	let { data }: PageProps = $props();
+	let { data, params }: PageProps = $props();
 	let currentId = $derived(data.assets[0]);
-	let viewer: ItemViewer;
-	let showViewer = $state(false)
+	let showViewer = $state(false);
+
+	async function setAlbumCover(albumId :string, assetId :string){
+		await fetch(`/api/album/${albumId}/cover`, {
+			method: "POST",
+			body: JSON.stringify({asset_id: assetId})
+		})
+	}
 </script>
 
 <div class="relative flex h-screen w-screen flex-col">
@@ -25,5 +33,17 @@
 			{/each}
 		</div>
 	</div>
-	<ItemViewer id={currentId} bind:show={showViewer} ></ItemViewer>
+	<ItemViewer id={currentId} bind:show={showViewer} menu={viewMenu}></ItemViewer>
 </div>
+
+{#snippet viewMenu()}
+	<a href={`/api/asset/${currentId}/original/`} target="_blank" class="btn btn-soft">
+		<Icon path={mdiDownload} /> Download.
+	</a>
+
+	<button class="btn btn-soft"
+		onclick={()=>{setAlbumCover(params.id, currentId)}}
+	>
+		<Icon path={mdiImageAlbum} /> Set as album cover.
+	</button>
+{/snippet}

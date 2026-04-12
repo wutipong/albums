@@ -49,13 +49,13 @@ func PopulateAlbumCover(ctx context.Context, albumId string, assetId string) err
 	var albumIdUUID pgtype.UUID
 	err := albumIdUUID.Scan(albumId)
 	if err != nil {
-		return fmt.Errorf("unable to parse album id: %w")
+		return fmt.Errorf("unable to parse album id: %w", err)
 	}
 
 	album, err := queries.GetAlbum(ctx, albumIdUUID)
 
 	var asset db.Asset
-	if albumId == "" {
+	if assetId != "" {
 		var assetIdUUID pgtype.UUID
 		err = assetIdUUID.Scan(assetId)
 		if err != nil {

@@ -45,6 +45,7 @@ export const GET: RequestHandler = async ({ params }) => {
 export const POST: RequestHandler = async ({ params, request }) => {
     const { id } = params;
     const input = await request.json()
+
     try {
         await notifyUpdateAlbumCover(id, input.asset_id)
     } catch {
