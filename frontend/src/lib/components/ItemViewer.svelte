@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { mdiClose, mdiDotsVertical } from '@mdi/js';
+	import { mdiClose, mdiDotsVertical, mdiDownload } from '@mdi/js';
 	import Icon from 'mdi-svelte';
 	let { id, show = $bindable(false) } = $props();
 </script>
@@ -23,11 +23,12 @@
 		<div class="fab">
 			<!-- a focusable div with tabindex is necessary to work on all browsers. role="button" is necessary for accessibility -->
 			<div tabindex="0" role="button" class="btn btn-circle btn-ghost btn-lg">
-				<Icon path={mdiDotsVertical}/>
+				<Icon path={mdiDotsVertical} />
 			</div>
 
-			<!-- buttons that show up when FAB is open -->
-			<button class="btn btn-circle btn-lg">A</button>
+			<a href={`/api/asset/${id}/original/`} target="_blank" class="btn btn-circle btn-lg">
+				<Icon path={mdiDownload} />
+			</a>
 			<button class="btn btn-circle btn-lg">B</button>
 			<button class="btn btn-circle btn-lg">C</button>
 		</div>

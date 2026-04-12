@@ -1,11 +1,9 @@
 import { createCacheAssetPath } from "$lib/server/cache";
-import { db } from "$lib/server/db";
-import type { RequestHandler } from "./$types";
+import { db } from "$lib/server/db"
+import * as mime from "mime-types"
 import fs from "node:fs/promises";
-import * as mime from 'mime-types'
-
-import notAvailableSvg from "$lib/assets/not-available.svg?raw"
 import path from "node:path";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ params }) => {
     const { id } = params;
@@ -16,15 +14,11 @@ export const GET: RequestHandler = async ({ params }) => {
         .executeTakeFirst()
 
     if (!asset || asset.thumbnail === "") {
-        return new Response(notAvailableSvg, {
-            headers: {
-                "Content-Type": "image/svg+xml",
-            }
-        });
+        return new Response("Asset not found", { status: 404 });
     }
-    const filePath = createCacheAssetPath(id, asset.thumbnail)
-    const data = await fs.readFile(filePath);
 
+    const filePath = createCacheAssetPath(id, asset.original)
+    const data = await fs.readFile(filePath);
     const contentType = mime.lookup(path.basename(filePath))
     if (!contentType) {
         return new Response("unable to determine asset content-type", { status: 404 });
@@ -32,7 +26,7 @@ export const GET: RequestHandler = async ({ params }) => {
 
     return new Response(data, {
         headers: {
-            "Content-Type": contentType
+            "Content-Type": contentType,
         }
     });
 };
