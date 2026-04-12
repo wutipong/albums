@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"os"
 
 	"github.com/acaloiaro/neoq"
-	"github.com/acaloiaro/neoq/backends/memory"
+	"github.com/acaloiaro/neoq/backends/postgres"
 	"github.com/acaloiaro/neoq/handler"
 	"github.com/acaloiaro/neoq/jobs"
 	"github.com/davidbyttow/govips/v2/vips"
@@ -24,12 +25,10 @@ func Init(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("unable to initialize vips")
 	}
+
 	queue, err = neoq.New(ctx,
-		neoq.WithBackend(memory.Backend),
-		// neoq.WithRecoveryCallback(func(ctx context.Context, err error) error {
-		// 	slog.Error("error processing task", slog.String("error", err.Error()))
-		// 	return nil
-		// }),
+		neoq.WithBackend(postgres.Backend),
+		postgres.WithConnectionString(os.Getenv("DATABASE_URL")),
 	)
 	if err != nil {
 		return fmt.Errorf("unable to initialize queue")
