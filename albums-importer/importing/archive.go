@@ -46,6 +46,11 @@ func ProcessArchive(
 		return fmt.Errorf("failed to process archive %s: %w", albumPath, err)
 	}
 
+	_, err = api.PopulateAlbumCover(ctx, server, album.ID)
+	if err != nil {
+		return fmt.Errorf("failed to queue populate album cover: %w", err)
+	}
+
 	return nil
 }
 

@@ -4,6 +4,7 @@ import {
     WorkerServiceDefinition,
 } from '$lib/server/grpc/proto/worker';
 import { env } from '$env/dynamic/private';
+import { idText } from 'typescript';
 
 const channel = createChannel(`http://${env.WORKER_ADDRESS ?? "localhost:7173"}`);
 
@@ -18,4 +19,11 @@ export async function notifyProcessAsset(id: string){
 
 export async function notifyScanCache() {
     return await client.notifyScanCache({})
+}
+
+export async function notifyUpdateAlbumCover(albumId: string, assetId?: string){
+    return await client.updateAlbumThumbnail({
+        id: albumId,
+        assetId: assetId,
+    })
 }

@@ -57,8 +57,11 @@ export const POST: RequestHandler = async ({ request }) => {
         await fs.mkdir(createCacheAssetPath(asset.id, "original"), { recursive: true });
         await fs.writeFile(createCacheAssetPath(asset.id, "original", basename), buffer);
 
-        notifyProcessAsset(asset.id)
-
+        try{
+            await notifyProcessAsset(asset.id)
+        } catch{
+            return json({ asset, success: true, warning: "failed to queue asset processing." });
+        }
         return json({ asset, success: true });
     } catch (err) {
         console.error(err);

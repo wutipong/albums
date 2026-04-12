@@ -109,5 +109,15 @@ func ProcessDirectory(
 
 		slog.Info("uploaded asset", slog.Any("asset", asset))
 	}
+
+	slog.Info("notify populate album cover",
+		slog.String("album", album.Name),
+		slog.String("id", album.ID),
+	)
+
+	_, err = api.PopulateAlbumCover(ctx, server, album.ID)
+	if err != nil {
+		return fmt.Errorf("failed to queue populate album cover: %w", err)
+	}
 	return nil
 }

@@ -30,8 +30,33 @@ type CreateAlbumRequest struct {
 	Name string `json:"name"`
 }
 
-func CreateAlbum(ctx context.Context, server ServerConfig, name string) (resp types.Album, err error) {
+func CreateAlbum(
+	ctx context.Context,
+	server ServerConfig,
+	name string,
+) (resp types.Album, err error) {
 	req := CreateAlbumRequest{Name: name}
 	resp, err = Post[types.Album](ctx, server, path.Join("api", "album"), req)
+	return
+}
+
+type PopulateAlbumCoverRequest struct {
+	AssetID string `json:"asset_id"`
+}
+
+type PopulateAlbumCoverResponse struct {
+	Status string `json:"status"`
+}
+
+func PopulateAlbumCover(
+	ctx context.Context,
+	server ServerConfig,
+	albumID string,
+) (resp PopulateAlbumCoverResponse, err error) {
+	req := PopulateAlbumCoverRequest{
+		AssetID: "",
+	}
+	resp, err = Post[PopulateAlbumCoverResponse](
+		ctx, server, path.Join("api", "album", albumID, "cover"), req)
 	return
 }

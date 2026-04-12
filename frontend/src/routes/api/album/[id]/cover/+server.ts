@@ -5,6 +5,8 @@ import fs from "node:fs/promises";
 import * as mime from 'mime-types'
 
 import notAvailableSvg from "$lib/assets/not-available-small.svg?raw"
+import { notifyUpdateAlbumCover } from "$lib/server/grpc/worker";
+import { json } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ params }) => {
     const { id } = params;
@@ -39,3 +41,14 @@ export const GET: RequestHandler = async ({ params }) => {
         }
     });
 };
+
+export const POST: RequestHandler = async ({ params, request }) => {
+    const { id } = params;
+    const input = await request.json()
+    try {
+        await notifyUpdateAlbumCover(id, input.asset_id)
+    } catch {
+        return json({ success: false })
+    }
+    return json({ success: true })
+}
