@@ -14,7 +14,10 @@
 			"version": 18
 		},
 		"ghcr.io/devcontainers-extra/features/act:1": {},
-		"ghcr.io/devcontainers-extra/features/protoc:1": {}
+		"ghcr.io/devcontainers-extra/features/protoc:1": {},
+		"ghcr.io/devcontainers/features/python:1": {
+			"version": "3.11"
+		}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// This can be used to network with other containers or with the host.
