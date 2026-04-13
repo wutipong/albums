@@ -2,3 +2,8 @@ cache/
 albums-importer/.input
 worker/worker
 db/schema.sql
+clip/.venv
+clip/dist
+clip/clip.egg-info
+clip/.eggs
+clip/__pycache__

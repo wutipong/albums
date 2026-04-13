@@ -6,7 +6,7 @@ option go_package = "/service/pb";
 service WorkerService {
 
   // Notify worker to process specific asset.
-  rpc NotifyProcessAsset(NotifyProcessAssetResquest) returns (NotifyProcessAssetResponse);
+  rpc NotifyProcessAsset(EncodeTextInput) returns (NotifyProcessAssetResponse);
 
   // Notify worker to queue unprocessed asset to processing queue.
   rpc NotifyScanCache(NotifyScanCacheRequest) returns (NotifyScanCacheResponse);
