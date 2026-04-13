@@ -1,43 +1,26 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	let { id, onclick = (id: string) => {} } = $props();
+	let { asset, onclick = (id: string) => {} } = $props();
 
-	let thumbnailWidth = $state(0);
-	let thumbnailHeight = $state(0);
-	let available = $state(false);
-	let videoDuration = $state('');
-	let imageFrames = $state(1);
-	let assetType = $state('image');
+	const TARGET_HEIGHT = 200;
 
 	let preview = $state(false);
+	let thumbnailWidth = $derived((TARGET_HEIGHT * asset.thumbnail_width) / asset.thumbnail_height);
+	let thumbnailHeight = TARGET_HEIGHT;
+	let assetType = $derived(asset.type);
+	let videoDuration = $derived(asset.video_duration.toString());
+	let imageFrames = $derived(asset.image_frames);
 
-	onMount(async () => {
-		const resp = await fetch(`/api/asset/${id}/`);
-		const obj = await resp.json();
-
-		const TARGET_HEIGHT = 200;
-		const ratio = TARGET_HEIGHT / obj.thumbnail_height;
-
-		thumbnailWidth = obj.thumbnail_width * ratio;
-		thumbnailHeight = TARGET_HEIGHT;
-		available = obj.available;
-
-		assetType = obj.type;
-		videoDuration = obj.video_duration.toString();
-		imageFrames = obj.image_frames;
-	});
+	$inspect(asset.video_duration)
 </script>
 
-<a
-	role="button"
+<button
 	tabindex="0"
-    href="#"
-	class={`block h-[${thumbnailHeight}px] m-1 overflow-hidden rounded-xl`}
+	class={`block h-[${thumbnailHeight}px] m-1 overflow-hidden rounded-xl cursor-pointer`}
 	style={`width: ${thumbnailWidth}px;`}
 	onmouseenter={() => (preview = true)}
 	onmouseleave={() => (preview = false)}
 	onclick={() => {
-		onclick(id);
+		onclick(asset);
 	}}
 >
 	<div class="relative h-full w-full">
@@ -49,8 +32,8 @@
 			<img
 				width={thumbnailWidth}
 				height={thumbnailHeight}
-				src={`/api/asset/${id}/thumbnail`}
-				alt={id}
+				src={`/api/asset/${asset.id}/thumbnail`}
+				alt={asset.id}
 				class:hidden={preview}
 			/>
 		</div>
@@ -63,8 +46,8 @@
 			<img
 				width={thumbnailWidth}
 				height={thumbnailHeight}
-				src={`/api/asset/${id}/preview`}
-				alt={id}
+				src={`/api/asset/${asset.id}/preview`}
+				alt={asset.id}
 				class="h-full w-full"
 			/>
 		</div>
@@ -79,4 +62,4 @@
 			{/if}
 		</div>
 	</div>
-</a>
+</button>

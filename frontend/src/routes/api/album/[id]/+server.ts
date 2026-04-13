@@ -23,10 +23,8 @@ export const GET: RequestHandler = async ({ params }) => {
         .orderBy('filename', 'asc')
         .execute()
 
-    const ids = assets.map(asset => asset.id);
-
     return json({
         ...album,
-        assets: ids
+        assets,
     })
 }

@@ -3,7 +3,7 @@
 	import ItemViewer from '$lib/components/ItemViewer.svelte';
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
-	import { mdiDownload, mdiImageAlbum, mdiMenu } from '@mdi/js';
+	import { mdiDownload, mdiImageAlbum } from '@mdi/js';
 
 	let { data, params }: PageProps = $props();
 	let currentId = $state('');
@@ -45,7 +45,7 @@
 		else hasPrevious = true;
 
 		currentIndex = index;
-		currentId = data.assets[index];
+		currentId = data.assets[index].id;
 	}
 </script>
 
@@ -64,8 +64,8 @@
 		<div class="flex flex-wrap bg-base-300">
 			{#each data.assets as asset, index (asset)}
 				<AssetThumbnail
-					id={asset}
-					onclick={(id: string) => {
+					{asset}
+					onclick={(asset: any) => {
 						onIndexUpdated(index);
 						showViewer = true;
 					}}
