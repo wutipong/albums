@@ -7,9 +7,10 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"time"
 
-	"github.com/davidbyttow/govips/v2/vips"
+	vips "github.com/cshum/vipsgen/vips816"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/wutipong/albums/worker/db"
 )
@@ -42,6 +43,22 @@ var videoExts = []string{
 	".webm",
 }
 
+var animationExts = []string{
+	".gif",
+	".webm",
+}
+
+func hasVideoExt(ext string) bool {
+	return slices.Contains(videoExts, strings.ToLower(ext))
+}
+
+func hasImageExt(ext string) bool {
+	return slices.Contains(imageExts, strings.ToLower(ext))
+}
+func hasAnimationExt(ext string) bool {
+	return slices.Contains(animationExts, strings.ToLower(ext))
+}
+
 func ProcessAsset(ctx context.Context, id string) error {
 	slog.Info("processing asset", slog.String("id", id))
 	var uuid pgtype.UUID
@@ -71,13 +88,13 @@ func ProcessAsset(ctx context.Context, id string) error {
 	}
 
 	ext := filepath.Ext(asset.Original)
-	if slices.Contains(imageExts, ext) {
+	if hasImageExt(ext) {
 		err = processImageAsset(ctx, &asset)
 		if err != nil {
 			slog.Info("error processing image asset.", slog.String("error", err.Error()))
 			return fmt.Errorf("unable to process image asset: %w", err)
 		}
-	} else if slices.Contains(videoExts, ext) {
+	} else if hasVideoExt(ext) {
 		err = processVideoAsset(ctx, &asset)
 		if err != nil {
 			slog.Info("error proessing video.", slog.String("error", err.Error()))
@@ -128,25 +145,28 @@ func processImageAsset(ctx context.Context, asset *db.Asset) error {
 
 	slog.Info("read original image file.")
 
-	params := vips.NewImportParams()
-	params.NumPages.Set(-1)
+	params := vips.DefaultLoadOptions()
+	if hasAnimationExt(filepath.Ext(asset.Original)) {
+		params.N = -1
+	}
 
-	original, err := vips.LoadImageFromFile(originalPath, params)
+	original, err := vips.NewImageFromFile(originalPath, params)
 	if err != nil {
 		return fmt.Errorf("unable to read original image: %w", err)
 	}
-	originalMeta := original.Metadata()
-	err = populateThumbnail(ctx, asset, original, originalMeta)
+	defer original.Close()
+
+	err = populateThumbnail(ctx, asset, original)
 	if err != nil {
 		return fmt.Errorf("unable to populate thumbnail: %e", err)
 	}
 
-	err = populatePreview(ctx, asset, original, originalMeta)
+	err = populatePreview(ctx, asset, original)
 	if err != nil {
 		return fmt.Errorf("unable to populate preview image: %e", err)
 	}
 
-	err = populateView(ctx, asset, original, originalMeta)
+	err = populateView(ctx, asset, original)
 	if err != nil {
 		return fmt.Errorf("unable to populate view image: %e", err)
 	}
@@ -157,8 +177,7 @@ func processImageAsset(ctx context.Context, asset *db.Asset) error {
 func populateView(
 	ctx context.Context,
 	asset *db.Asset,
-	original *vips.ImageRef,
-	originalMeta *vips.ImageMetadata,
+	original *vips.Image,
 ) error {
 	slog.Info("populating view media for asset", slog.String("id", asset.ID.String()))
 
@@ -167,33 +186,39 @@ func populateView(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	if originalMeta.Height <= VIEW_HEIGHT {
+	if original.Height() <= VIEW_HEIGHT {
 		asset.View = asset.Original
-		asset.ViewWidth = int32(originalMeta.Width)
-		asset.ViewHeight = int32(originalMeta.Height)
+		asset.ViewWidth = int32(original.Width())
+		asset.ViewHeight = int32(original.Height())
 
 		return nil
 	}
 
-	view, err := original.Copy()
+	view, err := original.Copy(nil)
 	if err != nil {
 		return fmt.Errorf("unable to copy original: %w", err)
 	}
+	defer view.Close()
 
-	err = view.AutoRotate()
+	err = view.Autorot(nil)
 	if err != nil {
 		return fmt.Errorf("unable to perform auto rotating: %w", err)
 	}
 
-	err = view.ThumbnailWithSize(VIEW_WIDTH, VIEW_HEIGHT, vips.InterestingNone, vips.SizeDown)
+	options := vips.DefaultThumbnailImageOptions()
+	options.Height = THUMBNAIL_HEIGHT
+	options.Crop = vips.InterestingNone
+	options.Size = vips.SizeDown
+
+	err = view.ThumbnailImage(VIEW_WIDTH, options)
 	if err != nil {
 		return fmt.Errorf("unable to resize preview image: %w", err)
 	}
 
-	params := vips.NewWebpExportParams()
-	params.Quality = THUMBNAIL_QUALITY
+	params := vips.DefaultWebpsaveBufferOptions()
+	params.Q = THUMBNAIL_QUALITY
+	buf, err := view.WebpsaveBuffer(params)
 
-	buf, _, err := view.ExportWebp(params)
 	if err != nil {
 		return fmt.Errorf("unable to write view image: %w", err)
 	}
@@ -214,8 +239,7 @@ func populateView(
 func populatePreview(
 	ctx context.Context,
 	asset *db.Asset,
-	original *vips.ImageRef,
-	originalMeta *vips.ImageMetadata,
+	original *vips.Image,
 ) error {
 	slog.Info("populating preview media for asset", slog.String("id", asset.ID.String()))
 
@@ -224,45 +248,50 @@ func populatePreview(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	if originalMeta.Height <= THUMBNAIL_HEIGHT {
+	if original.Height() <= THUMBNAIL_HEIGHT {
 		asset.Preview = asset.Original
 		asset.ImageFrames = 1
 
 		return nil
 	}
 
-	if originalMeta.Pages == 1 {
+	if original.Pages() == 1 {
 		asset.Preview = asset.Thumbnail
 		asset.ImageFrames = 1
 
 		return nil
 	}
 
-	asset.ImageFrames = int32(originalMeta.Pages)
+	asset.ImageFrames = int32(original.Pages())
 
-	preview, err := original.Copy()
+	preview, err := original.Copy(nil)
 	if err != nil {
 		return fmt.Errorf("unable to copy original: %w", err)
 	}
+	defer preview.Close()
 
-	err = preview.AutoRotate()
+	err = preview.Autorot(nil)
 	if err != nil {
 		return fmt.Errorf("unable to perform auto rotating: %w", err)
 	}
 
-	err = preview.ThumbnailWithSize(
-		THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT,
-		vips.InterestingNone, vips.SizeDown,
+	options := vips.DefaultThumbnailImageOptions()
+	options.Height = THUMBNAIL_HEIGHT
+	options.Crop = vips.InterestingNone
+	options.Size = vips.SizeDown
+
+	err = preview.ThumbnailImage(
+		THUMBNAIL_WIDTH, options,
 	)
 
 	if err != nil {
 		return fmt.Errorf("unable to resize image: %w", err)
 	}
 
-	params := vips.NewWebpExportParams()
-	params.Quality = THUMBNAIL_QUALITY
+	params := vips.DefaultWebpsaveBufferOptions()
+	params.Q = THUMBNAIL_QUALITY
 
-	buf, _, err := preview.ExportWebp(params)
+	buf, err := preview.WebpsaveBuffer(params)
 	if err != nil {
 		return fmt.Errorf("unable to write preview image: %w", err)
 	}
@@ -280,8 +309,7 @@ func populatePreview(
 func populateThumbnail(
 	ctx context.Context,
 	asset *db.Asset,
-	_ *vips.ImageRef,
-	originalMeta *vips.ImageMetadata,
+	original *vips.Image,
 ) error {
 	slog.Info("populating thumbnail media for asset", slog.String("id", asset.ID.String()))
 
@@ -290,47 +318,38 @@ func populateThumbnail(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	if originalMeta.Height <= THUMBNAIL_HEIGHT &&
-		originalMeta.Pages == 1 {
+	if original.Height() <= THUMBNAIL_HEIGHT &&
+		original.Pages() == 1 {
 		asset.Thumbnail = asset.Original
-		asset.ThumbnailWidth = int32(originalMeta.Width)
-		asset.ThumbnailHeight = int32(originalMeta.Height)
+		asset.ThumbnailWidth = int32(original.Width())
+		asset.ThumbnailHeight = int32(original.Height())
 
 		return nil
 	}
-	originalPath := createCacheAssetPath(asset.ID.String(), asset.Original)
-	thumbnail, err := vips.LoadImageFromFile(originalPath, vips.NewImportParams())
-	if err != nil {
-		return fmt.Errorf("unable to read original image: %w", err)
-	}
 
-	err = thumbnail.AutoRotate()
+	originalPath := createCacheAssetPath(asset.ID.String(), asset.Original)
+	thumbnail, _ := vips.NewImageFromFile(originalPath, nil)
+	defer thumbnail.Close()
+
+	err = thumbnail.Autorot(nil)
 	if err != nil {
 		return fmt.Errorf("unable to perform auto rotating: %w", err)
 	}
 
-	err = thumbnail.ThumbnailWithSize(
-		THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT,
-		vips.InterestingNone, vips.SizeDown,
-	)
+	options := vips.DefaultThumbnailImageOptions()
+	options.Height = THUMBNAIL_HEIGHT
+	options.Crop = vips.InterestingNone
+	options.Size = vips.SizeDown
+
+	err = thumbnail.ThumbnailImage(THUMBNAIL_WIDTH, options)
 	if err != nil {
 		return fmt.Errorf("unable to resize image: %w", err)
 	}
 
-	err = thumbnail.ExtractArea(0, 0, thumbnail.Width(), thumbnail.PageHeight())
-	if err != nil {
-		return fmt.Errorf("unable to crop image: %w", err)
-	}
+	params := vips.DefaultWebpsaveBufferOptions()
+	params.Q = THUMBNAIL_QUALITY
 
-	err = thumbnail.SetPages(1)
-	if err != nil {
-		return fmt.Errorf("unable to set page count: %w", err)
-	}
-
-	params := vips.NewWebpExportParams()
-	params.Quality = THUMBNAIL_QUALITY
-
-	buf, _, err := thumbnail.ExportWebp(params)
+	buf, err := thumbnail.WebpsaveBuffer(params)
 	if err != nil {
 		return fmt.Errorf("unable to write preview image: %w", err)
 	}

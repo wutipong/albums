@@ -10,7 +10,6 @@ import (
 	"github.com/acaloiaro/neoq/backends/postgres"
 	"github.com/acaloiaro/neoq/handler"
 	"github.com/acaloiaro/neoq/jobs"
-	"github.com/davidbyttow/govips/v2/vips"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/wutipong/albums/worker/db"
 )
@@ -21,10 +20,6 @@ var queue neoq.Neoq
 
 func Init(ctx context.Context) error {
 	var err error
-	err = vips.Startup(nil)
-	if err != nil {
-		return fmt.Errorf("unable to initialize vips")
-	}
 
 	queue, err = neoq.New(ctx,
 		neoq.WithBackend(postgres.Backend),
@@ -67,7 +62,6 @@ func Init(ctx context.Context) error {
 
 func Shutdown(ctx context.Context) {
 	queue.Shutdown(ctx)
-	vips.Shutdown()
 }
 
 func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessStatusT, err error) {

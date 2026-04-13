@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/davidbyttow/govips/v2/vips"
+	vips "github.com/cshum/vipsgen/vips816"
 	"github.com/jackc/pgx/v5/pgtype"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"github.com/wutipong/albums/worker/db"
@@ -128,8 +128,7 @@ func populateAlbumCoverFromImageAsset(
 	originalPath := createCacheAssetPath(assetId, asset.Original)
 	slog.Info("original asset path", slog.String("path", originalPath))
 
-	params := vips.NewImportParams()
-	cover, err := vips.LoadImageFromFile(originalPath, params)
+	cover, err := vips.NewImageFromFile(originalPath, nil)
 	if err != nil {
 		return fmt.Errorf("unable to read image: %w", err)
 	}
@@ -166,7 +165,7 @@ func populateAlbumCoverFromVideoAsset(ctx context.Context, album *db.Album, asse
 			"quality": fmt.Sprintf("%d", THUMBNAIL_QUALITY),
 		}).OverWriteOutput().ErrorToStdOut().Run()
 
-	image, err := vips.NewImageFromReader(buffer)
+	image, err := vips.NewImageFromBuffer(buffer.Bytes(), nil)
 	if err != nil {
 		return fmt.Errorf("unable to read image from ffmpeg output: %w", err)
 	}
@@ -176,18 +175,18 @@ func populateAlbumCoverFromVideoAsset(ctx context.Context, album *db.Album, asse
 	return writeAlbumCover(err, image, album)
 }
 
-func writeAlbumCover(err error, cover *vips.ImageRef, album *db.Album) error {
-	err = cover.AutoRotate()
+func writeAlbumCover(err error, cover *vips.Image, album *db.Album) error {
+	err = cover.Autorot(nil)
 	if err != nil {
 		return fmt.Errorf("unable to perform auto rotating: %w", err)
 	}
 
-	err = cover.ThumbnailWithSize(
-		ALBUM_COVER_WIDTH,
-		ALBUM_COVER_HEIGHT,
-		vips.InterestingAttention,
-		vips.SizeBoth,
-	)
+	options := vips.DefaultThumbnailImageOptions()
+	options.Height = ALBUM_COVER_HEIGHT
+	options.Crop = vips.InterestingAttention
+	options.Size = vips.SizeBoth
+
+	err = cover.ThumbnailImage(ALBUM_COVER_WIDTH, options)
 	if err != nil {
 		return fmt.Errorf("unable to resize preview image: %w", err)
 	}
@@ -199,10 +198,10 @@ func writeAlbumCover(err error, cover *vips.ImageRef, album *db.Album) error {
 		return fmt.Errorf("unable to reate directory: %w", err)
 	}
 
-	saveParams := vips.NewWebpExportParams()
-	saveParams.Quality = THUMBNAIL_QUALITY
+	saveParams := vips.DefaultWebpsaveBufferOptions()
+	saveParams.Q = THUMBNAIL_QUALITY
 
-	buf, _, err := cover.ExportWebp(saveParams)
+	buf, err := cover.WebpsaveBuffer(saveParams)
 	if err != nil {
 		return fmt.Errorf("unable to write preview image: %w", err)
 	}
