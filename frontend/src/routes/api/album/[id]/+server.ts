@@ -20,6 +20,7 @@ export const GET: RequestHandler = async ({ params }) => {
         .selectAll()
         .where('album_id', '=', album.id)
         .where('deleted_at', 'is', null)
+        .orderBy('filename', 'asc')
         .execute()
 
     const ids = assets.map(asset => asset.id);
