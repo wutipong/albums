@@ -180,7 +180,7 @@ func processImageAsset(ctx context.Context, asset *db.Asset) error {
 		return fmt.Errorf("unable to populate view image: %e", err)
 	}
 
-	err = populateImageEmbedding(ctx, asset, original)
+	err = PopulateImageEmbedding(ctx, asset, original)
 	if err != nil {
 		return fmt.Errorf("unable to populate image embedding: %w", err)
 	}
@@ -380,7 +380,7 @@ func populateThumbnail(
 	return nil
 }
 
-func populateImageEmbedding(
+func PopulateImageEmbedding(
 	ctx context.Context,
 	asset *db.Asset,
 	_ *vips.Image,

@@ -59,6 +59,12 @@ func main() {
 					defer db.Close(ctx)
 					return queue.PopulateAlbumsCover(ctx)
 				},
+			}, {
+				Name:  "populate-image-embedding",
+				Usage: "update image embedding for all assets.",
+				Action: func(ctx context.Context, c *cli.Command) error {
+					return populateImageEmbeddings(ctx)
+				},
 			},
 		},
 	}
@@ -125,6 +131,54 @@ func processExistingItems(ctx context.Context) error {
 		slog.Info("adding asset", slog.String("id", asset.ID.String()))
 
 		queue.EnqueueAssetProcessing(ctx, asset.ID.String())
+	}
+
+	return nil
+}
+
+func populateImageEmbeddings(ctx context.Context) error {
+	err := db.Connect(ctx, os.Getenv("DATABASE_URL"))
+	if err != nil {
+		return fmt.Errorf("unable to connect to the database: %w", err)
+	}
+	defer db.Close(ctx)
+
+	queries, _ := db.Get()
+	assets, err := queries.GetImageAssetsWithoutEmbedding(ctx)
+	if err != nil {
+		return fmt.Errorf("unable to retrieve assets with embedding missing :%w", err)
+	}
+
+	for _, asset := range assets {
+		err = queue.PopulateImageEmbedding(ctx, &asset, nil)
+		if err != nil {
+			slog.Error("unable to populate embedding", slog.String("error", err.Error()))
+			continue
+		}
+
+		_, err = queries.UpdateAsset(ctx, db.UpdateAssetParams{
+			ID:              asset.ID,
+			Filename:        asset.Filename,
+			Checksum:        asset.Checksum,
+			Type:            asset.Type,
+			Original:        asset.Original,
+			Preview:         asset.Preview,
+			Thumbnail:       asset.Thumbnail,
+			View:            asset.View,
+			ProcessStatus:   db.ProcessStatusTProcessed,
+			ThumbnailWidth:  asset.ThumbnailWidth,
+			ThumbnailHeight: asset.ThumbnailHeight,
+			ViewWidth:       asset.ViewWidth,
+			ViewHeight:      asset.ViewHeight,
+			ImageFrames:     asset.ImageFrames,
+			VideoDuration:   asset.VideoDuration,
+			ImageEmbedding:  asset.ImageEmbedding,
+		})
+
+		if err != nil {
+			slog.Error("update asset fails.", slog.String("error", err.Error()))
+			return fmt.Errorf("unable to save image metadata: %w", err)
+		}
 	}
 
 	return nil

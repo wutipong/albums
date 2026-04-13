@@ -22,6 +22,14 @@ WHERE
     process_status = 'pending'
     AND deleted_at IS NULL;
 
+-- name: GetImageAssetsWithoutEmbedding :many
+SELECT *
+FROM assets
+WHERE
+    type = 'image'
+    AND deleted_at IS NULL
+    AND image_embedding IS NULL;
+
 -- name: UpdateAsset :one
 UPDATE assets
 SET

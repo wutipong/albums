@@ -197,6 +197,57 @@ func (q *Queries) GetAssetProcessStatus(ctx context.Context, id pgtype.UUID) (Pr
 	return process_status, err
 }
 
+const getImageAssetsWithoutEmbedding = `-- name: GetImageAssetsWithoutEmbedding :many
+SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
+FROM assets
+WHERE
+    type = 'image'
+    AND deleted_at IS NULL
+    AND image_embedding IS NULL
+`
+
+func (q *Queries) GetImageAssetsWithoutEmbedding(ctx context.Context) ([]Asset, error) {
+	rows, err := q.db.Query(ctx, getImageAssetsWithoutEmbedding)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Asset
+	for rows.Next() {
+		var i Asset
+		if err := rows.Scan(
+			&i.ID,
+			&i.AlbumID,
+			&i.Filename,
+			&i.Checksum,
+			&i.CreatedAt,
+			&i.ModifiedAt,
+			&i.DeletedAt,
+			&i.Size,
+			&i.Type,
+			&i.Original,
+			&i.Preview,
+			&i.Thumbnail,
+			&i.View,
+			&i.ProcessStatus,
+			&i.ThumbnailWidth,
+			&i.ThumbnailHeight,
+			&i.ViewWidth,
+			&i.ViewHeight,
+			&i.ImageFrames,
+			&i.VideoDuration,
+			&i.ImageEmbedding,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getPendingAssets = `-- name: GetPendingAssets :many
 SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 FROM assets
