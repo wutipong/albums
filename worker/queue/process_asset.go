@@ -206,7 +206,7 @@ func populateView(
 	}
 
 	options := vips.DefaultThumbnailImageOptions()
-	options.Height = THUMBNAIL_HEIGHT
+	options.Height = VIEW_HEIGHT
 	options.Crop = vips.InterestingNone
 	options.Size = vips.SizeDown
 
