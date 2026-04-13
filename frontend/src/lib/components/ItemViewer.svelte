@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { mdiChevronLeft, mdiChevronRight, mdiClose, mdiDotsVertical } from '@mdi/js';
 	import Icon from 'mdi-svelte';
+	import 'vidstack/bundle';
+
 	let {
-		asset = $bindable({id:'<placeholder>'}),
+		asset = $bindable({ id: '<placeholder>' }),
 		show = $bindable(false),
 		next,
 		previous,
@@ -17,14 +19,31 @@
 		role="presentation"
 		class="absolute top-0 right-0 bottom-0 left-0 backdrop-blur-lg backdrop-brightness-50"
 	>
-		<div class="h-full w-full">
-			<img src={`/api/asset/${asset.id}/view`} alt={asset.id} class="m-auto h-full w-full object-contain" />
-		</div>
-
+		{#if asset.type === 'image'}
+			<div class="h-full w-full">
+				<img
+					src={`/api/asset/${asset.id}/view`}
+					alt={asset.id}
+					class="m-auto h-full w-full object-contain"
+				/>
+			</div>
+		{/if}
+		{#if asset.type === 'video'}
+			<media-player
+				class="h-full w-full"
+				title={asset.original}
+				src={`/api/asset/${asset.id}/view`}
+			>
+				<media-provider class="h-full w-full object-contain"></media-provider>
+				<media-video-layout></media-video-layout>
+			</media-player>
+		{/if}
 		<button
 			class="btn absolute top-1/2 left-4 btn-circle -translate-y-1/2 btn-ghost btn-lg"
 			class:btn-disabled={!hasPrevious}
-			onclick={() => {previous()}}
+			onclick={() => {
+				previous();
+			}}
 		>
 			<Icon path={mdiChevronLeft} />
 		</button>
@@ -32,7 +51,9 @@
 		<button
 			class="btn absolute top-1/2 right-4 btn-circle -translate-y-1/2 btn-ghost btn-lg"
 			class:btn-disabled={!hasNext}
-			onclick={() => {next()}}
+			onclick={() => {
+				next();
+			}}
 		>
 			<Icon path={mdiChevronRight} />
 		</button>
@@ -45,7 +66,7 @@
 		</button>
 
 		{#if menu}
-			<div class="fab">
+			<div class="fab bottom-20">
 				<!-- a focusable div with tabindex is necessary to work on all browsers. role="button" is necessary for accessibility -->
 				<div tabindex="0" role="button" class="btn btn-circle btn-ghost btn-lg">
 					<Icon path={mdiDotsVertical} />

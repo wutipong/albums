@@ -57,6 +57,7 @@
 		"mime-types": "^3.0.2",
 		"nice-grpc": "^2.1.14",
 		"sharp": "^0.34.5",
-		"svelte-adapter-bun": "^1.0.1"
+		"svelte-adapter-bun": "^1.0.1",
+		"vidstack": "^1.12.13"
 	}
 }
