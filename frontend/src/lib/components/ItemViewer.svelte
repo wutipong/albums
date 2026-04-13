@@ -2,7 +2,7 @@
 	import { mdiChevronLeft, mdiChevronRight, mdiClose, mdiDotsVertical } from '@mdi/js';
 	import Icon from 'mdi-svelte';
 	let {
-		id = $bindable(''),
+		asset = $bindable({id:'<placeholder>'}),
 		show = $bindable(false),
 		next,
 		previous,
@@ -18,7 +18,7 @@
 		class="absolute top-0 right-0 bottom-0 left-0 backdrop-blur-lg backdrop-brightness-50"
 	>
 		<div class="h-full w-full">
-			<img src={`/api/asset/${id}/view`} alt={id} class="m-auto h-full w-full object-contain" />
+			<img src={`/api/asset/${asset.id}/view`} alt={asset.id} class="m-auto h-full w-full object-contain" />
 		</div>
 
 		<button

@@ -6,7 +6,7 @@
 	import { mdiDownload, mdiImageAlbum } from '@mdi/js';
 
 	let { data, params }: PageProps = $props();
-	let currentId = $state('');
+	let asset = $state({id:'<placeholder>'});
 	let showViewer = $state(false);
 	let currentIndex = $state(0);
 	let hasNext = $state(true);
@@ -45,7 +45,7 @@
 		else hasPrevious = true;
 
 		currentIndex = index;
-		currentId = data.assets[index].id;
+		asset = data.assets[index];
 	}
 </script>
 
@@ -74,7 +74,7 @@
 		</div>
 	</div>
 	<ItemViewer
-		bind:id={currentId}
+		bind:asset={asset}
 		bind:show={showViewer}
 		{next}
 		{previous}
@@ -85,14 +85,14 @@
 </div>
 
 {#snippet viewMenu()}
-	<a href={`/api/asset/${currentId}/original/`} target="_blank" class="btn btn-soft">
+	<a href={`/api/asset/${asset.id}/original/`} target="_blank" class="btn btn-soft">
 		<Icon path={mdiDownload} /> Download.
 	</a>
 
 	<button
 		class="btn btn-soft"
 		onclick={() => {
-			setAlbumCover(params.id, currentId);
+			setAlbumCover(params.id, asset.id);
 		}}
 	>
 		<Icon path={mdiImageAlbum} /> Set as album cover.
