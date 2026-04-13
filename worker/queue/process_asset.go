@@ -38,8 +38,12 @@ var imageExts = []string{
 }
 
 var videoExts = []string{
-	".mp4",
+	".3gp",
+	".avi",
 	".m4v",
+	".mkv",
+	".mov",
+	".mp4",
 	".webm",
 }
 
