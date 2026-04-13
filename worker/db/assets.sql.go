@@ -361,7 +361,7 @@ type UpdateAssetParams struct {
 	ViewHeight      int32
 	ImageFrames     int32
 	VideoDuration   pgtype.Interval
-	ImageEmbedding  pgvector.Vector
+	ImageEmbedding  *pgvector.Vector
 }
 
 func (q *Queries) UpdateAsset(ctx context.Context, arg UpdateAssetParams) (Asset, error) {

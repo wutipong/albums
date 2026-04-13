@@ -129,5 +129,5 @@ type Asset struct {
 	ViewHeight      int32
 	ImageFrames     int32
 	VideoDuration   pgtype.Interval
-	ImageEmbedding  pgvector.Vector
+	ImageEmbedding  *pgvector.Vector
 }

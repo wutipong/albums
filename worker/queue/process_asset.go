@@ -2,8 +2,10 @@ package queue
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
 	"log/slog"
+	"math"
 	"os"
 	"path/filepath"
 	"slices"
@@ -12,6 +14,7 @@ import (
 
 	vips "github.com/cshum/vipsgen/vips816"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/pgvector/pgvector-go"
 	"github.com/wutipong/albums/worker/clip"
 	"github.com/wutipong/albums/worker/db"
 )
@@ -129,7 +132,7 @@ func ProcessAsset(ctx context.Context, id string) error {
 	})
 
 	if err != nil {
-		slog.Info("error parsing uuid.", slog.String("error", err.Error()))
+		slog.Error("update asset fails.", slog.String("error", err.Error()))
 		return fmt.Errorf("unable to save image metadata: %w", err)
 	}
 
@@ -177,6 +180,10 @@ func processImageAsset(ctx context.Context, asset *db.Asset) error {
 		return fmt.Errorf("unable to populate view image: %e", err)
 	}
 
+	err = populateImageEmbedding(ctx, asset, original)
+	if err != nil {
+		return fmt.Errorf("unable to populate image embedding: %w", err)
+	}
 	return nil
 }
 
@@ -376,8 +383,9 @@ func populateThumbnail(
 func populateImageEmbedding(
 	ctx context.Context,
 	asset *db.Asset,
-	original *vips.Image,
+	_ *vips.Image,
 ) error {
+	slog.Info("populating image embedding for asset", slog.String("id", asset.ID.String()))
 	spec, err := clip.GetImageSpec(ctx)
 	if err != nil {
 		return fmt.Errorf("unable to get image spec: %w", err)
@@ -412,12 +420,26 @@ func populateImageEmbedding(
 		return fmt.Errorf("unable to get image embedding: %w", err)
 	}
 
-	err = asset.ImageEmbedding.DecodeBinary(resp.Embedding)
+	embedding, err := ParseNumpyBytes(resp.Embedding)
 	if err != nil {
-		return fmt.Errorf("unable to decode embedding: %w")
+		return fmt.Errorf("unable to decode embedding: %w", err)
 	}
+	asset.ImageEmbedding = &embedding
 
 	return nil
+}
+
+func ParseNumpyBytes(b []byte) (pgvector.Vector, error) {
+	// 4 bytes per float32
+	length := len(b) / 4
+	vec := make([]float32, length)
+
+	for i := range length {
+		bits := binary.LittleEndian.Uint32(b[i*4 : (i+1)*4])
+		vec[i] = math.Float32frombits(bits)
+	}
+
+	return pgvector.NewVector(vec), nil
 }
 
 func createCacheAssetPath(id string, args ...string) string {
