@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nclip.proto\"\"\n\x11\x45ncodeTextRequest\x12\r\n\x05input\x18\x01 \x01(\t\"#\n\x12\x45ncodeImageRequest\x12\r\n\x05image\x18\x01 \x01(\x0c\"#\n\x0e\x45ncodeResponse\x12\x11\n\tembedding\x18\x01 \x01(\x0c\"\x13\n\x11GetImageSpecInput\"3\n\x12GetImageSpecOutput\x12\r\n\x05width\x18\x01 \x01(\x05\x12\x0e\n\x06height\x18\x02 \x01(\x05\x32\xb2\x01\n\x0f\x45ncodingService\x12\x31\n\nEncodeText\x12\x12.EncodeTextRequest\x1a\x0f.EncodeResponse\x12\x33\n\x0b\x45ncodeImage\x12\x13.EncodeImageRequest\x1a\x0f.EncodeResponse\x12\x37\n\x0cGetImageSpec\x12\x12.GetImageSpecInput\x1a\x13.GetImageSpecOutputB\rZ\x0b/service/pbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nclip.proto\"\"\n\x11\x45ncodeTextRequest\x12\r\n\x05input\x18\x01 \x01(\t\"#\n\x12\x45ncodeImageRequest\x12\r\n\x05image\x18\x01 \x01(\x0c\"#\n\x0e\x45ncodeResponse\x12\x11\n\tembedding\x18\x01 \x01(\x0c\"\x15\n\x13GetImageSpecRequest\"5\n\x14GetImageSpecResponse\x12\r\n\x05width\x18\x01 \x01(\x05\x12\x0e\n\x06height\x18\x02 \x01(\x05\x32\xb6\x01\n\x0f\x45ncodingService\x12\x31\n\nEncodeText\x12\x12.EncodeTextRequest\x1a\x0f.EncodeResponse\x12\x33\n\x0b\x45ncodeImage\x12\x13.EncodeImageRequest\x1a\x0f.EncodeResponse\x12;\n\x0cGetImageSpec\x12\x14.GetImageSpecRequest\x1a\x15.GetImageSpecResponseB\rZ\x0b/service/pbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -38,10 +38,10 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_ENCODEIMAGEREQUEST']._serialized_end=85
   _globals['_ENCODERESPONSE']._serialized_start=87
   _globals['_ENCODERESPONSE']._serialized_end=122
-  _globals['_GETIMAGESPECINPUT']._serialized_start=124
-  _globals['_GETIMAGESPECINPUT']._serialized_end=143
-  _globals['_GETIMAGESPECOUTPUT']._serialized_start=145
-  _globals['_GETIMAGESPECOUTPUT']._serialized_end=196
-  _globals['_ENCODINGSERVICE']._serialized_start=199
-  _globals['_ENCODINGSERVICE']._serialized_end=377
+  _globals['_GETIMAGESPECREQUEST']._serialized_start=124
+  _globals['_GETIMAGESPECREQUEST']._serialized_end=145
+  _globals['_GETIMAGESPECRESPONSE']._serialized_start=147
+  _globals['_GETIMAGESPECRESPONSE']._serialized_end=200
+  _globals['_ENCODINGSERVICE']._serialized_start=203
+  _globals['_ENCODINGSERVICE']._serialized_end=385
 # @@protoc_insertion_point(module_scope)

@@ -27,7 +27,8 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jsuar/go-cron-descriptor v0.1.0 // indirect
-	github.com/lib/pq v1.10.2 // indirect
+	github.com/lib/pq v1.10.9 // indirect
+	github.com/pgvector/pgvector-go v0.3.0 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
 	github.com/u2takey/go-utils v0.3.1 // indirect
 	go.uber.org/atomic v1.10.0 // indirect

@@ -39,7 +39,8 @@ SET
     view_width = $12,
     view_height = $13,
     image_frames = $14,
-    video_duration = $15
+    video_duration = $15,
+    image_embedding = $16
 WHERE
     id = $1
     AND deleted_at IS NULL

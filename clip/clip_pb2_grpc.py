@@ -47,8 +47,8 @@ class EncodingServiceStub(object):
                 _registered_method=True)
         self.GetImageSpec = channel.unary_unary(
                 '/EncodingService/GetImageSpec',
-                request_serializer=clip__pb2.GetImageSpecInput.SerializeToString,
-                response_deserializer=clip__pb2.GetImageSpecOutput.FromString,
+                request_serializer=clip__pb2.GetImageSpecRequest.SerializeToString,
+                response_deserializer=clip__pb2.GetImageSpecResponse.FromString,
                 _registered_method=True)
 
 
@@ -92,8 +92,8 @@ def add_EncodingServiceServicer_to_server(servicer, server):
             ),
             'GetImageSpec': grpc.unary_unary_rpc_method_handler(
                     servicer.GetImageSpec,
-                    request_deserializer=clip__pb2.GetImageSpecInput.FromString,
-                    response_serializer=clip__pb2.GetImageSpecOutput.SerializeToString,
+                    request_deserializer=clip__pb2.GetImageSpecRequest.FromString,
+                    response_serializer=clip__pb2.GetImageSpecResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -176,8 +176,8 @@ class EncodingService(object):
             request,
             target,
             '/EncodingService/GetImageSpec',
-            clip__pb2.GetImageSpecInput.SerializeToString,
-            clip__pb2.GetImageSpecOutput.FromString,
+            clip__pb2.GetImageSpecRequest.SerializeToString,
+            clip__pb2.GetImageSpecResponse.FromString,
             options,
             channel_credentials,
             insecure,

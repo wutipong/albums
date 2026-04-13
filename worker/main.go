@@ -17,7 +17,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-//go:generate protoc --go_out=. --go-grpc_out=. -I/workspaces/grpc worker.proto
+//go:generate protoc --go_out=. --go-grpc_out=. -I/workspaces/grpc worker.proto clip.proto
 //go:generate sqlc generate
 
 func main() {

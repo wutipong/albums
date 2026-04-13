@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/pgvector/pgvector-go"
 )
 
 type AssetTypeT string
@@ -128,4 +129,5 @@ type Asset struct {
 	ViewHeight      int32
 	ImageFrames     int32
 	VideoDuration   pgtype.Interval
+	ImageEmbedding  pgvector.Vector
 }

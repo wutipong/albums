@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/pgvector/pgvector-go"
 )
 
 const createAsset = `-- name: CreateAsset :one
@@ -23,7 +24,7 @@ INSERT INTO
     )
 VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING
-    id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration
+    id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 `
 
 type CreateAssetParams struct {
@@ -66,6 +67,7 @@ func (q *Queries) CreateAsset(ctx context.Context, arg CreateAssetParams) (Asset
 		&i.ViewHeight,
 		&i.ImageFrames,
 		&i.VideoDuration,
+		&i.ImageEmbedding,
 	)
 	return i, err
 }
@@ -148,7 +150,7 @@ func (q *Queries) GetAlbumsWithoutCover(ctx context.Context) ([]Album, error) {
 }
 
 const getAsset = `-- name: GetAsset :one
-SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration FROM assets WHERE id = $1 AND deleted_at IS NULL LIMIT 1
+SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding FROM assets WHERE id = $1 AND deleted_at IS NULL LIMIT 1
 `
 
 func (q *Queries) GetAsset(ctx context.Context, id pgtype.UUID) (Asset, error) {
@@ -175,6 +177,7 @@ func (q *Queries) GetAsset(ctx context.Context, id pgtype.UUID) (Asset, error) {
 		&i.ViewHeight,
 		&i.ImageFrames,
 		&i.VideoDuration,
+		&i.ImageEmbedding,
 	)
 	return i, err
 }
@@ -195,7 +198,7 @@ func (q *Queries) GetAssetProcessStatus(ctx context.Context, id pgtype.UUID) (Pr
 }
 
 const getPendingAssets = `-- name: GetPendingAssets :many
-SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration
+SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 FROM assets
 WHERE
     process_status = 'pending'
@@ -232,6 +235,7 @@ func (q *Queries) GetPendingAssets(ctx context.Context) ([]Asset, error) {
 			&i.ViewHeight,
 			&i.ImageFrames,
 			&i.VideoDuration,
+			&i.ImageEmbedding,
 		); err != nil {
 			return nil, err
 		}
@@ -244,7 +248,7 @@ func (q *Queries) GetPendingAssets(ctx context.Context) ([]Asset, error) {
 }
 
 const getRandomAlbumAsset = `-- name: GetRandomAlbumAsset :one
-SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration
+SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 from assets
 WHERE
     type <> 'audio'
@@ -279,6 +283,7 @@ func (q *Queries) GetRandomAlbumAsset(ctx context.Context, albumID pgtype.UUID) 
 		&i.ViewHeight,
 		&i.ImageFrames,
 		&i.VideoDuration,
+		&i.ImageEmbedding,
 	)
 	return i, err
 }
@@ -331,12 +336,13 @@ SET
     view_width = $12,
     view_height = $13,
     image_frames = $14,
-    video_duration = $15
+    video_duration = $15,
+    image_embedding = $16
 WHERE
     id = $1
     AND deleted_at IS NULL
 RETURNING
-    id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration
+    id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 `
 
 type UpdateAssetParams struct {
@@ -355,6 +361,7 @@ type UpdateAssetParams struct {
 	ViewHeight      int32
 	ImageFrames     int32
 	VideoDuration   pgtype.Interval
+	ImageEmbedding  pgvector.Vector
 }
 
 func (q *Queries) UpdateAsset(ctx context.Context, arg UpdateAssetParams) (Asset, error) {
@@ -374,6 +381,7 @@ func (q *Queries) UpdateAsset(ctx context.Context, arg UpdateAssetParams) (Asset
 		arg.ViewHeight,
 		arg.ImageFrames,
 		arg.VideoDuration,
+		arg.ImageEmbedding,
 	)
 	var i Asset
 	err := row.Scan(
@@ -397,6 +405,7 @@ func (q *Queries) UpdateAsset(ctx context.Context, arg UpdateAssetParams) (Asset
 		&i.ViewHeight,
 		&i.ImageFrames,
 		&i.VideoDuration,
+		&i.ImageEmbedding,
 	)
 	return i, err
 }
@@ -410,7 +419,7 @@ WHERE
     id = $1
     AND deleted_at IS NULL
 RETURNING
-    id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration
+    id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 `
 
 type UpdateAssetProcessStatusParams struct {
@@ -442,6 +451,7 @@ func (q *Queries) UpdateAssetProcessStatus(ctx context.Context, arg UpdateAssetP
 		&i.ViewHeight,
 		&i.ImageFrames,
 		&i.VideoDuration,
+		&i.ImageEmbedding,
 	)
 	return i, err
 }

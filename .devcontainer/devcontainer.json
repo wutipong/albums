@@ -20,7 +20,7 @@
 		},
 		"ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
 		"ghcr.io/azutake/devcontainer-features/go-packages-install:0": {
-			"PACKAGES":"github.com/sqlc-dev/sqlc/cmd/sqlc@latest,github.com/amacneil/dbmate@latest,oogle.golang.org/protobuf/cmd/protoc-gen-go@latest,google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest"
+			"PACKAGES":"github.com/sqlc-dev/sqlc/cmd/sqlc@latest,github.com/amacneil/dbmate@latest,google.golang.org/protobuf/cmd/protoc-gen-go@latest,google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest"
 		},
 		"ghcr.io/devcontainers-extra/features/apt-packages:1": {
 			"packages": "libvips-dev,libvpx9,libopus0,ffmpeg"
@@ -44,6 +44,7 @@
 		"DATABASE_URL": "postgres://postgres:postgres@db:5432/postgres?sslmode=disable",
 		"CACHE_DIR": "/workspaces/cache",
 		"REDIS_URL": "redis://redis:6379",
-		"WORKER_ADDRESS": "localhost:7173"
+		"WORKER_ADDRESS": "localhost:7173",
+		"CLIP_ADDRESS": "localhost:8173"
 	}
 }
