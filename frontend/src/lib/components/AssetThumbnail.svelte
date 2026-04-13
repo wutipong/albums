@@ -7,10 +7,7 @@
 	let thumbnailWidth = $derived((TARGET_HEIGHT * asset.thumbnail_width) / asset.thumbnail_height);
 	let thumbnailHeight = TARGET_HEIGHT;
 	let assetType = $derived(asset.type);
-	let videoDuration = $derived(asset.video_duration.toString());
 	let imageFrames = $derived(asset.image_frames);
-
-	$inspect(asset.video_duration)
 </script>
 
 <button
