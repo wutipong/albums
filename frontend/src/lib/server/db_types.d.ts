@@ -16,6 +16,20 @@ export type Int8 = ColumnType<string, bigint | number | string, bigint | number 
 
 export type Interval = ColumnType<IPostgresInterval, IPostgresInterval | number | string, IPostgresInterval | number | string>;
 
+export type JobStatus = "failed" | "new" | "processed";
+
+export type Json = JsonValue;
+
+export type JsonArray = JsonValue[];
+
+export type JsonObject = {
+  [x: string]: JsonValue | undefined;
+};
+
+export type JsonPrimitive = boolean | number | string | null;
+
+export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
+
 export type ProcessStatusT = "pending" | "processed" | "processing";
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
@@ -36,6 +50,7 @@ export interface Assets {
   deleted_at: Timestamp | null;
   filename: string;
   id: Generated<string>;
+  image_embedding: Generated<string | null>;
   image_frames: Generated<number>;
   modified_at: Generated<Timestamp>;
   original: Generated<string>;
@@ -52,6 +67,39 @@ export interface Assets {
   view_width: Generated<number>;
 }
 
+export interface NeoqDeadJobs {
+  created_at: Generated<Timestamp | null>;
+  deadline: Timestamp | null;
+  error: string | null;
+  fingerprint: string;
+  id: Generated<number>;
+  max_retries: number | null;
+  payload: Json | null;
+  queue: string;
+  retries: number | null;
+  status: Generated<JobStatus>;
+}
+
+export interface NeoqJobs {
+  created_at: Generated<Timestamp | null>;
+  deadline: Timestamp | null;
+  error: string | null;
+  fingerprint: string;
+  id: Generated<Int8>;
+  max_retries: Generated<number | null>;
+  payload: Json | null;
+  queue: string;
+  ran_at: Timestamp | null;
+  retries: Generated<number | null>;
+  run_after: Generated<Timestamp | null>;
+  status: Generated<JobStatus>;
+}
+
+export interface NeoqSchemaMigrations {
+  dirty: boolean;
+  version: Int8;
+}
+
 export interface SchemaMigrations {
   version: string;
 }
@@ -59,5 +107,8 @@ export interface SchemaMigrations {
 export interface DB {
   albums: Albums;
   assets: Assets;
+  neoq_dead_jobs: NeoqDeadJobs;
+  neoq_jobs: NeoqJobs;
+  neoq_schema_migrations: NeoqSchemaMigrations;
   schema_migrations: SchemaMigrations;
 }

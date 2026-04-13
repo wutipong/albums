@@ -71,7 +71,7 @@ export interface NotifyScanCacheResponse {
 
 export interface UpdateAlbumThumbnailRequest {
   id: string;
-  assetId?: string | undefined;
+  assetId: string;
 }
 
 export interface UpdateAlbumThumbnailResponse {
@@ -300,7 +300,7 @@ export const NotifyScanCacheResponse: MessageFns<NotifyScanCacheResponse> = {
 };
 
 function createBaseUpdateAlbumThumbnailRequest(): UpdateAlbumThumbnailRequest {
-  return { id: "", assetId: undefined };
+  return { id: "", assetId: "" };
 }
 
 export const UpdateAlbumThumbnailRequest: MessageFns<UpdateAlbumThumbnailRequest> = {
@@ -308,7 +308,7 @@ export const UpdateAlbumThumbnailRequest: MessageFns<UpdateAlbumThumbnailRequest
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
     }
-    if (message.assetId !== undefined) {
+    if (message.assetId !== "") {
       writer.uint32(18).string(message.assetId);
     }
     return writer;
@@ -353,7 +353,7 @@ export const UpdateAlbumThumbnailRequest: MessageFns<UpdateAlbumThumbnailRequest
         ? globalThis.String(object.assetId)
         : isSet(object.asset_id)
         ? globalThis.String(object.asset_id)
-        : undefined,
+        : "",
     };
   },
 
@@ -362,7 +362,7 @@ export const UpdateAlbumThumbnailRequest: MessageFns<UpdateAlbumThumbnailRequest
     if (message.id !== "") {
       obj.id = message.id;
     }
-    if (message.assetId !== undefined) {
+    if (message.assetId !== "") {
       obj.assetId = message.assetId;
     }
     return obj;
@@ -374,7 +374,7 @@ export const UpdateAlbumThumbnailRequest: MessageFns<UpdateAlbumThumbnailRequest
   fromPartial(object: DeepPartial<UpdateAlbumThumbnailRequest>): UpdateAlbumThumbnailRequest {
     const message = createBaseUpdateAlbumThumbnailRequest();
     message.id = object.id ?? "";
-    message.assetId = object.assetId ?? undefined;
+    message.assetId = object.assetId ?? "";
     return message;
   },
 };

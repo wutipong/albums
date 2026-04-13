@@ -17,12 +17,14 @@ class EncodingServer(clip_pb2_grpc.EncodingService):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model = CLIPModel.from_pretrained(
             MODEL_ID,
-            force_download=False
         ).to(self.device)
+
         self.processor = CLIPProcessor.from_pretrained(MODEL_ID)
         self.config = CLIPConfig.from_pretrained(MODEL_ID)
+
         self.logit_scale = self.model.logit_scale.item(
         ) if self.model.logit_scale.item() else 4.60517
+        
         print("Model clip loaded", "device:", self.device)
 
     def EncodeText(self, request, context):
@@ -30,7 +32,7 @@ class EncodingServer(clip_pb2_grpc.EncodingService):
         generate the 512-d embeddings of the texts
         '''
         inputs = self.processor(
-            text=request.text, return_tensors="pt", padding=True).to(self.device)
+            text=request.input, return_tensors="pt", padding=True).to(self.device)
         text_embeddings = self.model.get_text_features(**inputs)
         output = text_embeddings.cpu().detach().numpy().tobytes()
 

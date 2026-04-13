@@ -4,7 +4,6 @@ import {
     WorkerServiceDefinition,
 } from '$lib/server/grpc/proto/worker';
 import { env } from '$env/dynamic/private';
-import { idText } from 'typescript';
 
 const channel = createChannel(`http://${env.WORKER_ADDRESS ?? "localhost:7173"}`);
 
