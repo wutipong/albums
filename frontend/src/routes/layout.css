@@ -2,3 +2,4 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 @plugin 'daisyui';
+@plugin "vidstack/tailwind.cjs";
