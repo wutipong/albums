@@ -45,7 +45,6 @@ export interface Albums {
 
 export interface Assets {
   album_id: string;
-  checksum: string;
   created_at: Generated<Timestamp>;
   deleted_at: Timestamp | null;
   filename: string;
@@ -56,7 +55,6 @@ export interface Assets {
   original: Generated<string>;
   preview: Generated<string>;
   process_status: Generated<ProcessStatusT>;
-  size: Generated<Int8>;
   thumbnail: Generated<string>;
   thumbnail_height: Generated<number>;
   thumbnail_width: Generated<number>;

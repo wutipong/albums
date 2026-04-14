@@ -115,7 +115,6 @@ func ProcessAsset(ctx context.Context, id string) error {
 	_, err = queries.UpdateAsset(ctx, db.UpdateAssetParams{
 		ID:              uuid,
 		Filename:        asset.Filename,
-		Checksum:        asset.Checksum,
 		Type:            asset.Type,
 		Original:        asset.Original,
 		Preview:         asset.Preview,

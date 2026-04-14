@@ -17,44 +17,36 @@ INSERT INTO
     assets (
         album_id,
         filename,
-        checksum,
         type,
-        original,
-        size
+        original
     )
-VALUES ($1, $2, $3, $4, $5, $6)
+VALUES ($1, $2, $3, $4)
 RETURNING
-    id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
+    id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 `
 
 type CreateAssetParams struct {
 	AlbumID  pgtype.UUID
 	Filename string
-	Checksum string
 	Type     AssetTypeT
 	Original string
-	Size     int64
 }
 
 func (q *Queries) CreateAsset(ctx context.Context, arg CreateAssetParams) (Asset, error) {
 	row := q.db.QueryRow(ctx, createAsset,
 		arg.AlbumID,
 		arg.Filename,
-		arg.Checksum,
 		arg.Type,
 		arg.Original,
-		arg.Size,
 	)
 	var i Asset
 	err := row.Scan(
 		&i.ID,
 		&i.AlbumID,
 		&i.Filename,
-		&i.Checksum,
 		&i.CreatedAt,
 		&i.ModifiedAt,
 		&i.DeletedAt,
-		&i.Size,
 		&i.Type,
 		&i.Original,
 		&i.Preview,
@@ -150,7 +142,7 @@ func (q *Queries) GetAlbumsWithoutCover(ctx context.Context) ([]Album, error) {
 }
 
 const getAsset = `-- name: GetAsset :one
-SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding FROM assets WHERE id = $1 AND deleted_at IS NULL LIMIT 1
+SELECT id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding FROM assets WHERE id = $1 AND deleted_at IS NULL LIMIT 1
 `
 
 func (q *Queries) GetAsset(ctx context.Context, id pgtype.UUID) (Asset, error) {
@@ -160,11 +152,9 @@ func (q *Queries) GetAsset(ctx context.Context, id pgtype.UUID) (Asset, error) {
 		&i.ID,
 		&i.AlbumID,
 		&i.Filename,
-		&i.Checksum,
 		&i.CreatedAt,
 		&i.ModifiedAt,
 		&i.DeletedAt,
-		&i.Size,
 		&i.Type,
 		&i.Original,
 		&i.Preview,
@@ -198,7 +188,7 @@ func (q *Queries) GetAssetProcessStatus(ctx context.Context, id pgtype.UUID) (Pr
 }
 
 const getImageAssetsWithoutEmbedding = `-- name: GetImageAssetsWithoutEmbedding :many
-SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
+SELECT id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 FROM assets
 WHERE
     type = 'image'
@@ -219,11 +209,9 @@ func (q *Queries) GetImageAssetsWithoutEmbedding(ctx context.Context) ([]Asset, 
 			&i.ID,
 			&i.AlbumID,
 			&i.Filename,
-			&i.Checksum,
 			&i.CreatedAt,
 			&i.ModifiedAt,
 			&i.DeletedAt,
-			&i.Size,
 			&i.Type,
 			&i.Original,
 			&i.Preview,
@@ -249,7 +237,7 @@ func (q *Queries) GetImageAssetsWithoutEmbedding(ctx context.Context) ([]Asset, 
 }
 
 const getPendingAssets = `-- name: GetPendingAssets :many
-SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
+SELECT id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 FROM assets
 WHERE
     process_status = 'pending'
@@ -269,11 +257,9 @@ func (q *Queries) GetPendingAssets(ctx context.Context) ([]Asset, error) {
 			&i.ID,
 			&i.AlbumID,
 			&i.Filename,
-			&i.Checksum,
 			&i.CreatedAt,
 			&i.ModifiedAt,
 			&i.DeletedAt,
-			&i.Size,
 			&i.Type,
 			&i.Original,
 			&i.Preview,
@@ -299,7 +285,7 @@ func (q *Queries) GetPendingAssets(ctx context.Context) ([]Asset, error) {
 }
 
 const getRandomAlbumAsset = `-- name: GetRandomAlbumAsset :one
-SELECT id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
+SELECT id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 from assets
 WHERE
     type <> 'audio'
@@ -317,11 +303,9 @@ func (q *Queries) GetRandomAlbumAsset(ctx context.Context, albumID pgtype.UUID) 
 		&i.ID,
 		&i.AlbumID,
 		&i.Filename,
-		&i.Checksum,
 		&i.CreatedAt,
 		&i.ModifiedAt,
 		&i.DeletedAt,
-		&i.Size,
 		&i.Type,
 		&i.Original,
 		&i.Preview,
@@ -374,32 +358,30 @@ const updateAsset = `-- name: UpdateAsset :one
 UPDATE assets
 SET
     filename = $2,
-    checksum = $3,
-    type = $4,
-    original = $5,
-    preview = $6,
-    thumbnail = $7,
-    view = $8,
-    process_status = $9,
+    type = $3,
+    original = $4,
+    preview = $5,
+    thumbnail = $6,
+    view = $7,
+    process_status = $8,
     modified_at = NOW(),
-    thumbnail_width = $10,
-    thumbnail_height = $11,
-    view_width = $12,
-    view_height = $13,
-    image_frames = $14,
-    video_duration = $15,
-    image_embedding = $16
+    thumbnail_width = $9,
+    thumbnail_height = $10,
+    view_width = $11,
+    view_height = $12,
+    image_frames = $13,
+    video_duration = $14,
+    image_embedding = $15
 WHERE
     id = $1
     AND deleted_at IS NULL
 RETURNING
-    id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
+    id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 `
 
 type UpdateAssetParams struct {
 	ID              pgtype.UUID
 	Filename        string
-	Checksum        string
 	Type            AssetTypeT
 	Original        string
 	Preview         string
@@ -419,7 +401,6 @@ func (q *Queries) UpdateAsset(ctx context.Context, arg UpdateAssetParams) (Asset
 	row := q.db.QueryRow(ctx, updateAsset,
 		arg.ID,
 		arg.Filename,
-		arg.Checksum,
 		arg.Type,
 		arg.Original,
 		arg.Preview,
@@ -439,11 +420,9 @@ func (q *Queries) UpdateAsset(ctx context.Context, arg UpdateAssetParams) (Asset
 		&i.ID,
 		&i.AlbumID,
 		&i.Filename,
-		&i.Checksum,
 		&i.CreatedAt,
 		&i.ModifiedAt,
 		&i.DeletedAt,
-		&i.Size,
 		&i.Type,
 		&i.Original,
 		&i.Preview,
@@ -470,7 +449,7 @@ WHERE
     id = $1
     AND deleted_at IS NULL
 RETURNING
-    id, album_id, filename, checksum, created_at, modified_at, deleted_at, size, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
+    id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 `
 
 type UpdateAssetProcessStatusParams struct {
@@ -485,11 +464,9 @@ func (q *Queries) UpdateAssetProcessStatus(ctx context.Context, arg UpdateAssetP
 		&i.ID,
 		&i.AlbumID,
 		&i.Filename,
-		&i.Checksum,
 		&i.CreatedAt,
 		&i.ModifiedAt,
 		&i.DeletedAt,
-		&i.Size,
 		&i.Type,
 		&i.Original,
 		&i.Preview,

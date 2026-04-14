@@ -31,21 +31,13 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     try {
-        const checksum = calculateChecksum(buffer);
-
-        if (await checkDuplicate(albumId, checksum, buffer.length.toString())) {
-            return json({ success: false, error: "Duplicate asset" }, { status: 400 });
-        }
-
         const basename = path.basename(file.name);
         const asset = await db.insertInto("assets")
             .values({
                 album_id: albumId,
                 filename: file.name,
-                checksum,
                 type: "image",
                 original: path.join("original", basename),
-                size: buffer.length.toString()
             })
             .returningAll()
             .executeTakeFirstOrThrow();
@@ -68,22 +60,3 @@ export const POST: RequestHandler = async ({ request }) => {
         return json({ success: false, error: "Failed to process image" }, { status: 500 });
     }
 };
-
-function calculateChecksum(buffer: Buffer): string {
-    const hash = createHash('sha256');
-    hash.update(buffer);
-
-    return hash.digest('hex');
-}
-
-async function checkDuplicate(albumId: string, checksum: string, size: string): Promise<boolean> {
-    const existingAsset = await db.selectFrom('assets')
-        .selectAll()
-        .where('album_id', '=', albumId)
-        .where('assets.checksum', '=', checksum)
-        .where('assets.size', '=', size)
-        .where('assets.deleted_at', 'is', null)
-        .executeTakeFirst()
-
-    return existingAsset !== undefined;
-}

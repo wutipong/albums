@@ -6,12 +6,10 @@ INSERT INTO
     assets (
         album_id,
         filename,
-        checksum,
         type,
-        original,
-        size
+        original
     )
-VALUES ($1, $2, $3, $4, $5, $6)
+VALUES ($1, $2, $3, $4)
 RETURNING
     *;
 
@@ -34,21 +32,20 @@ WHERE
 UPDATE assets
 SET
     filename = $2,
-    checksum = $3,
-    type = $4,
-    original = $5,
-    preview = $6,
-    thumbnail = $7,
-    view = $8,
-    process_status = $9,
+    type = $3,
+    original = $4,
+    preview = $5,
+    thumbnail = $6,
+    view = $7,
+    process_status = $8,
     modified_at = NOW(),
-    thumbnail_width = $10,
-    thumbnail_height = $11,
-    view_width = $12,
-    view_height = $13,
-    image_frames = $14,
-    video_duration = $15,
-    image_embedding = $16
+    thumbnail_width = $9,
+    thumbnail_height = $10,
+    view_width = $11,
+    view_height = $12,
+    image_frames = $13,
+    video_duration = $14,
+    image_embedding = $15
 WHERE
     id = $1
     AND deleted_at IS NULL

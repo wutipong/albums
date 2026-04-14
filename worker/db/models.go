@@ -112,11 +112,9 @@ type Asset struct {
 	ID              pgtype.UUID
 	AlbumID         pgtype.UUID
 	Filename        string
-	Checksum        string
 	CreatedAt       pgtype.Timestamptz
 	ModifiedAt      pgtype.Timestamptz
 	DeletedAt       pgtype.Timestamptz
-	Size            int64
 	Type            AssetTypeT
 	Original        string
 	Preview         string
