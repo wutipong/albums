@@ -45,16 +45,16 @@
 </script>
 
 {#snippet title()}
-	<div class="flex text-xl">
+	<div class="flex text-xl md:ms-4">
 		<Icon path={mdiImageSearchOutline}></Icon>
 		{data.search}
 	</div>
 {/snippet}
 
-<div class="relative flex h-screen w-screen flex-col bg-base-300">
+<div class="relative flex h-screen w-screen flex-col bg-base-100">
 	<NavBar {title} />
-	<div class="mt-8 overflow-auto">
-		<div class="flex flex-wrap">
+	<div class="p-4 pt-8 overflow-auto">
+		<div class="flex flex-wrap gap-4 justify-evenly">
 			{#each data.assets as asset, index (asset)}
 				<AssetThumbnail
 					{asset}

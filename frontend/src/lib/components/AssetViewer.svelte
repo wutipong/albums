@@ -82,7 +82,7 @@
 					<Icon path={mdiDotsVertical} />
 				</button>
 				<ul
-					class="menu dropdown w-52 rounded-box bg-base-100 shadow-sm"
+					class="menu dropdown w-52 rounded-box bg-base-300 shadow-sm"
 					popover
 					id="popover-1"
 					style="position-anchor:--anchor-1"

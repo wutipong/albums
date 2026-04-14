@@ -5,7 +5,7 @@
     const IMAGE_HEIGHT = 200
 </script>
 
-<div class='card bg-base-200 w-[300px] h-[300px] hover:bg-base-100 hover:shadow-xl m-4'>
+<div class='card bg-base-100 w-[300px] h-[300px] hover:bg-base-300 hover:shadow-xl m-4'>
     <figure>
         <a href={`/album/${album.id}/`}>
             <img 
