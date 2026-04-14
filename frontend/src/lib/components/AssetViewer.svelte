@@ -58,22 +58,27 @@
 			<Icon path={mdiChevronRight} />
 		</button>
 
-		<button
-			class="btn absolute top-4 right-4 btn-circle btn-ghost btn-lg"
-			onclick={() => (show = false)}
-		>
-			<Icon path={mdiClose} />
-		</button>
-
-		{#if menu}
-			<div class="fab bottom-20">
-				<!-- a focusable div with tabindex is necessary to work on all browsers. role="button" is necessary for accessibility -->
-				<div tabindex="0" role="button" class="btn btn-circle btn-ghost btn-lg">
+		<div class="bg-opacity-100 absolute top-4 right-4 flex flex-row-reverse gap-4 rounded-full">
+			<button class="btn btn-circle btn-ghost btn-lg" onclick={() => (show = false)}>
+				<Icon path={mdiClose} />
+			</button>
+			{#if menu}
+				<button
+					class="btn btn-circle btn-ghost btn-lg"
+					popovertarget="popover-1"
+					style="anchor-name:--anchor-1"
+				>
 					<Icon path={mdiDotsVertical} />
-				</div>
-
-				{@render menu()}
-			</div>
-		{/if}
+				</button>
+				<ul
+					class="menu dropdown w-52 rounded-box bg-base-100 shadow-sm"
+					popover
+					id="popover-1"
+					style="position-anchor:--anchor-1"
+				>
+					{@render menu()}
+				</ul>
+			{/if}
+		</div>
 	</div>
 {/if}

@@ -1,13 +1,13 @@
 <script lang="ts">
 	import AssetThumbnail from '$lib/components/AssetThumbnail.svelte';
-	import ItemViewer from '$lib/components/ItemViewer.svelte';
+	import AssetViewer from '$lib/components/AssetViewer.svelte';
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
 	import { mdiDownload, mdiImageAlbum } from '@mdi/js';
 	import NavBar from '$lib/components/NavBar.svelte';
 
 	let { data, params }: PageProps = $props();
-	let asset = $state({id:'<placeholder>'});
+	let asset = $state({ id: '<placeholder>' });
 	let showViewer = $state(false);
 	let currentIndex = $state(0);
 	let hasNext = $state(true);
@@ -51,13 +51,16 @@
 </script>
 
 {#snippet title()}
-	<div class="text-xl">{data.name}</div>
+	<div class="flex text-xl md:ms-4">
+		<Icon path={mdiImageAlbum}></Icon>
+		{data.name}
+	</div>
 {/snippet}
 
 <div class="relative flex h-screen w-screen flex-col bg-base-300">
 	<NavBar {title}></NavBar>
 	<div class="overflow-auto p-4 pt-8">
-		<div class="flex flex-wrap justify-between gap-4">
+		<div class="flex flex-wrap justify-evenly gap-4">
 			{#each data.assets as asset, index (asset)}
 				<AssetThumbnail
 					{asset}
@@ -69,8 +72,8 @@
 			{/each}
 		</div>
 	</div>
-	<ItemViewer
-		bind:asset={asset}
+	<AssetViewer
+		bind:asset
 		bind:show={showViewer}
 		{next}
 		{previous}
@@ -81,16 +84,18 @@
 </div>
 
 {#snippet viewMenu()}
-	<a href={`/api/asset/${asset.id}/original/`} target="_blank" class="btn btn-soft">
-		<Icon path={mdiDownload} /> Download.
-	</a>
-
-	<button
-		class="btn btn-soft"
-		onclick={() => {
-			setAlbumCover(params.id, asset.id);
-		}}
-	>
-		<Icon path={mdiImageAlbum} /> Set as album cover.
-	</button>
+	<li>
+		<a href={`/api/asset/${asset.id}/original/`} target="_blank">
+			<Icon path={mdiDownload} /> Download.
+		</a>
+	</li>
+	<li>
+		<button
+			onclick={() => {
+				setAlbumCover(params.id, asset.id);
+			}}
+		>
+			<Icon path={mdiImageAlbum} /> Set as album cover.
+		</button>
+	</li>
 {/snippet}

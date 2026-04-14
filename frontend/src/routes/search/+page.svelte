@@ -1,6 +1,6 @@
 <script lang="ts">
 	import AssetThumbnail from '$lib/components/AssetThumbnail.svelte';
-	import ItemViewer from '$lib/components/ItemViewer.svelte';
+	import AssetViewer from '$lib/components/AssetViewer.svelte';
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
 	import { mdiDownload, mdiImageAlbum, mdiImageSearch, mdiImageSearchOutline } from '@mdi/js';
@@ -53,7 +53,7 @@
 
 <div class="relative flex h-screen w-screen flex-col bg-base-300">
 	<NavBar {title} />
-	<div class="overflow-auto mt-8">
+	<div class="mt-8 overflow-auto">
 		<div class="flex flex-wrap">
 			{#each data.assets as asset, index (asset)}
 				<AssetThumbnail
@@ -66,7 +66,7 @@
 			{/each}
 		</div>
 	</div>
-	<ItemViewer
+	<AssetViewer
 		bind:asset
 		bind:show={showViewer}
 		{next}
@@ -78,11 +78,14 @@
 </div>
 
 {#snippet viewMenu()}
-	<a href={`/album/${asset.album_id}/`} class="btn btn-soft">
-		<Icon path={mdiImageAlbum} /> View album.
-	</a>
-
-	<a href={`/api/asset/${asset.id}/original/`} target="_blank" class="btn btn-soft">
-		<Icon path={mdiDownload} /> Download.
-	</a>
+	<li>
+		<a href={`/album/${asset.album_id}/`}>
+			<Icon path={mdiImageAlbum} /> View album.
+		</a>
+	</li>
+	<li>
+		<a href={`/api/asset/${asset.id}/original/`} target="_blank">
+			<Icon path={mdiDownload} /> Download.
+		</a>
+	</li>
 {/snippet}
