@@ -159,7 +159,6 @@ func populateImageEmbeddings(ctx context.Context) error {
 		_, err = queries.UpdateAsset(ctx, db.UpdateAssetParams{
 			ID:              asset.ID,
 			Filename:        asset.Filename,
-			Checksum:        asset.Checksum,
 			Type:            asset.Type,
 			Original:        asset.Original,
 			Preview:         asset.Preview,
