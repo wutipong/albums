@@ -5,6 +5,7 @@
 	import type { PageProps } from './$types';
 	import { mdiDownload, mdiImageAlbum } from '@mdi/js';
 	import NavBar from '$lib/components/NavBar.svelte';
+	import Toast from '$lib/components/Toast.svelte';
 
 	let { data, params }: PageProps = $props();
 	let asset = $state({ id: '<placeholder>' });
@@ -13,11 +14,18 @@
 	let hasNext = $state(true);
 	let hasPrevious = $state(true);
 
+	let toast: Toast;
+
 	async function setAlbumCover(albumId: string, assetId: string) {
 		await fetch(`/api/album/${albumId}/cover`, {
 			method: 'POST',
 			body: JSON.stringify({ asset_id: assetId })
 		});
+
+		toast.add(
+			'Album cover change has been queued. It will take some time before the change is applied.',
+			'info'
+		);
 	}
 
 	function next() {
@@ -82,6 +90,8 @@
 		menu={viewMenu}
 	/>
 </div>
+
+<Toast bind:this={toast} />
 
 {#snippet viewMenu()}
 	<li>
