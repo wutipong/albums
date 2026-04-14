@@ -14,6 +14,20 @@
 	} = $props();
 </script>
 
+<style lang="scss">
+	media-player{
+		width: 100%;
+		height: 100%;
+		aspect-ratio: unset;
+	}
+
+	:global(media-provider video) {
+		width: 95%;
+		height: 95%;
+		margin: auto;
+	}
+</style>
+
 {#if show}
 	<div
 		role="presentation"
@@ -30,7 +44,6 @@
 		{/if}
 		{#if asset.type === 'video'}
 			<media-player
-				class="h-full w-full"
 				title={asset.original}
 				src={`/api/asset/${asset.id}/view`}
 			>
