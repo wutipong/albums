@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ params, fetch, url }) => {
         .where("deleted_at", 'is', null)
         .where("type", '=', 'image')
         .orderBy(cosineDistance('image_embedding', vectorArray))
-        .limit(20)
+        .limit(50)
         .execute()
 
     const outAssets = []

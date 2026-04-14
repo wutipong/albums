@@ -4,6 +4,7 @@
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
 	import { mdiDownload, mdiImageAlbum } from '@mdi/js';
+	import NavBar from '$lib/components/NavBar.svelte';
 
 	let { data, params }: PageProps = $props();
 	let asset = $state({id:'<placeholder>'});
@@ -49,19 +50,14 @@
 	}
 </script>
 
-<div class="relative flex h-screen w-screen flex-col">
-	<div class="navbar bg-base-100 shadow-sm">
-		<div class="flex-1">
-			<div class="btn text-xl btn-ghost">{data.name}</div>
-		</div>
-		<div class="flex-none">
-			<ul class="menu menu-horizontal px-1">
-				<li><a href="/album">Albums</a></li>
-			</ul>
-		</div>
-	</div>
-	<div class="overflow-auto">
-		<div class="flex flex-wrap bg-base-300">
+{#snippet title()}
+	<div class="text-xl">{data.name}</div>
+{/snippet}
+
+<div class="relative flex h-screen w-screen flex-col bg-base-300">
+	<NavBar {title}></NavBar>
+	<div class="overflow-auto mt-8">
+		<div class="flex flex-wrap">
 			{#each data.assets as asset, index (asset)}
 				<AssetThumbnail
 					{asset}

@@ -3,10 +3,11 @@
 	import ItemViewer from '$lib/components/ItemViewer.svelte';
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
-	import { mdiDownload } from '@mdi/js';
+	import { mdiDownload, mdiImageAlbum, mdiImageSearch, mdiImageSearchOutline } from '@mdi/js';
+	import NavBar from '$lib/components/NavBar.svelte';
 
 	let { data, params }: PageProps = $props();
-	let asset = $state({id:'<placeholder>'});
+	let asset = $state({ id: '<placeholder>', album_id: '' });
 	let showViewer = $state(false);
 	let currentIndex = $state(0);
 	let hasNext = $state(true);
@@ -34,7 +35,7 @@
 	function onIndexUpdated(index: number) {
 		if (index == data.assets.length - 1) hasNext = false;
 		else hasNext = true;
-        
+
 		if (index == 0) hasPrevious = false;
 		else hasPrevious = true;
 
@@ -43,18 +44,16 @@
 	}
 </script>
 
-<div class="relative flex h-screen w-screen flex-col bg-base-300">
-	<div class="navbar bg-base-100 shadow-sm">
-		<div class="flex-1">
-			<div class="btn text-xl btn-ghost">{data.search}</div>
-		</div>
-		<div class="flex-none">
-			<ul class="menu menu-horizontal px-1">
-				<li><a href="/album">Albums</a></li>
-			</ul>
-		</div>
+{#snippet title()}
+	<div class="flex text-xl">
+		<Icon path={mdiImageSearchOutline}></Icon>
+		{data.search}
 	</div>
-	<div class="overflow-auto">
+{/snippet}
+
+<div class="relative flex h-screen w-screen flex-col bg-base-300">
+	<NavBar {title} />
+	<div class="overflow-auto mt-8">
 		<div class="flex flex-wrap">
 			{#each data.assets as asset, index (asset)}
 				<AssetThumbnail
@@ -68,7 +67,7 @@
 		</div>
 	</div>
 	<ItemViewer
-		bind:asset={asset}
+		bind:asset
 		bind:show={showViewer}
 		{next}
 		{previous}
@@ -79,6 +78,10 @@
 </div>
 
 {#snippet viewMenu()}
+	<a href={`/album/${asset.album_id}/`} class="btn btn-soft">
+		<Icon path={mdiImageAlbum} /> View album.
+	</a>
+
 	<a href={`/api/asset/${asset.id}/original/`} target="_blank" class="btn btn-soft">
 		<Icon path={mdiDownload} /> Download.
 	</a>
