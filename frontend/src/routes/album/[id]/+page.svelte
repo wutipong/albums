@@ -56,8 +56,8 @@
 
 <div class="relative flex h-screen w-screen flex-col bg-base-300">
 	<NavBar {title}></NavBar>
-	<div class="overflow-auto mt-8">
-		<div class="flex flex-wrap">
+	<div class="overflow-auto p-4 pt-8">
+		<div class="flex flex-wrap justify-between gap-4">
 			{#each data.assets as asset, index (asset)}
 				<AssetThumbnail
 					{asset}

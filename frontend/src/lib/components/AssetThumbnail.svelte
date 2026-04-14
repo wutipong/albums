@@ -12,7 +12,7 @@
 
 <button
 	tabindex="0"
-	class={`block h-[${thumbnailHeight}px] m-1 overflow-hidden rounded-xl cursor-pointer`}
+	class={`block h-[${thumbnailHeight}px] m-1 overflow-hidden rounded-xl cursor-pointer hover:shadow-xl`}
 	style={`width: ${thumbnailWidth}px;`}
 	onmouseenter={() => (preview = true)}
 	onmouseleave={() => (preview = false)}
@@ -37,7 +37,7 @@
 
 		<div
 			class:hidden={!preview}
-			class="box-border h-full w-full overflow-hidden rounded-xl border-4"
+			class="box-border h-full w-full overflow-hidden rounded-xl"
 			style={`width: ${thumbnailWidth}px; height: ${thumbnailHeight}px;`}
 		>
 			<img
