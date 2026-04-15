@@ -171,7 +171,7 @@ func processVideoThumbnail(ctx context.Context, asset *db.Asset, info Probe) err
 
 	videoDuration := time.Duration(duration) * time.Second
 	asset.VideoDuration = pgtype.Interval{
-		Microseconds: int64(videoDuration),
+		Microseconds: videoDuration.Microseconds(),
 		Valid:        true,
 	}
 	return nil

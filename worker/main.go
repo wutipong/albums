@@ -27,12 +27,21 @@ func main() {
 	})))
 
 	id := ""
+	processPending := false
 
 	cmd := &cli.Command{
 		Name:  "worker",
 		Usage: "process assets to albums",
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			return performWork(ctx)
+			return performWork(ctx, processPending)
+		},
+
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:        "process-pending",
+				Usage:       "process pending items in the queue.",
+				Destination: &processPending,
+			},
 		},
 		Commands: []*cli.Command{
 			{
@@ -75,7 +84,7 @@ func main() {
 	}
 }
 
-func performWork(ctx context.Context) error {
+func performWork(ctx context.Context, processPending bool) error {
 	err := db.Connect(ctx, os.Getenv("DATABASE_URL"))
 	if err != nil {
 		return fmt.Errorf("unable to connect to the database: %w", err)
@@ -88,9 +97,11 @@ func performWork(ctx context.Context) error {
 	}
 	defer queue.Shutdown(ctx)
 
-	err = processExistingItems(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to processing pending items :%w", err)
+	if processPending {
+		err = processExistingItems(ctx)
+		if err != nil {
+			return fmt.Errorf("unable to processing pending items :%w", err)
+		}
 	}
 
 	address := os.Getenv("WORKER_ADDRESS")
