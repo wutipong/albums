@@ -1,5 +1,5 @@
 
-import { createAuthClient } from "better-auth/client"
+import { createAuthClient } from "better-auth/svelte"
 import { genericOAuthClient } from "better-auth/client/plugins"
 
 export const authClient = createAuthClient({

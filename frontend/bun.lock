@@ -5,6 +5,7 @@
     "": {
       "name": "frontend",
       "dependencies": {
+        "@better-auth/kysely-adapter": "^1.6.4",
         "@mdi/js": "^7.4.47",
         "@types/mime-types": "^3.0.1",
         "@types/pg": "^8.20.0",
@@ -61,7 +62,7 @@
 
     "@better-auth/drizzle-adapter": ["@better-auth/drizzle-adapter@1.6.3", "", { "peerDependencies": { "@better-auth/core": "^1.6.3", "@better-auth/utils": "0.4.0", "drizzle-orm": ">=0.41.0" }, "optionalPeers": ["drizzle-orm"] }, "sha512-P5erUYKoctOnOf+hd3umkOhOqJA+WuDByzmgnxZMBQLhgmusn5cgW10449B9aZu8HxIcU/tUQo/8ucwXHNzZ0A=="],
 
-    "@better-auth/kysely-adapter": ["@better-auth/kysely-adapter@1.6.3", "", { "peerDependencies": { "@better-auth/core": "^1.6.3", "@better-auth/utils": "0.4.0", "kysely": "^0.27.0 || ^0.28.0" }, "optionalPeers": ["kysely"] }, "sha512-4iZLGaajEdPMgtiTARINbNZGl6CPHSzlS0fl4ONWryP/52iakYhXYNBJIB70Ls1Xl+kEqYkBFmndfj/x4j18RQ=="],
+    "@better-auth/kysely-adapter": ["@better-auth/kysely-adapter@1.6.4", "", { "peerDependencies": { "@better-auth/core": "^1.6.4", "@better-auth/utils": "0.4.0", "kysely": "^0.28.14" }, "optionalPeers": ["kysely"] }, "sha512-CVuvhy81gs66oHjjMTVKV1bfVCPivJzf9za8xghGB9wrkeMaZnPVKVqDobHf8juDfT5XRMQJmrcGLxubI2le/A=="],
 
     "@better-auth/memory-adapter": ["@better-auth/memory-adapter@1.6.3", "", { "peerDependencies": { "@better-auth/core": "^1.6.3", "@better-auth/utils": "0.4.0" } }, "sha512-0HCogGjUqVBl5j+7pkoovyIIAcCKsy8wiebDbTnedD99bCXQ+BhBAf8KQG1wMx6Nnc8fFwDuhSBhvTmCrdlmMQ=="],
 
@@ -992,6 +993,8 @@
     "@types/pg/@types/node": ["@types/node@24.12.2", "", { "dependencies": { "undici-types": "~7.16.0" } }, "sha512-A1sre26ke7HDIuY/M23nd9gfB+nrmhtYyMINbjI1zHJxYteKR6qSMX56FsmjMcDb3SMcjJg5BiRRgOCC/yBD0g=="],
 
     "@typescript-eslint/eslint-plugin/ignore": ["ignore@7.0.5", "", {}, "sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg=="],
+
+    "better-auth/@better-auth/kysely-adapter": ["@better-auth/kysely-adapter@1.6.3", "", { "peerDependencies": { "@better-auth/core": "^1.6.3", "@better-auth/utils": "0.4.0", "kysely": "^0.27.0 || ^0.28.0" }, "optionalPeers": ["kysely"] }, "sha512-4iZLGaajEdPMgtiTARINbNZGl6CPHSzlS0fl4ONWryP/52iakYhXYNBJIB70Ls1Xl+kEqYkBFmndfj/x4j18RQ=="],
 
     "dotenv-expand/dotenv": ["dotenv@16.6.1", "", {}, "sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow=="],
 
