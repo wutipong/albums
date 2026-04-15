@@ -152,8 +152,8 @@ func processVideoThumbnail(ctx context.Context, asset *db.Asset, info Probe) err
 			"vframes": "1",
 			"quality": fmt.Sprintf("%d", THUMBNAIL_QUALITY),
 			"vf": fmt.Sprintf(
-				"scale=%d:%d:force_original_aspect_ratio=decrease",
-				THUMBNAIL_HEIGHT, THUMBNAIL_HEIGHT,
+				"scale=-2:%d:force_original_aspect_ratio=decrease",
+				THUMBNAIL_HEIGHT,
 			),
 		}).OverWriteOutput().ErrorToStdOut().Run()
 
@@ -205,8 +205,8 @@ func processVideoPreview(ctx context.Context, asset *db.Asset, info Probe) error
 			"loop":    "0",
 			"quality": fmt.Sprintf("%d", THUMBNAIL_QUALITY),
 			"vf": fmt.Sprintf(
-				"fps=5,scale=%d:%d:force_original_aspect_ratio=decrease",
-				THUMBNAIL_HEIGHT, THUMBNAIL_HEIGHT,
+				"fps=5,scale=-2:%d:force_original_aspect_ratio=decrease",
+				THUMBNAIL_HEIGHT,
 			),
 		}).OverWriteOutput().ErrorToStdOut().Run()
 
