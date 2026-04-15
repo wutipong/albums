@@ -14,7 +14,7 @@ export const auth = betterAuth({
         genericOAuth({
             config: [
                 {
-                    providerId: "generic-oauth",
+                    providerId: env.OIDC_PROVIDER_ID ?? "",
                     clientId: env.OIDC_CLIENT_ID ?? "",
                     clientSecret: env.OIDC_SECRET,
                     discoveryUrl: env.OIDC_DISCOVERY_URL ?? "",
