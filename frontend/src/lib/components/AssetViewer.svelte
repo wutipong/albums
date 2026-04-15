@@ -44,7 +44,7 @@
 		{/if}
 		{#if asset.type === 'video'}
 			<media-player
-				title={asset.original}
+				title={asset.filename}
 				src={`/api/asset/${asset.id}/view`}
 			>
 				<media-provider></media-provider>
