@@ -24,7 +24,7 @@
 	:global(media-provider video) {
 		width: 95%;
 		height: 95%;
-		margin: auto;
+		
 	}
 </style>
 
