@@ -49,6 +49,7 @@
 		"@mdi/js": "^7.4.47",
 		"@types/mime-types": "^3.0.1",
 		"@types/pg": "^8.20.0",
+		"better-auth": "^1.6.3",
 		"bree": "^9.2.9",
 		"bullmq": "^5.73.0",
 		"ioredis": "^5.10.1",
