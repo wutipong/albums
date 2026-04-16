@@ -28,6 +28,7 @@ func showAlbum(ctx context.Context, profileName string, dryRun bool, albumID str
 	server := api.ServerConfig{
 		URL:    serverUrl,
 		DryRun: dryRun,
+		APIKey: config.APIKey,
 	}
 
 	albumDetail, err := api.GetAlbumDetail(ctx, server, albumID)

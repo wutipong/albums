@@ -13,7 +13,8 @@ import (
 )
 
 type Profile struct {
-	URL string `yaml:"url"`
+	URL    string `yaml:"url"`
+	APIKey string `yaml:"api_key"`
 }
 
 func createConfigPath() (path string, err error) {

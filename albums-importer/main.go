@@ -47,9 +47,9 @@ func main() {
 			&cli.StringFlag{
 				Name:        "profile",
 				Value:       "default",
-				Usage:       "profile of immich server.",
+				Usage:       "profile of albums server.",
 				Destination: &profileStr,
-				Category:    "Immich Server",
+				Category:    "albums Server",
 			},
 		},
 		Commands: []*cli.Command{

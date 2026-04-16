@@ -28,6 +28,7 @@ func listAlbum(ctx context.Context, profileName string, dryRun bool) (err error)
 	server := api.ServerConfig{
 		URL:    serverUrl,
 		DryRun: dryRun,
+		APIKey: config.APIKey,
 	}
 
 	albumList, err := api.GetAlbumList(ctx, server)

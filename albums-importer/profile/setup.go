@@ -55,6 +55,19 @@ func setupProfile(ctx context.Context, profile string) error {
 	}
 	config.URL = result
 
+	apiPrompt := promptui.Prompt{
+		Label:     "API key",
+		Default:   config.APIKey,
+		AllowEdit: true,
+	}
+
+	result, err = apiPrompt.Run()
+	if err != nil {
+		err = fmt.Errorf("prompt failed: %w", err)
+		return err
+	}
+	config.APIKey = result
+
 	configMap[profile] = config
 
 	err = saveConfigMap(ctx, configMap)

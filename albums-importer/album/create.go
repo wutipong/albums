@@ -28,6 +28,7 @@ func createAlbum(ctx context.Context, profileName string, dryRun bool, name stri
 	server := api.ServerConfig{
 		URL:    serverUrl,
 		DryRun: dryRun,
+		APIKey: config.APIKey,
 	}
 
 	resp, err := api.CreateAlbum(ctx, server, name)

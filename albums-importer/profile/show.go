@@ -14,6 +14,7 @@ func showProfile(ctx context.Context, profile string) (err error) {
 	slog.Info("profile",
 		slog.String("name", profile),
 		slog.String("url", config.URL),
+		slog.String("api_key", config.APIKey),
 	)
 
 	return nil

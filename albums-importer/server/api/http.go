@@ -14,8 +14,7 @@ import (
 type ServerConfig struct {
 	URL    *url.URL
 	DryRun bool
-	//APIKey string
-
+	APIKey string
 }
 
 func Post[R any](
@@ -90,7 +89,7 @@ func DoRequest(
 	if err != nil {
 		return
 	}
-	//req.Header.Set("x-api-key", server.APIKey)
+	req.Header.Set("x-api-key", server.APIKey)
 
 	if contentType != "" {
 		req.Header.Set("Content-Type", contentType)

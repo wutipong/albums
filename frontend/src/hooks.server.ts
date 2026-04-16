@@ -3,6 +3,7 @@ import { redirect, type Handle } from "@sveltejs/kit";
 import { auth } from "$lib/server/auth";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { building } from '$app/environment';
+import { error } from "node:console";
 
 const handleBetterAuth: Handle = async ({ event, resolve }) => {
     // path to your auth file
@@ -17,6 +18,11 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 };
 
 const handleSession: Handle = async ({ event, resolve }) => {
+    const apiKey = event.request.headers.get("x-api-key")
+    if (apiKey != null) {
+        return handleSessionApiKey({ event, resolve })
+    }
+
     const session = event.locals.session;
 
     if (event.url.pathname.startsWith('/login')) {
@@ -32,6 +38,29 @@ const handleSession: Handle = async ({ event, resolve }) => {
     }
 
     return resolve(event);
+}
+
+const handleSessionApiKey: Handle = async ({ event, resolve }) => {
+    const apiKey = event.request.headers.get("x-api-key")
+    if (!apiKey) {
+        throw error("apikey is missing.")
+    }
+
+    const resp = await auth.api.verifyApiKey({
+        body: {
+            key: apiKey,
+        },
+    });
+
+    if (resp.error) {
+        throw resp.error.message
+    }
+
+    if (!resp.valid) {
+        throw error("API key is invalid")
+    }
+
+    return resolve(event)
 }
 
 export const handle = sequence(handleBetterAuth, handleSession);

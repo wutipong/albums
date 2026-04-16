@@ -37,7 +37,7 @@ func Command(profileStr *string, displayLogLevel *string, fileLogLevel *string) 
 			&cli.BoolFlag{
 				Name:        "dry-run",
 				Value:       false,
-				Usage:       "Processing assets without working with the Immich server.",
+				Usage:       "Processing assets without working with the Albums server.",
 				Destination: &dryRun,
 				Category:    "Processing",
 			},
@@ -73,23 +73,24 @@ func Command(profileStr *string, displayLogLevel *string, fileLogLevel *string) 
 			c, err := profile.LoadProfile(ctx, *profileStr)
 			if err != nil {
 				return fmt.Errorf(
-					"unable to load configuration. please run 'immich-importer setup' first: %w",
+					"unable to load configuration. please run 'Albums-importer setup' first: %w",
 					err,
 				)
 			}
 
-			slog.Info("Immich instance",
+			slog.Info("Albums instance",
 				slog.String("url", c.URL),
 			)
 
 			url, err := url.Parse(c.URL)
 			if err != nil {
-				return fmt.Errorf("invalid immich url: %w", err)
+				return fmt.Errorf("invalid Albums url: %w", err)
 			}
 
 			server := api.ServerConfig{
 				URL:    url,
 				DryRun: dryRun,
+				APIKey: c.APIKey,
 			}
 
 			return Process(
