@@ -3,6 +3,7 @@ import { env } from "$env/dynamic/private";
 import { betterAuth } from "better-auth";
 import { genericOAuth } from "better-auth/plugins"
 import { sveltekitCookies } from "better-auth/svelte-kit";
+import { apiKey } from "@better-auth/api-key"
 import { Pool } from "pg";
 
 export const auth = betterAuth({
@@ -11,6 +12,9 @@ export const auth = betterAuth({
     }),
     plugins: [
         sveltekitCookies(getRequestEvent),
+        apiKey({
+            rateLimit: { enabled: false },
+        }),
         genericOAuth({
             config: [
                 {

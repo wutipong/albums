@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { authClient } from '$lib/auth-client';
-	import { mdiImageSearch, mdiMagnify, mdiImageAlbum, mdiLogout } from '@mdi/js';
+	import { mdiImageSearch, mdiMagnify, mdiImageAlbum, mdiLogout, mdiAccount } from '@mdi/js';
 	import Icon from 'mdi-svelte';
 	import { onMount } from 'svelte';
 	import { createHash } from '@better-auth/utils/hash';
@@ -30,8 +30,6 @@
 		const hashVal = await createHash('SHA-256', 'hex').digest(email);
 
 		avatarSrc = `https://gravatar.com/avatar/${hashVal} `;
-
-		console.log(avatarSrc);
 	});
 </script>
 
@@ -64,6 +62,10 @@
 				tabindex="-1"
 				class="dropdown-content menu z-1 mt-3 w-52 menu-sm rounded-box bg-base-300 p-2 shadow"
 			>
+				<li>
+					<a href="/user"><Icon path={mdiAccount} /> User</a>
+				</li>
+				<li></li>
 				<li>
 					<a href="/logout" data-sveltekit-preload-data="off"><Icon path={mdiLogout}/> Logout</a>
 				</li>
