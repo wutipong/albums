@@ -32,7 +32,10 @@
 		8080,
 		5432,
 		5173,
-		3000
+		3000,
+		3900,
+		3901,
+		3902
 	],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": ".devcontainer/post-create.sh",
@@ -45,6 +48,9 @@
 		"CACHE_DIR": "/workspaces/cache",
 		"REDIS_URL": "redis://redis:6379",
 		"WORKER_ADDRESS": "localhost:7173",
-		"CLIP_ADDRESS": "localhost:8173"
+		"CLIP_ADDRESS": "localhost:8173",
+		"GARAGE_DEFAULT_ACCESS_KEY": "GK1234567890ABCDEFGH",
+		"GARAGE_DEFAULT_SECRET_KEY": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+		"GARAGE_DEFAULT_BUCKET": "my-test-bucket"
 	}
 }

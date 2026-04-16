@@ -12,7 +12,6 @@ services:
 
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
     network_mode: service:db
-
     # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
@@ -25,7 +24,6 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
-
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
@@ -35,7 +33,29 @@ services:
       - "6379:6379"
     restart: always
 
+  # Garage S3 Service
+  garage:
+    image: dxflrs/garage:v2.3.0
+    environment:
+      GARAGE_DEFAULT_ACCESS_KEY: "GK1234567890ABCDEFGH"
+      GARAGE_DEFAULT_SECRET_KEY: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+      GARAGE_DEFAULT_BUCKET: "my-test-bucket"
+    volumes:
+      - ../garage/garage.toml:/etc/garage.toml
+      - garage-meta:/var/lib/garage/meta
+      - garage-data:/var/lib/garage/data
+    ports:
+      - "3900:3900" # S3 API
+      - "3901:3901" # RPC
+      - "3902:3902" # Web
+    command:
+      - /garage
+      - server
+      - --single-node
+      - --default-bucket
 volumes:
   postgres-data:
+  garage-meta:
+  garage-data:
 
 
