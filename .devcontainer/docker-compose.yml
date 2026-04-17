@@ -53,6 +53,18 @@ services:
       - server
       - --single-node
       - --default-bucket
+
+  imgproxy:
+    image: darthsim/imgproxy:v3
+    ports:
+      - "8080:8080"
+    environment:
+      IMGPROXY_KEY: 998815c0f9c53188a267729f1c9642874e4ce943996a5a733daf9ae23a1a7579
+      IMGPROXY_SALT: db05ab55dbb501be4915bfde6105ed42f51564bc48d5ad7b27ed674b214f158f
+      IMGPROXY_USE_S3: true
+      IMGPROXY_S3_REGION: 'garage'
+      IMGPROXY_S3_ENDPOINT: http://garage:3900
+      IMGPROXY_S3_ENDPOINT_USE_PATH_STYLE: true
 volumes:
   postgres-data:
   garage-meta:
