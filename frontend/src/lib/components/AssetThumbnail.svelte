@@ -29,7 +29,7 @@
 			<img
 				width={thumbnailWidth}
 				height={thumbnailHeight}
-				src={`/api/asset/${asset.id}/thumbnail`}
+				src={asset.thumbnail_url}
 				alt={asset.id}
 				class:hidden={preview}
 			/>
@@ -43,7 +43,7 @@
 			<img
 				width={thumbnailWidth}
 				height={thumbnailHeight}
-				src={`/api/asset/${asset.id}/preview`}
+				src={asset.preview_url}
 				alt={asset.id}
 				class="h-full w-full"
 			/>

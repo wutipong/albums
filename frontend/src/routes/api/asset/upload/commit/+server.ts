@@ -41,7 +41,6 @@ export const POST: RequestHandler = async ({ request }) => {
             Key: oldKey
         }));
 
-        console.log(r2)
     } catch (error) {
         return json({ success: false, error: "Failed to move asset." }, { status: 500 });
     }
