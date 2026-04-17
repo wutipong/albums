@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"net/url"
 	"os"
-	"time"
 
 	"github.com/wutipong/albums/albums-importer/profile"
 	"github.com/wutipong/albums/albums-importer/server/api"
@@ -44,7 +43,12 @@ func createAsset(ctx context.Context, profileName string, dryRun bool, path stri
 	}
 	defer file.Close()
 
-	resp, err := api.PostAsset(ctx, server, albumID, "", path, file, time.Now())
+	stat, err := file.Stat()
+	if err != nil {
+		return fmt.Errorf("unable to retrieve filestat: %w", err)
+	}
+
+	resp, err := api.PostAsset(ctx, server, albumID, "", path, file, stat.Size())
 	if err != nil {
 		return err
 	}

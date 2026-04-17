@@ -207,6 +207,12 @@ func uploadArchiveAsset(
 
 	defer file.Close()
 
+	stat, err := file.Stat()
+	if err != nil {
+		err = fmt.Errorf("unable to retrieve file stat:%w", err)
+		return
+	}
+
 	resp, err := api.PostAsset(
 		ctx,
 		server,
@@ -214,7 +220,7 @@ func uploadArchiveAsset(
 		archivePath,
 		filename,
 		file,
-		f.ModTime(),
+		stat.Size(),
 	)
 	if err != nil {
 		err = fmt.Errorf("failed to upload asset %s/%s: %w", archivePath, filename, err)

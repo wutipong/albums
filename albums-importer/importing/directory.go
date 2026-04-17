@@ -96,7 +96,7 @@ func ProcessDirectory(
 			path,
 			file.Name(),
 			reader,
-			info.ModTime(),
+			info.Size(),
 		)
 		if err != nil {
 			slog.Error("failed to upload asset",
