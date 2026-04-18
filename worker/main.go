@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/lmittmann/tint"
 	"github.com/urfave/cli/v3"
 	"github.com/wutipong/albums/worker/db"
@@ -201,5 +203,14 @@ func processSingle(ctx context.Context, id string) error {
 	}
 	defer db.Close(ctx)
 
-	return queue.ProcessAsset(ctx, id)
+	cfg, err := config.LoadDefaultConfig(ctx)
+	if err != nil {
+		return fmt.Errorf("unable to read s3 config: %w", err)
+	}
+	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.UsePathStyle = true
+		// BaseEndpoint: aws.String("http://localhost:4566"), // Often used with custom endpoints
+	})
+
+	return queue.ProcessAsset(ctx, client, id)
 }

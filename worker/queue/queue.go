@@ -10,6 +10,8 @@ import (
 	"github.com/acaloiaro/neoq/backends/postgres"
 	"github.com/acaloiaro/neoq/handler"
 	"github.com/acaloiaro/neoq/jobs"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/wutipong/albums/worker/db"
 )
@@ -29,6 +31,15 @@ func Init(ctx context.Context) error {
 		return fmt.Errorf("unable to initialize queue")
 	}
 
+	cfg, err := config.LoadDefaultConfig(ctx)
+	if err != nil {
+		return fmt.Errorf("unable to read s3 config: %w", err)
+	}
+	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.UsePathStyle = true
+		// BaseEndpoint: aws.String("http://localhost:4566"), // Often used with custom endpoints
+	})
+
 	// create a handler that listens for new job on the "greetings" queue
 	h := handler.New("asset-processing", func(ctx context.Context) (err error) {
 		j, _ := jobs.FromContext(ctx)
@@ -39,7 +50,7 @@ func Init(ctx context.Context) error {
 				id := j.Payload["id"]
 				idStr := id.(string)
 				slog.Info("job", slog.Any("id", id), slog.Any("command", command))
-				err = ProcessAsset(ctx, idStr)
+				err = ProcessAsset(ctx, client, idStr)
 			}
 
 		case "populate-album-cover":

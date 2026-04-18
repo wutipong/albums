@@ -33,7 +33,7 @@ export const POST: RequestHandler = async ({ request }) => {
             album_id: albumId,
             filename: filename,
             type: "image",
-            process_status: "pending",
+            process_status: "uploading",
             original: key,
         })
         .returningAll()

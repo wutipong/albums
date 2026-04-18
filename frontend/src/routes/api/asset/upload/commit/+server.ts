@@ -4,6 +4,8 @@ import { db } from "$lib/server/db";
 import { s3 } from "$lib/server/s3";
 import { CopyObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { env } from "$env/dynamic/private";
+import * as mime from 'mime-types'
+import { notifyProcessAsset } from "$lib/server/grpc/worker";
 
 export const POST: RequestHandler = async ({ request }) => {
     const req = await request.json()
@@ -20,20 +22,28 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     const oldKey = asset.original
-    asset.process_status = 'processing'
+    asset.process_status = 'pending'
     asset.original = oldKey.replace('pending', 'public')
     const newKey = asset.original
+
+    const mimetype = mime.lookup(asset.filename)
+    if (!mimetype){
+        return json({ success: false, error: "invalid content type" }, { status: 400 });
+    }
+
+    if(mimetype.startsWith('image/')){
+        asset.type = 'image'
+    } else if (mimetype.startsWith('video')){
+        asset.type = 'video'
+    }
 
     try {
         // 1. Copy the object to the permanent location
         const r1 = await s3.send(new CopyObjectCommand({
             Bucket: env.S3_BUCKET,
             Key: newKey,
-            // Source must be "bucket-name/path/to/object"
             CopySource: `${env.S3_BUCKET}/${oldKey}`
         }));
-
-        console.log(r1)
 
         // 2. Delete the original "pending" file
         const r2 = await s3.send(new DeleteObjectCommand({
@@ -52,6 +62,12 @@ export const POST: RequestHandler = async ({ request }) => {
 
     if (!resp) {
         return json({ success: false, error: "Failed to update asset" }, { status: 500 });
+    }
+
+    try{
+        await notifyProcessAsset(asset.id)
+    }catch (error){
+        return json({ success: false, error: "Failed to notify asset processing" }, { status: 500 });
     }
 
     return json({ asset: asset, success: true });
