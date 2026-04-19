@@ -8,7 +8,12 @@
 	import Toast from '$lib/components/Toast.svelte';
 
 	let { data, params }: PageProps = $props();
-	let asset = $state({ id: '<placeholder>' });
+	let asset = $state({
+		id: '<placeholder>',
+		type: 'image',
+		view_url: 'http://example.com',
+		filename: ''
+	});
 	let showViewer = $state(false);
 	let currentIndex = $state(0);
 	let hasNext = $state(true);
@@ -67,7 +72,7 @@
 
 <div class="relative flex h-screen w-screen flex-col bg-base-100">
 	<NavBar {title}></NavBar>
-	<div class="overflow-auto mx-4 pt-8">
+	<div class="mx-4 overflow-auto pt-8">
 		<div class="flex flex-wrap justify-evenly gap-4">
 			{#each data.assets as asset, index (asset)}
 				<AssetThumbnail
@@ -81,7 +86,9 @@
 		</div>
 	</div>
 	<AssetViewer
-		bind:asset
+		bind:assetType={asset.type}
+		bind:viewURL={asset.view_url}
+		bind:filename={asset.filename}
 		bind:show={showViewer}
 		{next}
 		{previous}
