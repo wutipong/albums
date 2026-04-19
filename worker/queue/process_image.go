@@ -167,7 +167,7 @@ func populateThumbnail(
 
 	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(os.Getenv("S3_BUCKET")),
-		Body:   bytes.NewBuffer(buf),
+		Body:   bytes.NewReader(buf),
 		Key:    aws.String(asset.Thumbnail),
 	})
 
