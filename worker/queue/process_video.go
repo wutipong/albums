@@ -91,7 +91,7 @@ func processVideoView(
 	}
 
 	asset.View = createAssetKey()
-	outputFile, err := os.CreateTemp("", "*view.webm")
+	outputFile, err := os.CreateTemp("", "*view.mp4")
 	if err != nil {
 		return fmt.Errorf("unable to create temp file to transcode: %w", err)
 	}

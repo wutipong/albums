@@ -28,6 +28,7 @@ func processImageAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
+	slog.Info("getting object from S3.", slog.String("id", asset.Original))
 	s3Obj, err := s3Client.GetObject(ctx, &s3.GetObjectInput{
 		Key:    aws.String(asset.Original),
 		Bucket: aws.String(os.Getenv("S3_BUCKET")),
@@ -38,6 +39,7 @@ func processImageAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset
 	}
 	defer s3Obj.Body.Close()
 
+	slog.Info("reading data", slog.String("id", asset.Original))
 	buff, err := io.ReadAll(s3Obj.Body)
 	if err != nil {
 		return fmt.Errorf("unable to read object from s3: %w", err)
@@ -179,22 +181,28 @@ func populateThumbnail(
 func PopulateImageEmbedding(
 	ctx context.Context,
 	asset *db.Asset,
-	_ *vips.Image,
+	original *vips.Image,
 ) error {
 	slog.Info("populating image embedding for asset", slog.String("id", asset.ID.String()))
 	spec, err := clip.GetImageSpec(ctx)
 	if err != nil {
 		return fmt.Errorf("unable to get image spec: %w", err)
 	}
+	copyOptions := vips.DefaultCopyOptions()
+	img, _ := original.Copy(copyOptions)
 
-	originalPath := createCacheAssetPath(asset.ID.String(), asset.Original)
-	img, _ := vips.NewImageFromFile(originalPath, nil)
 	defer img.Close()
 
 	err = img.Autorot(nil)
 	if err != nil {
 		return fmt.Errorf("unable to perform auto rotating: %w", err)
 	}
+
+	width := img.Width()
+	pageHeight := img.PageHeight()
+
+	img.ExtractArea(0, 0, width, pageHeight)
+	img.SetPages(1)
 
 	options := vips.DefaultThumbnailImageOptions()
 	options.Height = int(spec.Height)
