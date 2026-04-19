@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 
         const thumbnail_url = generateImageUrl({
             endpoint: env.IMGPROXY_URL,
-            url: `s3://${env.S3_BUCKET}/${asset.original}`,
+            url: `s3://${env.S3_BUCKET}/${asset.thumbnail}`,
             options: {
                 resizing_type: "auto",
                 height: 200,
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 
         const preview_url = generateImageUrl({
             endpoint: env.IMGPROXY_URL,
-            url: `s3://${env.S3_BUCKET}/${asset.original}`,
+            url: `s3://${env.S3_BUCKET}/${asset.preview}`,
             options: {
                 resizing_type: "auto",
                 height: 200,
@@ -43,7 +43,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 
         const view_url = generateImageUrl({
             endpoint: env.IMGPROXY_URL,
-            url: `s3://${env.S3_BUCKET}/${asset.original}`,
+            url: `s3://${env.S3_BUCKET}/${asset.view}`,
             options: {
                 resizing_type: "auto",
                 height: 2000,
