@@ -145,7 +145,7 @@ func WalkArchive(
 				}
 				defer file.Close()
 
-				tempFile, err := os.CreateTemp("", filename)
+				tempFile, err := os.CreateTemp("", filepath.Base(filename))
 				if err != nil {
 					return fmt.Errorf("unable to create temporary file: %w", err)
 				}
