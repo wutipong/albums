@@ -19,6 +19,8 @@ import (
 	"github.com/wutipong/albums/worker/db"
 )
 
+const THUMBNAIL_HEIGHT = 200
+
 func processImageAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset) error {
 	slog.Info("processing image asset", slog.String("id", asset.ID.String()))
 
@@ -58,9 +60,9 @@ func processImageAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset
 	}
 	defer original.Close()
 
-	err = populateThumbnail(ctx, s3Client, asset, original)
+	err = populateView(ctx, s3Client, asset, original)
 	if err != nil {
-		return fmt.Errorf("unable to populate thumbnail: %e", err)
+		return fmt.Errorf("unable to populate view image: %e", err)
 	}
 
 	err = populatePreview(ctx, s3Client, asset, original)
@@ -68,9 +70,9 @@ func processImageAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset
 		return fmt.Errorf("unable to populate preview image: %e", err)
 	}
 
-	err = populateView(ctx, s3Client, asset, original)
+	err = populateThumbnail(ctx, s3Client, asset, original)
 	if err != nil {
-		return fmt.Errorf("unable to populate view image: %e", err)
+		return fmt.Errorf("unable to populate thumbnail: %e", err)
 	}
 
 	err = PopulateImageEmbedding(ctx, asset, original)
@@ -82,7 +84,7 @@ func processImageAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset
 
 func populateView(
 	ctx context.Context,
-	_ *s3.Client,
+	s3Client *s3.Client,
 	asset *db.Asset,
 	original *vips.Image,
 ) error {
@@ -93,9 +95,36 @@ func populateView(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	asset.View = asset.Original
 	asset.ViewWidth = int32(original.Width())
 	asset.ViewHeight = int32(original.Height())
+
+	if filepath.Ext(asset.Filename) != ".gif" {
+		asset.View = asset.Original
+
+		return nil
+	}
+
+	view, err := original.Copy(nil)
+	if err != nil {
+		return fmt.Errorf("unable to copy original image: %w", err)
+	}
+
+	buf, err := view.WebpsaveBuffer(nil)
+	if err != nil {
+		return fmt.Errorf("unable to save to webp image.")
+	}
+
+	asset.View = createAssetKey()
+
+	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
+		Bucket: aws.String(os.Getenv("S3_BUCKET")),
+		Body:   bytes.NewReader(buf),
+		Key:    aws.String(asset.View),
+	})
+
+	if err != nil {
+		return fmt.Errorf("unable to put object to S3: %w", err)
+	}
 
 	return nil
 }
@@ -106,7 +135,10 @@ func populatePreview(
 	asset *db.Asset,
 	original *vips.Image,
 ) error {
-	slog.Info("populating preview media for asset", slog.String("id", asset.ID.String()))
+	slog.Info(
+		"populating preview media for asset",
+		slog.String("id", asset.ID.String()),
+	)
 
 	err := ctx.Err()
 	if err != nil {
@@ -132,13 +164,15 @@ func populateThumbnail(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
+	asset.ThumbnailWidth = int32((original.Width() * THUMBNAIL_HEIGHT) / original.Height())
+	asset.ThumbnailHeight = THUMBNAIL_HEIGHT
+
 	if original.Pages() == 1 {
 		asset.Thumbnail = asset.Original
-		asset.ThumbnailWidth = int32(original.Width())
-		asset.ThumbnailHeight = int32(original.Height())
 
 		return nil
 	}
+
 	copyOptions := vips.DefaultCopyOptions()
 
 	thumbnail, _ := original.Copy(copyOptions)
