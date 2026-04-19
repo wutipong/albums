@@ -1,14 +1,14 @@
 import type { RequestHandler } from "./$types";
-import fs from "node:fs/promises";
-import type { File } from "node:buffer";
 import { json } from "@sveltejs/kit";
 import { db } from "$lib/server/db";
 import { s3 } from "$lib/server/s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
+import * as mime from 'mime-types'
 
 import { randomUUID } from 'node:crypto';
 import { env } from "$env/dynamic/private";
+import path from "node:path";
 
 export const POST: RequestHandler = async ({ request }) => {
     const req = await request.json()
@@ -28,11 +28,22 @@ export const POST: RequestHandler = async ({ request }) => {
     }
     const key = `pending/${randomUUID()}`
 
+    const contentType = mime.contentType(path.basename(filename))
+
+    if (!contentType) {
+        return json({ success: false, error: "Failed to recognize filetype"}, {status: 400})
+    }
+    const type = contentType.substring(0, contentType.indexOf("/"))
+
+    if (type != 'image' && type != 'video') {
+        return json({ success: false, error: "Unsupported asset type."}, {status: 400})
+    }
+
     const asset = await db.insertInto("assets")
         .values({
             album_id: albumId,
             filename: filename,
-            type: "image",
+            type: type,
             process_status: "uploading",
             original: key,
         })
@@ -47,6 +58,7 @@ export const POST: RequestHandler = async ({ request }) => {
         Bucket: env.S3_BUCKET,
         Key: key,
         ChecksumCRC32: checksum,
+        ContentType: contentType,
     });
     const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
