@@ -14,7 +14,7 @@
                     alt={album.id} 
                     width='300' 
                     height='200'
-                    >
+                />
             {/if}
         </a>
     </figure>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import notAvailableSvg from '$lib/assets/not-available-small.svg?raw'
 	let { asset, onclick = (id: string) => {} } = $props();
 
 	const TARGET_HEIGHT = 200;
@@ -19,6 +20,7 @@
 	onclick={() => {
 		onclick(asset);
 	}}
+	disabled={asset.process_status != 'processed'}
 >
 	<div class="relative h-full w-full">
 		<div
@@ -26,13 +28,17 @@
 			class="box-border h-full w-full overflow-hidden rounded-xl"
 			style={`width: ${thumbnailWidth}px; height: ${thumbnailHeight}px;`}
 		>
-			<img
-				width={thumbnailWidth}
-				height={thumbnailHeight}
-				src={asset.thumbnail_url}
-				alt={asset.id}
-				class:hidden={preview}
-			/>
+			{#if asset.thumbnail_url ===''}
+				{@html notAvailableSvg}
+			{:else}
+				<img
+					width={thumbnailWidth}
+					height={thumbnailHeight}
+					src={asset.thumbnail_url}
+					alt={asset.id}
+					class:hidden={preview}
+				/>
+			{/if}
 		</div>
 
 		<div
@@ -40,13 +46,17 @@
 			class="box-border h-full w-full overflow-hidden rounded-xl"
 			style={`width: ${thumbnailWidth}px; height: ${thumbnailHeight}px;`}
 		>
-			<img
-				width={thumbnailWidth}
-				height={thumbnailHeight}
-				src={asset.preview_url}
-				alt={asset.id}
-				class="h-full w-full"
-			/>
+			{#if asset.preview_url == ''}
+				{@html notAvailableSvg}
+			{:else}
+				<img
+					width={thumbnailWidth}
+					height={thumbnailHeight}
+					src={asset.preview_url}
+					alt={asset.id}
+					class="h-full w-full"
+				/>
+			{/if}
 		</div>
 
 		<div class="absolute top-1 right-2 place-items-end">

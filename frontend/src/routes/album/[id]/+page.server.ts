@@ -15,47 +15,54 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 
     const outAssets = []
     for (const asset of assets) {
-        const video_duration = asset.video_duration.seconds
 
-        const thumbnail_url = generateImageUrl({
-            endpoint: env.IMGPROXY_URL,
-            url: `s3://${env.S3_BUCKET}/${asset.thumbnail}`,
-            options: {
-                resizing_type: "auto",
-                height: 200,
-                enlarge: 1,
-            },
-            salt: env.IMGPROXY_SALT,
-            key: env.IMGPROXY_KEY,
-        })
+        if (asset.process_status === 'processed') {
+            const video_duration = asset.video_duration.seconds
 
-        const preview_url = generateImageUrl({
-            endpoint: env.IMGPROXY_URL,
-            url: `s3://${env.S3_BUCKET}/${asset.preview}`,
-            options: {
-                resizing_type: "auto",
-                height: 200,
-                enlarge: 1,
-            },
-            salt: env.IMGPROXY_SALT,
-            key: env.IMGPROXY_KEY,
-        })
+            const thumbnail_url = generateImageUrl({
+                endpoint: env.IMGPROXY_URL,
+                url: `s3://${env.S3_BUCKET}/${asset.thumbnail}`,
+                options: {
+                    resizing_type: "auto",
+                    height: 200,
+                    enlarge: 1,
+                },
+                salt: env.IMGPROXY_SALT,
+                key: env.IMGPROXY_KEY,
+            })
 
-        const view_url = generateImageUrl({
-            endpoint: env.IMGPROXY_URL,
-            url: `s3://${env.S3_BUCKET}/${asset.view}`,
-            options: {
-                resizing_type: "auto",
-                height: 2000,
-                enlarge: 1,
-            },
-            salt: env.IMGPROXY_SALT,
-            key: env.IMGPROXY_KEY,
-        })
+            const preview_url = generateImageUrl({
+                endpoint: env.IMGPROXY_URL,
+                url: `s3://${env.S3_BUCKET}/${asset.preview}`,
+                options: {
+                    resizing_type: "auto",
+                    height: 200,
+                    enlarge: 1,
+                },
+                salt: env.IMGPROXY_SALT,
+                key: env.IMGPROXY_KEY,
+            })
 
-        const out = { ...asset, video_duration, thumbnail_url, preview_url, view_url }
+            const view_url = generateImageUrl({
+                endpoint: env.IMGPROXY_URL,
+                url: `s3://${env.S3_BUCKET}/${asset.view}`,
+                options: {
+                    resizing_type: "auto",
+                    height: 2000,
+                    enlarge: 1,
+                },
+                salt: env.IMGPROXY_SALT,
+                key: env.IMGPROXY_KEY,
+            })
 
-        outAssets.push(out)
+            const out = { ...asset, video_duration, thumbnail_url, preview_url, view_url }
+            outAssets.push(out)
+        }
+        else {
+            const out = { ...asset, video_duration: 0, thumbnail_url: '', preview_url: '', view_url: '' }
+            outAssets.push(out)
+        }
+
     }
 
     const album = await db.selectFrom('albums')
