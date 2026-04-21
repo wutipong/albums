@@ -12,9 +12,10 @@ import (
 )
 
 type ServerConfig struct {
-	URL    *url.URL
-	DryRun bool
-	APIKey string
+	URL     *url.URL
+	DryRun  bool
+	APIKey  string
+	Network string
 }
 
 func Post[R any](

@@ -68,6 +68,18 @@ func setupProfile(ctx context.Context, profile string) error {
 	}
 	config.APIKey = result
 
+	networkPrompt := promptui.Select{
+		Label: "Network",
+		Items: []string{"public", "private"},
+	}
+	_, result, err = networkPrompt.Run()
+
+	if err != nil {
+		err = fmt.Errorf("prompt failed: %w", err)
+		return err
+	}
+	config.Network = Network(result)
+
 	configMap[profile] = config
 
 	err = saveConfigMap(ctx, configMap)

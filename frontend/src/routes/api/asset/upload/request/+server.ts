@@ -1,7 +1,7 @@
 import type { RequestHandler } from "./$types";
 import { json } from "@sveltejs/kit";
 import { db } from "$lib/server/db";
-import { s3 } from "$lib/server/s3";
+import { s3, s3Public } from "$lib/server/s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import * as mime from 'mime-types'
@@ -15,6 +15,9 @@ export const POST: RequestHandler = async ({ request }) => {
     const albumId = req.album_id;
     const filename = req.filename;
     const checksum = req.checksum;
+    const network = req.network ?? 'private';
+
+    console.log(network)
 
     const album = await db.selectFrom('albums')
         .selectAll()
@@ -31,12 +34,12 @@ export const POST: RequestHandler = async ({ request }) => {
     const contentType = mime.contentType(path.basename(filename))
 
     if (!contentType) {
-        return json({ success: false, error: "Failed to recognize filetype"}, {status: 400})
+        return json({ success: false, error: "Failed to recognize filetype" }, { status: 400 })
     }
     const type = contentType.substring(0, contentType.indexOf("/"))
 
     if (type != 'image' && type != 'video') {
-        return json({ success: false, error: "Unsupported asset type."}, {status: 400})
+        return json({ success: false, error: "Unsupported asset type." }, { status: 400 })
     }
 
     const asset = await db.insertInto("assets")
@@ -60,7 +63,12 @@ export const POST: RequestHandler = async ({ request }) => {
         ChecksumCRC32: checksum,
         ContentType: contentType,
     });
-    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+    const url = await getSignedUrl(
+        network === 'public' ? s3Public : s3, 
+        command, 
+        { expiresIn: 3600 }
+    );
 
     return json({ id: asset.id, url, success: true });
 };

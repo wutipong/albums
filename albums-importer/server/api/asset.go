@@ -68,6 +68,7 @@ func PostAsset(
 			AlbumID:  albumID,
 			Filename: assetFileName,
 			Checksum: encoded,
+			Network:  server.Network,
 		})
 	if err != nil {
 		err = fmt.Errorf("request to upload failed: %w", err)
@@ -110,6 +111,7 @@ type PostAssetRequestRequest struct {
 	AlbumID  string `json:"album_id"`
 	Filename string `json:"filename"`
 	Checksum string `json:"checksum"`
+	Network  string `json:"network"`
 }
 
 type PostAssetRequestResponse struct {
