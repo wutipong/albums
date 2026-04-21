@@ -133,9 +133,10 @@ func processVideoView(
 	outputFile.Seek(0, io.SeekStart)
 
 	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: aws.String(os.Getenv("S3_BUCKET")),
-		Body:   outputFile,
-		Key:    aws.String(asset.View),
+		Bucket:      aws.String(os.Getenv("S3_BUCKET")),
+		Body:        outputFile,
+		Key:         aws.String(asset.View),
+		ContentType: aws.String("video/mp4"),
 	})
 
 	return nil
@@ -191,9 +192,10 @@ func processVideoThumbnail(
 	}
 
 	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: aws.String(os.Getenv("S3_BUCKET")),
-		Body:   outputFile,
-		Key:    aws.String(asset.Thumbnail),
+		Bucket:      aws.String(os.Getenv("S3_BUCKET")),
+		Body:        outputFile,
+		Key:         aws.String(asset.Thumbnail),
+		ContentType: aws.String("image/webp"),
 	})
 	return nil
 }
@@ -237,9 +239,10 @@ func processVideoPreview(
 
 	asset.Preview = createAssetKey()
 	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: aws.String(os.Getenv("S3_BUCKET")),
-		Body:   outputFile,
-		Key:    aws.String(asset.Preview),
+		Bucket:      aws.String(os.Getenv("S3_BUCKET")),
+		Body:        outputFile,
+		Key:         aws.String(asset.Preview),
+		ContentType: aws.String("image/webp"),
 	})
 
 	return nil

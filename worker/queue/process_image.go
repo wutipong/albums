@@ -117,9 +117,10 @@ func populateView(
 	asset.View = createAssetKey()
 
 	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: aws.String(os.Getenv("S3_BUCKET")),
-		Body:   bytes.NewReader(buf),
-		Key:    aws.String(asset.View),
+		Bucket:      aws.String(os.Getenv("S3_BUCKET")),
+		Body:        bytes.NewReader(buf),
+		Key:         aws.String(asset.View),
+		ContentType: aws.String("image/webp"),
 	})
 
 	if err != nil {
@@ -200,9 +201,10 @@ func populateThumbnail(
 	asset.Thumbnail = createAssetKey()
 
 	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: aws.String(os.Getenv("S3_BUCKET")),
-		Body:   bytes.NewReader(buf),
-		Key:    aws.String(asset.Thumbnail),
+		Bucket:      aws.String(os.Getenv("S3_BUCKET")),
+		Body:        bytes.NewReader(buf),
+		Key:         aws.String(asset.Thumbnail),
+		ContentType: aws.String("image/webp"),
 	})
 
 	if err != nil {
@@ -278,20 +280,4 @@ func ParseNumpyBytes(b []byte) (pgvector.Vector, error) {
 	}
 
 	return pgvector.NewVector(vec), nil
-}
-
-func createCacheAssetPath(id string, args ...string) string {
-	topLevelDir := id[0:2]
-	secondLevelDir := id[2:4]
-
-	combined := []string{
-		os.Getenv("CACHE_DIR"),
-		"assets",
-		topLevelDir,
-		secondLevelDir,
-		id,
-	}
-	combined = append(combined, args...)
-
-	return filepath.Join(combined...)
 }
