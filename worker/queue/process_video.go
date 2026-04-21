@@ -13,7 +13,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/davidbyttow/govips/v2/vips"
 	"github.com/jackc/pgx/v5/pgtype"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"github.com/wutipong/albums/worker/db"
@@ -82,7 +81,7 @@ func processVideoAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset
 
 func processVideoView(
 	ctx context.Context, s3Client *s3.Client, asset *db.Asset,
-	originalFile *os.File, info Probe,
+	originalFile *os.File, _ Probe,
 ) error {
 	slog.Info("process video asset view media", slog.Any("id", asset.ID))
 	err := ctx.Err()
@@ -176,14 +175,6 @@ func processVideoThumbnail(
 	if err != nil {
 		return fmt.Errorf("unable to create thumbnail asset for video asset: %w", err)
 	}
-
-	thumbnail, err := vips.NewImageFromFile(outputFile.Name())
-	if err != nil {
-		return fmt.Errorf("unable to read thumbnail image: %w", err)
-	}
-	asset.Thumbnail = createAssetKey()
-	asset.ThumbnailWidth = int32(thumbnail.Width())
-	asset.ThumbnailHeight = int32(thumbnail.Height())
 
 	videoDuration := time.Duration(duration) * time.Second
 	asset.VideoDuration = pgtype.Interval{
