@@ -18,7 +18,7 @@ export const load: PageServerLoad = async () => {
 				endpoint: env.IMGPROXY_URL,
 				url: `s3://${env.S3_BUCKET}/${album.cover}`,
 				options: {
-					resizing_type: "auto",
+					resizing_type: "fill",
 					height: 200,
 					width: 300,
 					enlarge: 1,
