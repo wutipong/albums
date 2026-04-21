@@ -59,6 +59,7 @@ export const load: PageServerLoad = async ({ params, fetch, url }) => {
             key: env.IMGPROXY_KEY,
         })
 
+
         const view_url = generateImageUrl({
             endpoint: env.IMGPROXY_URL,
             url: `s3://${env.S3_BUCKET}/${asset.view}`,

@@ -8,5 +8,15 @@ export const s3 = new S3Client({
         accessKeyId: env.AWS_ACCESS_KEY_ID ?? "",
         secretAccessKey: env.AWS_SECRET_ACCESS_KEY ?? "",
     },
-    forcePathStyle: true,
+    forcePathStyle: true, 
+});
+
+export const s3Public = new S3Client({
+    region: env.AWS_DEFAULT_REGION ?? "",
+    endpoint: env.S3_PUBLIC_URL ?? "",
+    credentials: {
+        accessKeyId: env.AWS_ACCESS_KEY_ID ?? "",
+        secretAccessKey: env.AWS_SECRET_ACCESS_KEY ?? "",
+    },
+    forcePathStyle: true, 
 });

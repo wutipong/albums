@@ -14,6 +14,8 @@
 		hasPrevious = false,
 		menu
 	} = $props();
+
+	$inspect(viewURL)
 </script>
 
 <style lang="scss">
@@ -45,13 +47,17 @@
 			</div>
 		{/if}
 		{#if assetType === 'video'}
-			<media-player
-				title={filename}
-				src={viewURL}
-			>
-				<media-provider></media-provider>
-				<media-video-layout></media-video-layout>
-			</media-player>
+			{#key viewURL}
+				<media-player
+					title={filename}
+					src={viewURL}
+				>
+					<media-provider >
+						<source src={viewURL} type="video/mp4" />
+					</media-provider>
+					<media-video-layout></media-video-layout>
+				</media-player>
+			{/key}
 		{/if}
 		<div
 			class="absolute top-1/2 left-4 -translate-y-1/2 bg-transparent"
