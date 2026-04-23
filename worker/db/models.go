@@ -62,6 +62,7 @@ const (
 	ProcessStatusTPending    ProcessStatusT = "pending"
 	ProcessStatusTProcessing ProcessStatusT = "processing"
 	ProcessStatusTProcessed  ProcessStatusT = "processed"
+	ProcessStatusTUploading  ProcessStatusT = "uploading"
 )
 
 func (e *ProcessStatusT) Scan(src interface{}) error {

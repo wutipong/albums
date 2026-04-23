@@ -31,7 +31,7 @@ while true; do
     sleep 0.5
 done
 
-rm -rf cache
+aws s3 rm s3://${S3_BUCKET} --recursive
 
 dbmate up
 

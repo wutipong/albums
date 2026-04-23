@@ -8,13 +8,34 @@
 	import Toast from '$lib/components/Toast.svelte';
 
 	let { data, params }: PageProps = $props();
-	let asset = $state({ id: '<placeholder>' });
+	let asset = $state({
+		id: '<placeholder>',
+		type: 'image',
+		view_url: 'http://example.com',
+		filename: ''
+	});
 	let showViewer = $state(false);
 	let currentIndex = $state(0);
-	let hasNext = $state(true);
-	let hasPrevious = $state(true);
+
+	let nextIndex = $state(-1)
+	let prevIndex = $state(-1)
 
 	let toast: Toast;
+
+	function findPrevious(assets: any[], index: number): number {
+		return assets.slice(0, index).findLastIndex((asset: any, index, arr) => {
+			if (asset == undefined) return false;
+			return asset.process_status == 'processed';
+		});
+	}
+
+	function findNext(assets: any[], index: number): number {
+		return assets.findIndex((asset: any, i, arr) => {
+			if (i <= index) return false
+			if (asset == undefined) return false;
+			return asset.process_status == 'processed';
+		});
+	}
 
 	async function setAlbumCover(albumId: string, assetId: string) {
 		await fetch(`/api/album/${albumId}/cover`, {
@@ -29,29 +50,25 @@
 	}
 
 	function next() {
-		if (hasNext) {
-			currentIndex++;
-		} else {
-			return;
-		}
+		if (nextIndex === -1) {
+			return
+		} 
+
+		currentIndex = nextIndex;
 		onIndexUpdated(currentIndex);
 	}
 
 	function previous() {
-		if (hasPrevious) {
-			currentIndex--;
-		} else {
-			return;
-		}
-
+		if (prevIndex === -1) {
+			return
+		} 
+		currentIndex = prevIndex
 		onIndexUpdated(currentIndex);
 	}
 
 	function onIndexUpdated(index: number) {
-		if (index == data.assets.length - 1) hasNext = false;
-		else hasNext = true;
-		if (index == 0) hasPrevious = false;
-		else hasPrevious = true;
+		nextIndex = findNext(data.assets, index);
+		prevIndex = findPrevious(data.assets, index);
 
 		currentIndex = index;
 		asset = data.assets[index];
@@ -67,7 +84,7 @@
 
 <div class="relative flex h-screen w-screen flex-col bg-base-100">
 	<NavBar {title}></NavBar>
-	<div class="overflow-auto mx-4 pt-8">
+	<div class="mx-4 overflow-auto pt-8">
 		<div class="flex flex-wrap justify-evenly gap-4">
 			{#each data.assets as asset, index (asset)}
 				<AssetThumbnail
@@ -81,12 +98,14 @@
 		</div>
 	</div>
 	<AssetViewer
-		bind:asset
+		bind:assetType={asset.type}
+		bind:viewURL={asset.view_url}
+		bind:filename={asset.filename}
 		bind:show={showViewer}
 		{next}
 		{previous}
-		{hasNext}
-		{hasPrevious}
+		hasNext={nextIndex != -1}
+		hasPrevious={prevIndex != -1}
 		menu={viewMenu}
 	/>
 </div>

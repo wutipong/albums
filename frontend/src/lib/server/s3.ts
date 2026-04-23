@@ -1,0 +1,22 @@
+import { S3Client } from "@aws-sdk/client-s3";
+import { env } from "$env/dynamic/private";
+
+export const s3 = new S3Client({
+    region: env.AWS_DEFAULT_REGION ?? "",
+    endpoint: env.AWS_ENDPOINT_URL ?? "",
+    credentials: {
+        accessKeyId: env.AWS_ACCESS_KEY_ID ?? "",
+        secretAccessKey: env.AWS_SECRET_ACCESS_KEY ?? "",
+    },
+    forcePathStyle: true, 
+});
+
+export const s3Public = new S3Client({
+    region: env.AWS_DEFAULT_REGION ?? "",
+    endpoint: env.S3_PUBLIC_URL ?? "",
+    credentials: {
+        accessKeyId: env.AWS_ACCESS_KEY_ID ?? "",
+        secretAccessKey: env.AWS_SECRET_ACCESS_KEY ?? "",
+    },
+    forcePathStyle: true, 
+});

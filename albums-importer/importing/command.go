@@ -88,9 +88,10 @@ func Command(profileStr *string, displayLogLevel *string, fileLogLevel *string) 
 			}
 
 			server := api.ServerConfig{
-				URL:    url,
-				DryRun: dryRun,
-				APIKey: c.APIKey,
+				URL:     url,
+				DryRun:  dryRun,
+				APIKey:  c.APIKey,
+				Network: string(c.Network),
 			}
 
 			return Process(

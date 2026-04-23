@@ -46,7 +46,10 @@
 		"vite": "^7.3.1"
 	},
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.1031.0",
+		"@aws-sdk/s3-request-presigner": "^3.1031.0",
 		"@better-auth/api-key": "^1.6.4",
+		"@imgproxy/imgproxy-node": "^1.1.0",
 		"@mdi/js": "^7.4.47",
 		"@types/mime-types": "^3.0.1",
 		"@types/pg": "^8.20.0",

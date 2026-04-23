@@ -1,22 +1,16 @@
 package queue
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
 
-	vips "github.com/cshum/vipsgen/vips816"
 	"github.com/jackc/pgx/v5/pgtype"
-	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"github.com/wutipong/albums/worker/db"
 )
 
-const ALBUM_COVER_WIDTH = 300
-const ALBUM_COVER_HEIGHT = 200
 const ALBUM_COVER_FILE = "cover.webp"
 
 func PopulateAlbumsCover(ctx context.Context) error {
@@ -89,19 +83,9 @@ func SetAlbumCoverFromAsset(
 	asset db.Asset,
 	album db.Album,
 ) error {
-	var err error
-	switch asset.Type {
-	case "image":
-		err = populateAlbumCoverFromImageAsset(ctx, &album, &asset)
-	case "video":
-		err = populateAlbumCoverFromVideoAsset(ctx, &album, &asset)
-	}
+	album.Cover = asset.Thumbnail
 
-	if err != nil {
-		return fmt.Errorf("unable to populate cover from asset: %w", err)
-	}
-
-	_, err = queries.UpdateAlbumThumbnail(ctx, db.UpdateAlbumThumbnailParams{
+	_, err := queries.UpdateAlbumThumbnail(ctx, db.UpdateAlbumThumbnailParams{
 		ID:    album.ID,
 		Cover: album.Cover,
 	})
@@ -110,106 +94,6 @@ func SetAlbumCoverFromAsset(
 		return fmt.Errorf("unable update data: %w", err)
 	}
 
-	return nil
-}
-
-func populateAlbumCoverFromImageAsset(
-	ctx context.Context,
-	album *db.Album,
-	asset *db.Asset,
-) error {
-	err := ctx.Err()
-	if err != nil {
-		slog.Info("context.", slog.String("error", err.Error()))
-		return fmt.Errorf("context cancelled: %w", err)
-	}
-
-	assetId := asset.ID.String()
-	originalPath := createCacheAssetPath(assetId, asset.Original)
-	slog.Info("original asset path", slog.String("path", originalPath))
-
-	cover, err := vips.NewImageFromFile(originalPath, nil)
-	if err != nil {
-		return fmt.Errorf("unable to read image: %w", err)
-	}
-
-	return writeAlbumCover(err, cover, album)
-}
-
-func populateAlbumCoverFromVideoAsset(ctx context.Context, album *db.Album, asset *db.Asset) error {
-	err := ctx.Err()
-	if err != nil {
-		slog.Info("context.", slog.String("error", err.Error()))
-		return fmt.Errorf("context cancelled: %w", err)
-	}
-
-	assetId := asset.ID.String()
-	originalPath := createCacheAssetPath(assetId, asset.Original)
-	slog.Info("original asset path", slog.String("path", originalPath))
-
-	probe, err := ffmpeg.Probe(originalPath)
-	if err != nil {
-		return fmt.Errorf("unable to probe original video: %w", err)
-	}
-
-	var info Probe
-	json.Unmarshal([]byte(probe), &info)
-
-	buffer := new(bytes.Buffer)
-	err = ffmpeg.Input(originalPath).
-		WithOutput(buffer).
-		Output("pipe:", ffmpeg.KwArgs{
-			"c:v":     "libwebp",
-			"f":       "webp",
-			"vframes": "1",
-			"quality": fmt.Sprintf("%d", THUMBNAIL_QUALITY),
-		}).OverWriteOutput().ErrorToStdOut().Run()
-
-	image, err := vips.NewImageFromBuffer(buffer.Bytes(), nil)
-	if err != nil {
-		return fmt.Errorf("unable to read image from ffmpeg output: %w", err)
-	}
-
-	slog.Debug("image", slog.Any("image", image))
-
-	return writeAlbumCover(err, image, album)
-}
-
-func writeAlbumCover(err error, cover *vips.Image, album *db.Album) error {
-	err = cover.Autorot(nil)
-	if err != nil {
-		return fmt.Errorf("unable to perform auto rotating: %w", err)
-	}
-
-	options := vips.DefaultThumbnailImageOptions()
-	options.Height = ALBUM_COVER_HEIGHT
-	options.Crop = vips.InterestingAttention
-	options.Size = vips.SizeBoth
-
-	err = cover.ThumbnailImage(ALBUM_COVER_WIDTH, options)
-	if err != nil {
-		return fmt.Errorf("unable to resize preview image: %w", err)
-	}
-
-	album.Cover = ALBUM_COVER_FILE
-	coverPath := createCacheAlbumPath(album.ID.String(), album.Cover)
-	err = os.MkdirAll(filepath.Dir(coverPath), 0755)
-	if err != nil {
-		return fmt.Errorf("unable to reate directory: %w", err)
-	}
-
-	saveParams := vips.DefaultWebpsaveBufferOptions()
-	saveParams.Q = THUMBNAIL_QUALITY
-
-	buf, err := cover.WebpsaveBuffer(saveParams)
-	if err != nil {
-		return fmt.Errorf("unable to write preview image: %w", err)
-	}
-
-	err = os.WriteFile(coverPath, buf, 0644)
-	if err != nil {
-		return fmt.Errorf("unable to save file: %w", err)
-	}
 	return nil
 }
 

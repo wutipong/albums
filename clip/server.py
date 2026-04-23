@@ -1,5 +1,6 @@
 
 from concurrent import futures
+import threading
 from PIL import Image
 from transformers import CLIPModel, CLIPProcessor, CLIPConfig
 import clip_pb2
@@ -11,6 +12,7 @@ import torch
 
 MODEL_ID = "openai/clip-vit-base-patch32"
 
+lock = threading.Lock()
 
 class EncodingServer(clip_pb2_grpc.EncodingService):
     def __init__(self) -> None:
@@ -31,26 +33,29 @@ class EncodingServer(clip_pb2_grpc.EncodingService):
         '''
         generate the 512-d embeddings of the texts
         '''
-        inputs = self.processor(
-            text=request.input, return_tensors="pt", padding=True).to(self.device)
-        text_embeddings = self.model.get_text_features(**inputs)
-        output = text_embeddings.cpu().detach().numpy().tobytes()
 
-        return clip_pb2.EncodeResponse(embedding=output)
+        with lock:
+            inputs = self.processor(
+                text=request.input, return_tensors="pt", padding=True).to(self.device)
+            text_embeddings = self.model.get_text_features(**inputs)
+            output = text_embeddings.cpu().detach().numpy().tobytes()
+
+            return clip_pb2.EncodeResponse(embedding=output)
 
     def EncodeImage(self, request, context):
         '''
         generate the 512-d embeddings of the images
         '''
-        image_data = request.image
-        image = Image.open(io.BytesIO(image_data))
+        with lock:
+            image_data = request.image
+            image = Image.open(io.BytesIO(image_data))
 
-        inputs = self.processor(
-            images=image, return_tensors="pt", padding=True).to(self.device)
-        image_embeddings = self.model.get_image_features(**inputs)
-        output = image_embeddings.cpu().detach().numpy().tobytes()
+            inputs = self.processor(
+                images=image, return_tensors="pt", padding=True).to(self.device)
+            image_embeddings = self.model.get_image_features(**inputs)
+            output = image_embeddings.cpu().detach().numpy().tobytes()
 
-        return clip_pb2.EncodeResponse(embedding=output)
+            return clip_pb2.EncodeResponse(embedding=output)
 
     def GetImageSpec(self, request, context):
         width = self.config.vision_config.image_size

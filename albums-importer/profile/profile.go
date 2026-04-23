@@ -12,9 +12,17 @@ import (
 	"go.yaml.in/yaml/v4"
 )
 
+type Network string
+
+const (
+	NetworkPublic  Network = "public"
+	NetworkPrivate Network = "private"
+)
+
 type Profile struct {
-	URL    string `yaml:"url"`
-	APIKey string `yaml:"api_key"`
+	URL     string  `yaml:"url"`
+	APIKey  string  `yaml:"api_key"`
+	Network Network `yaml:"network"`
 }
 
 func createConfigPath() (path string, err error) {

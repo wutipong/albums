@@ -1,7 +1,6 @@
 package importing
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -146,13 +145,22 @@ func WalkArchive(
 				}
 				defer file.Close()
 
-				buffer := bytes.Buffer{}
-				_, err = io.Copy(&buffer, file)
+				tempFile, err := os.CreateTemp("", filepath.Base(filename))
+				if err != nil {
+					return fmt.Errorf("unable to create temporary file: %w", err)
+				}
 
-				reader := bytes.NewReader(buffer.Bytes())
+				defer os.Remove(tempFile.Name())
+				defer tempFile.Close()
+
+				_, err = io.Copy(tempFile, file)
+				if err != nil {
+					return fmt.Errorf("unable to copy data to the temporary: %w", err)
+				}
+				tempFile.Seek(0, io.SeekStart)
 
 				err = WalkArchive(
-					ctx, server, albumID, filepath.Join(archivePath, filename), reader,
+					ctx, server, albumID, filepath.Join(archivePath, filename), tempFile,
 				)
 				if err != nil {
 					return fmt.Errorf("failed to process nested archive %s: %w", filename, err)
@@ -207,6 +215,12 @@ func uploadArchiveAsset(
 
 	defer file.Close()
 
+	stat, err := file.Stat()
+	if err != nil {
+		err = fmt.Errorf("unable to retrieve file stat:%w", err)
+		return
+	}
+
 	resp, err := api.PostAsset(
 		ctx,
 		server,
@@ -214,7 +228,7 @@ func uploadArchiveAsset(
 		archivePath,
 		filename,
 		file,
-		f.ModTime(),
+		stat.Size(),
 	)
 	if err != nil {
 		err = fmt.Errorf("failed to upload asset %s/%s: %w", archivePath, filename, err)

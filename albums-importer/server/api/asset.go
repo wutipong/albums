@@ -3,12 +3,14 @@ package api
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
+	"encoding/binary"
 	"fmt"
+	"hash/crc32"
 	"io"
 	"log/slog"
-	"mime/multipart"
+	"net/http"
 	"path/filepath"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/wutipong/albums/albums-importer/server/types"
@@ -26,7 +28,7 @@ func PostAsset(
 	containerPath string,
 	path string,
 	reader io.Reader,
-	modDate time.Time,
+	size int64,
 ) (result PostAssetResposnse, err error) {
 	if ctx.Err() != nil {
 		err = fmt.Errorf("context error: %w", ctx.Err())
@@ -47,27 +49,82 @@ func PostAsset(
 		return
 	}
 
+	data, err := io.ReadAll(reader)
+	if err != nil {
+		err = fmt.Errorf("unable to read from reader: %w", err)
+		return
+	}
+
+	checksum := crc32.ChecksumIEEE(data)
+	buf := make([]byte, 4)
+	binary.BigEndian.PutUint32(buf, checksum)
+	encoded := base64.StdEncoding.EncodeToString(buf)
+
 	assetFileName := filepath.Join(containerPath, path)
 
-	var body bytes.Buffer
-	writer := multipart.NewWriter(&body)
-
-	_ = writer.WriteField("albumId", albumID)
-
-	part, err := writer.CreateFormFile("file", assetFileName)
+	postAssetRequest, err := Post[PostAssetRequestResponse](
+		ctx, server, "/api/asset/upload/request",
+		PostAssetRequestRequest{
+			AlbumID:  albumID,
+			Filename: assetFileName,
+			Checksum: encoded,
+			Network:  server.Network,
+		})
 	if err != nil {
-		err = fmt.Errorf("failed to create form file: %w", err)
+		err = fmt.Errorf("request to upload failed: %w", err)
 		return
 	}
 
-	_, err = io.Copy(part, reader)
+	req, err := http.NewRequest(http.MethodPut, postAssetRequest.URL, bytes.NewBuffer(data))
 	if err != nil {
-		err = fmt.Errorf("failed to write data to form file: %w", err)
+		err = fmt.Errorf("failed to create request for put object: %w", err)
 		return
 	}
-	_ = writer.Close()
+	req.ContentLength = size
 
-	return DoRequestWithReturnObject[PostAssetResposnse](
-		ctx, "POST", server, "/api/asset", &body, writer.FormDataContentType(),
-	)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		err = fmt.Errorf("failed to put object: %w", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	postAssetCommit, err := Post[PostAssetCommitResponse](
+		ctx, server, "/api/asset/upload/commit",
+		PostAssetCommitRequest{
+			ID: postAssetRequest.ID,
+		})
+
+	if err != nil {
+		err = fmt.Errorf("unable to commit asset upload %s: %w", postAssetRequest.ID, err)
+	}
+
+	result = PostAssetResposnse{
+		Asset:   postAssetCommit.Asset,
+		Success: postAssetCommit.Success,
+	}
+
+	return
+}
+
+type PostAssetRequestRequest struct {
+	AlbumID  string `json:"album_id"`
+	Filename string `json:"filename"`
+	Checksum string `json:"checksum"`
+	Network  string `json:"network"`
+}
+
+type PostAssetRequestResponse struct {
+	ID      string `json:"id"`
+	URL     string `json:"url"`
+	Success bool   `json:"success"`
+}
+
+type PostAssetCommitRequest struct {
+	ID string `json:"id"`
+}
+
+type PostAssetCommitResponse struct {
+	Asset   types.Asset `json:"asset"`
+	Success bool        `json:"success"`
 }

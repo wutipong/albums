@@ -67,7 +67,9 @@
 		</div>
 	</div>
 	<AssetViewer
-		bind:asset
+		assetType={data.assets[currentIndex].type}
+		viewURL={data.assets[currentIndex].view_url}
+		filename={data.assets[currentIndex].filename}
 		bind:show={showViewer}
 		{next}
 		{previous}

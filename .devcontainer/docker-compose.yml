@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-
+    env_file: .env
     volumes:
       - ..:/workspaces:cached
 
@@ -12,7 +12,6 @@ services:
 
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
     network_mode: service:db
-
     # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
@@ -22,10 +21,9 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
-
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
@@ -35,7 +33,56 @@ services:
       - "6379:6379"
     restart: always
 
+  # Garage S3 Service
+  garage:
+    image: dxflrs/garage:v2.3.0
+    environment:
+      GARAGE_DEFAULT_ACCESS_KEY: ${AWS_ACCESS_KEY_ID}
+      GARAGE_DEFAULT_SECRET_KEY: ${AWS_SECRET_ACCESS_KEY}
+      GARAGE_DEFAULT_BUCKET: ${S3_BUCKET}
+    volumes:
+      - ../garage/garage.toml:/etc/garage.toml
+      - garage-meta:/var/lib/garage/meta
+      - garage-data:/var/lib/garage/data
+    ports:
+      - "3900:3900" # S3 API
+      - "3901:3901" # RPC
+      - "3902:3902" # Web
+    command:
+      - /garage
+      - server
+      - --single-node
+      - --default-bucket
+
+  garage-webui:
+    image: khairul169/garage-webui:latest
+    container_name: garage-webui
+    restart: unless-stopped
+    volumes:
+      - ../garage/garage.toml:/etc/garage.toml:ro
+    ports:
+      - 3909:3909
+    environment:
+      API_BASE_URL: "http://garage:3903"
+      S3_ENDPOINT_URL: "http://garage:3900"
+
+  imgproxy:
+    image: darthsim/imgproxy:v3
+    ports:
+      - "8080:8080"
+    environment:
+      IMGPROXY_KEY: ${IMGPROXY_KEY}
+      IMGPROXY_SALT: ${IMGPROXY_SALT}
+      IMGPROXY_USE_S3: true
+      IMGPROXY_S3_REGION: ${AWS_DEFAULT_REGION}
+      IMGPROXY_S3_ENDPOINT: ${AWS_ENDPOINT_URL}
+      IMGPROXY_S3_ENDPOINT_USE_PATH_STYLE: ${S3_FORCE_PATH_STYLE}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      IMGPROXY_MAX_ANIMATION_FRAMES: 2000000000
 volumes:
   postgres-data:
+  garage-meta:
+  garage-data:  
 
 

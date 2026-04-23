@@ -4,7 +4,9 @@
 	import 'vidstack/bundle';
 
 	let {
-		asset = $bindable({ id: '<placeholder>' }),
+		viewURL = $bindable('http://example.com'),
+		assetType = $bindable('image'),
+		filename = $bindable(''),
 		show = $bindable(false),
 		next,
 		previous,
@@ -12,6 +14,8 @@
 		hasPrevious = false,
 		menu
 	} = $props();
+
+	$inspect(viewURL)
 </script>
 
 <style lang="scss">
@@ -33,27 +37,31 @@
 		role="presentation"
 		class="absolute top-0 right-0 bottom-0 left-0 backdrop-blur-lg backdrop-brightness-50"
 	>
-		{#if asset.type === 'image'}
+		{#if assetType === 'image'}
 			<div class="h-full w-full">
 				<img
-					src={`/api/asset/${asset.id}/view`}
-					alt={asset.id}
+					src={viewURL}
+					alt={filename}
 					class="m-auto h-full w-full object-contain"
 				/>
 			</div>
 		{/if}
-		{#if asset.type === 'video'}
-			<media-player
-				title={asset.filename}
-				src={`/api/asset/${asset.id}/view`}
-			>
-				<media-provider></media-provider>
-				<media-video-layout></media-video-layout>
-			</media-player>
+		{#if assetType === 'video'}
+			{#key viewURL}
+				<media-player
+					title={filename}
+					src={viewURL}
+				>
+					<media-provider >
+						<source src={viewURL} type="video/mp4" />
+					</media-provider>
+					<media-video-layout></media-video-layout>
+				</media-player>
+			{/key}
 		{/if}
 		<div
 			class="absolute top-1/2 left-4 -translate-y-1/2 bg-transparent"
-			data-theme={asset.type === 'video' ? 'dark' : null}
+			data-theme={assetType === 'video' ? 'dark' : null}
 		>
 			<button
 				class="btn btn-circle btn-ghost btn-lg"
@@ -67,7 +75,7 @@
 		</div>
 		<div
 			class="absolute top-1/2 right-4 -translate-y-1/2 bg-transparent"
-			data-theme={asset.type === 'video' ? 'dark' : null}
+			data-theme={assetType === 'video' ? 'dark' : null}
 		>
 			<button
 				class="btn btn-circle btn-ghost btn-lg"
@@ -81,7 +89,7 @@
 		</div>
 		<div
 			class="absolute top-4 right-4 flex flex-row-reverse gap-4 rounded-full bg-transparent"
-			data-theme={asset.type === 'video' ? 'dark' : null}
+			data-theme={assetType === 'video' ? 'dark' : null}
 		>
 			<button class="btn btn-circle btn-ghost btn-lg" onclick={() => (show = false)}>
 				<Icon path={mdiClose} />
