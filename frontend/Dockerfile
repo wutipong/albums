@@ -7,10 +7,12 @@ WORKDIR /app
 COPY package.json bun.lock ./
 
 # Install dependencies
-RUN bun install --frozen-lockfile
+RUN bun install --frozen-lockfile --copy
 
 # Copy source code
 COPY . .
+
+RUN bunx svelte-kit sync
 
 # Build the application
 RUN bun run build
@@ -22,6 +24,7 @@ WORKDIR /app
 
 # Copy built files from builder stage
 COPY --from=builder /app/build ./build
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 
 # Expose port 3000
