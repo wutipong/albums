@@ -5,7 +5,6 @@ go 1.26.1
 require (
 	github.com/acaloiaro/neoq v0.71.3
 	github.com/cshum/vipsgen v1.3.9
-	github.com/davidbyttow/govips/v2 v2.18.0
 	github.com/jackc/pgx/v5 v5.9.1
 	github.com/lmittmann/tint v1.1.3
 	github.com/pgvector/pgvector-go v0.3.0
@@ -34,7 +33,7 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go v1.55.8 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.41.6 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.41.6
 	github.com/aws/aws-sdk-go-v2/config v1.32.16
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.99.1
 	github.com/aws/smithy-go v1.25.0 // indirect
@@ -57,7 +56,6 @@ require (
 	go.uber.org/goleak v1.3.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
-	golang.org/x/image v0.38.0 // indirect
 	golang.org/x/net v0.52.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.42.0 // indirect
