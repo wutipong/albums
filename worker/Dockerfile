@@ -1,11 +1,12 @@
 # ---- Build Stage ----
-FROM golang:1.26-bookworm AS builder
+FROM golang:1.26-alpine3.22 AS builder
 
 # Install native dependencies required by govips and ffmpeg-go
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    pkg-config \
-    libvips-dev \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+    pkgconfig \
+    vips-dev \
+    gcc \
+    musl-dev
 
 WORKDIR /app
 
@@ -18,14 +19,13 @@ COPY . .
 RUN CGO_ENABLED=1 GOOS=linux go build -o worker ./main.go
 
 # ---- Runtime Stage ----
-FROM debian:bookworm-slim
+FROM alpine:3.22
 
 # Install runtime native libraries (libvips, ffmpeg)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libvips42 \
+RUN apk add --no-cache \
+    vips \
     ffmpeg \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    ca-certificates
 
 WORKDIR /app
 
