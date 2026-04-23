@@ -12,6 +12,8 @@ RUN bun install --frozen-lockfile
 # Copy source code
 COPY . .
 
+RUN bunx svelte-kit sync
+
 # Build the application
 RUN bun run build
 
