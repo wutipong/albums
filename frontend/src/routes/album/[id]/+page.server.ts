@@ -1,11 +1,12 @@
 import { env } from "$env/dynamic/private";
 import { db } from "$lib/server/db";
-import { s3, s3Public } from "$lib/server/s3";
+import { s3Public } from "$lib/server/s3";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import type { PageServerLoad } from "./$types";
 import { generateImageUrl } from '@imgproxy/imgproxy-node'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { URL } from "node:url";
+
+export const ssr = false;
 
 export const load: PageServerLoad = async ({ params, fetch }) => {
     const { id } = params;

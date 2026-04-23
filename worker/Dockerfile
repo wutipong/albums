@@ -1,5 +1,5 @@
 # ---- Build Stage ----
-FROM golang:1.24-bookworm AS builder
+FROM golang:1.26-bookworm AS builder
 
 # Install native dependencies required by govips and ffmpeg-go
 RUN apt-get update && apt-get install -y --no-install-recommends \
