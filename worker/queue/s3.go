@@ -22,7 +22,7 @@ func GetMinioEndpoint(input string) (endpoint string, secure bool, err error) {
 	}
 	endpoint = input
 	endpoint = strings.TrimPrefix(endpoint, scheme)
-	endpoint = strings.TrimPrefix(endpoint, "//")
+	endpoint = strings.TrimPrefix(endpoint, "://")
 
 	return
 }

@@ -36,6 +36,8 @@ func Init(ctx context.Context) error {
 		return fmt.Errorf("unable to get endpoint: %w", err)
 	}
 
+	slog.Info("using S3 endpoint.", slog.String("endpoint", endpoint))
+
 	minioClient, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewEnvAWS(),
 		Secure: secure,
