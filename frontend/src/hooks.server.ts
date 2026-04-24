@@ -2,8 +2,26 @@ import { sequence } from "@sveltejs/kit/hooks";
 import { redirect, type Handle } from "@sveltejs/kit";
 import { auth } from "$lib/server/auth";
 import { svelteKitHandler } from "better-auth/svelte-kit";
-import { building } from '$app/environment';
 import { error } from "node:console";
+import { dev, building } from "$app/environment";
+import { getMigrations } from "better-auth/db/migration";
+
+const runMigrations = async () => {
+    // Skip if we are in development mode OR currently building the app
+    if (dev || building) return;
+
+    try {
+        const { runMigrations: execute } = await getMigrations(auth.options);
+        await execute();
+        console.log("Better Auth database migrations applied.");
+    } catch (e) {
+        console.error("Better Auth migration failed:", e);
+        
+        process.exit(1); 
+    }
+};
+
+await runMigrations()
 
 const handleBetterAuth: Handle = async ({ event, resolve }) => {
     // path to your auth file
