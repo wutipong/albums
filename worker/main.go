@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/lmittmann/tint"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/urfave/cli/v3"
 	"github.com/wutipong/albums/worker/db"
 	"github.com/wutipong/albums/worker/queue"
@@ -203,14 +203,18 @@ func processSingle(ctx context.Context, id string) error {
 	}
 	defer db.Close(ctx)
 
-	cfg, err := config.LoadDefaultConfig(ctx)
+	endpoint, secure, err := queue.GetMinioEndpoint(os.Getenv("AWS_ENDPOINT_URL"))
 	if err != nil {
-		return fmt.Errorf("unable to read s3 config: %w", err)
+		return fmt.Errorf("unable to get endpoint: %w", err)
 	}
-	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.UsePathStyle = true
-		// BaseEndpoint: aws.String("http://localhost:4566"), // Often used with custom endpoints
-	})
 
-	return queue.ProcessAsset(ctx, client, id)
+	minioClient, err := minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewEnvAWS(),
+		Secure: secure,
+	})
+	if err != nil {
+		return fmt.Errorf("unable to create minio client: %w", err)
+	}
+
+	return queue.ProcessAsset(ctx, minioClient, id)
 }

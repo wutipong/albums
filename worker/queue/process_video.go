@@ -11,9 +11,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/minio/minio-go/v7"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"github.com/wutipong/albums/worker/db"
 )
@@ -21,7 +20,7 @@ import (
 const VIDEO_WIDTH = 1280
 const VIDEO_HEIGHT = 720
 
-func processVideoAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset) error {
+func processVideoAsset(ctx context.Context, minioClient *minio.Client, asset *db.Asset) error {
 	slog.Info("process video asset", slog.Any("id", asset.ID))
 
 	err := ctx.Err()
@@ -30,15 +29,17 @@ func processVideoAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	s3Obj, err := s3Client.GetObject(ctx, &s3.GetObjectInput{
-		Key:    aws.String(asset.Original),
-		Bucket: aws.String(os.Getenv("S3_BUCKET")),
-	})
+	s3Obj, err := minioClient.GetObject(
+		ctx,
+		os.Getenv("S3_BUCKET"),
+		asset.Original,
+		minio.GetObjectOptions{},
+	)
 
 	if err != nil {
 		return fmt.Errorf("unable to get object from s3: %w", err)
 	}
-	defer s3Obj.Body.Close()
+	defer s3Obj.Close()
 
 	originalFile, err := os.CreateTemp("",
 		fmt.Sprintf("*.%s", filepath.Base(asset.Filename)),
@@ -49,7 +50,7 @@ func processVideoAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset
 	}
 	defer os.Remove(originalFile.Name())
 
-	io.Copy(originalFile, s3Obj.Body)
+	io.Copy(originalFile, s3Obj)
 
 	probe, err := ffmpeg.Probe(originalFile.Name())
 	if err != nil {
@@ -59,17 +60,17 @@ func processVideoAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset
 	var info Probe
 	json.Unmarshal([]byte(probe), &info)
 
-	err = processVideoThumbnail(ctx, s3Client, asset, originalFile, info)
+	err = processVideoThumbnail(ctx, minioClient, asset, originalFile, info)
 	if err != nil {
 		return fmt.Errorf("unable to process video asset thumbnail: %w", err)
 	}
 
-	err = processVideoPreview(ctx, s3Client, asset, originalFile, info)
+	err = processVideoPreview(ctx, minioClient, asset, originalFile, info)
 	if err != nil {
 		return fmt.Errorf("unable to process video asset preview: %w", err)
 	}
 
-	err = processVideoView(ctx, s3Client, asset, originalFile, info)
+	err = processVideoView(ctx, minioClient, asset, originalFile, info)
 	if err != nil {
 		return fmt.Errorf("unable to process video asset view: %w", err)
 	}
@@ -80,7 +81,7 @@ func processVideoAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset
 }
 
 func processVideoView(
-	ctx context.Context, s3Client *s3.Client, asset *db.Asset,
+	ctx context.Context, minioClient *minio.Client, asset *db.Asset,
 	originalFile *os.File, _ Probe,
 ) error {
 	slog.Info("process video asset view media", slog.Any("id", asset.ID))
@@ -131,18 +132,22 @@ func processVideoView(
 
 	outputFile.Seek(0, io.SeekStart)
 
-	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(os.Getenv("S3_BUCKET")),
-		Body:        outputFile,
-		Key:         aws.String(asset.View),
-		ContentType: aws.String("video/mp4"),
-	})
+	_, err = minioClient.PutObject(
+		ctx,
+		os.Getenv("S3_BUCKET"),
+		asset.View,
+		outputFile,
+		-1,
+		minio.PutObjectOptions{
+			ContentType: "video/mp4",
+		},
+	)
 
 	return nil
 }
 
 func processVideoThumbnail(
-	ctx context.Context, s3Client *s3.Client, asset *db.Asset, originalFile *os.File, info Probe,
+	ctx context.Context, minioClient *minio.Client, asset *db.Asset, originalFile *os.File, info Probe,
 ) error {
 	slog.Info("process video asset thumbnail", slog.Any("id", asset.ID))
 	err := ctx.Err()
@@ -182,17 +187,20 @@ func processVideoThumbnail(
 		Valid:        true,
 	}
 
-	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(os.Getenv("S3_BUCKET")),
-		Body:        outputFile,
-		Key:         aws.String(asset.Thumbnail),
-		ContentType: aws.String("image/webp"),
-	})
+	_, err = minioClient.PutObject(
+		ctx, os.Getenv("S3_BUCKET"),
+		asset.Thumbnail,
+		outputFile,
+		-1,
+		minio.PutObjectOptions{
+			ContentType: "image/webp",
+		},
+	)
 	return nil
 }
 
 func processVideoPreview(
-	ctx context.Context, s3Client *s3.Client, asset *db.Asset,
+	ctx context.Context, minioClient *minio.Client, asset *db.Asset,
 	originalFile *os.File, info Probe,
 ) error {
 	slog.Info("process video preview", slog.Any("id", asset.ID))
@@ -229,12 +237,14 @@ func processVideoPreview(
 	}
 
 	asset.Preview = createAssetKey()
-	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(os.Getenv("S3_BUCKET")),
-		Body:        outputFile,
-		Key:         aws.String(asset.Preview),
-		ContentType: aws.String("image/webp"),
-	})
-
+	_, err = minioClient.PutObject(
+		ctx, os.Getenv("S3_BUCKET"),
+		asset.Preview,
+		outputFile,
+		-1,
+		minio.PutObjectOptions{
+			ContentType: "image/webp",
+		},
+	)
 	return nil
 }

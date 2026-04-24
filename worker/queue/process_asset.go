@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/minio/minio-go/v7"
 	"github.com/wutipong/albums/worker/db"
 )
 
@@ -25,7 +25,7 @@ func hasAnimationExt(ext string) bool {
 	return slices.Contains(animationExts, strings.ToLower(ext))
 }
 
-func ProcessAsset(ctx context.Context, s3Client *s3.Client, id string) error {
+func ProcessAsset(ctx context.Context, minioClient *minio.Client, id string) error {
 	slog.Info("processing asset", slog.String("id", id))
 	var uuid pgtype.UUID
 	err := uuid.Scan(id)
@@ -42,13 +42,13 @@ func ProcessAsset(ctx context.Context, s3Client *s3.Client, id string) error {
 
 	switch asset.Type {
 	case "image":
-		err = processImageAsset(ctx, s3Client, &asset)
+		err = processImageAsset(ctx, minioClient, &asset)
 		if err != nil {
 			slog.Info("error processing image asset.", slog.String("error", err.Error()))
 			return fmt.Errorf("unable to process image asset: %w", err)
 		}
 	case "video":
-		err = processVideoAsset(ctx, s3Client, &asset)
+		err = processVideoAsset(ctx, minioClient, &asset)
 		if err != nil {
 			slog.Info("error proessing video.", slog.String("error", err.Error()))
 			return fmt.Errorf("unable to process video asset: %w", err)

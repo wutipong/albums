@@ -10,9 +10,9 @@ import (
 	"github.com/acaloiaro/neoq/backends/postgres"
 	"github.com/acaloiaro/neoq/handler"
 	"github.com/acaloiaro/neoq/jobs"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/wutipong/albums/worker/db"
 )
 
@@ -31,14 +31,18 @@ func Init(ctx context.Context) error {
 		return fmt.Errorf("unable to initialize queue")
 	}
 
-	cfg, err := config.LoadDefaultConfig(ctx)
+	endpoint, secure, err := GetMinioEndpoint(os.Getenv("AWS_ENDPOINT_URL"))
 	if err != nil {
-		return fmt.Errorf("unable to read s3 config: %w", err)
+		return fmt.Errorf("unable to get endpoint: %w", err)
 	}
-	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.UsePathStyle = true
-		// BaseEndpoint: aws.String("http://localhost:4566"), // Often used with custom endpoints
+
+	minioClient, err := minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewEnvAWS(),
+		Secure: secure,
 	})
+	if err != nil {
+		return fmt.Errorf("unable to create minio client: %w", err)
+	}
 
 	// create a handler that listens for new job on the "greetings" queue
 	h := handler.New("asset-processing", func(ctx context.Context) (err error) {
@@ -50,7 +54,7 @@ func Init(ctx context.Context) error {
 				id := j.Payload["id"]
 				idStr := id.(string)
 				slog.Info("job", slog.Any("id", id), slog.Any("command", command))
-				err = ProcessAsset(ctx, client, idStr)
+				err = ProcessAsset(ctx, minioClient, idStr)
 			}
 
 		case "populate-album-cover":

@@ -11,9 +11,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	vips "github.com/cshum/vipsgen/vips816"
+	"github.com/minio/minio-go/v7"
 	"github.com/pgvector/pgvector-go"
 	"github.com/wutipong/albums/worker/clip"
 	"github.com/wutipong/albums/worker/db"
@@ -21,7 +20,7 @@ import (
 
 const THUMBNAIL_HEIGHT = 200
 
-func processImageAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset) error {
+func processImageAsset(ctx context.Context, minioClient *minio.Client, asset *db.Asset) error {
 	slog.Info("processing image asset", slog.String("id", asset.ID.String()))
 
 	err := ctx.Err()
@@ -31,18 +30,19 @@ func processImageAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset
 	}
 
 	slog.Info("getting object from S3.", slog.String("id", asset.Original))
-	s3Obj, err := s3Client.GetObject(ctx, &s3.GetObjectInput{
-		Key:    aws.String(asset.Original),
-		Bucket: aws.String(os.Getenv("S3_BUCKET")),
-	})
+	object, err := minioClient.GetObject(
+		ctx, os.Getenv("S3_BUCKET"),
+		asset.Original,
+		minio.GetObjectOptions{},
+	)
 
 	if err != nil {
 		return fmt.Errorf("unable to get object from s3: %w", err)
 	}
-	defer s3Obj.Body.Close()
+	defer object.Close()
 
 	slog.Info("reading data", slog.String("id", asset.Original))
-	buff, err := io.ReadAll(s3Obj.Body)
+	buff, err := io.ReadAll(object)
 	if err != nil {
 		return fmt.Errorf("unable to read object from s3: %w", err)
 	}
@@ -60,17 +60,17 @@ func processImageAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset
 	}
 	defer original.Close()
 
-	err = populateView(ctx, s3Client, asset, original)
+	err = populateView(ctx, minioClient, asset, original)
 	if err != nil {
 		return fmt.Errorf("unable to populate view image: %e", err)
 	}
 
-	err = populatePreview(ctx, s3Client, asset, original)
+	err = populatePreview(ctx, minioClient, asset, original)
 	if err != nil {
 		return fmt.Errorf("unable to populate preview image: %e", err)
 	}
 
-	err = populateThumbnail(ctx, s3Client, asset, original)
+	err = populateThumbnail(ctx, minioClient, asset, original)
 	if err != nil {
 		return fmt.Errorf("unable to populate thumbnail: %e", err)
 	}
@@ -84,7 +84,7 @@ func processImageAsset(ctx context.Context, s3Client *s3.Client, asset *db.Asset
 
 func populateView(
 	ctx context.Context,
-	s3Client *s3.Client,
+	minioClient *minio.Client,
 	asset *db.Asset,
 	original *vips.Image,
 ) error {
@@ -116,12 +116,15 @@ func populateView(
 
 	asset.View = createAssetKey()
 
-	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(os.Getenv("S3_BUCKET")),
-		Body:        bytes.NewReader(buf),
-		Key:         aws.String(asset.View),
-		ContentType: aws.String("image/webp"),
-	})
+	_, err = minioClient.PutObject(
+		ctx, os.Getenv("S3_BUCKET"),
+		asset.View,
+		bytes.NewReader(buf),
+		int64(len(buf)),
+		minio.PutObjectOptions{
+			ContentType: "image/webp",
+		},
+	)
 
 	if err != nil {
 		return fmt.Errorf("unable to put object to S3: %w", err)
@@ -132,7 +135,7 @@ func populateView(
 
 func populatePreview(
 	ctx context.Context,
-	_ *s3.Client,
+	_ *minio.Client,
 	asset *db.Asset,
 	original *vips.Image,
 ) error {
@@ -154,7 +157,7 @@ func populatePreview(
 
 func populateThumbnail(
 	ctx context.Context,
-	s3Client *s3.Client,
+	minioClient *minio.Client,
 	asset *db.Asset,
 	original *vips.Image,
 ) error {
@@ -200,12 +203,15 @@ func populateThumbnail(
 
 	asset.Thumbnail = createAssetKey()
 
-	_, err = s3Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(os.Getenv("S3_BUCKET")),
-		Body:        bytes.NewReader(buf),
-		Key:         aws.String(asset.Thumbnail),
-		ContentType: aws.String("image/webp"),
-	})
+	_, err = minioClient.PutObject(
+		ctx, os.Getenv("S3_BUCKET"),
+		asset.Thumbnail,
+		bytes.NewReader(buf),
+		int64(len(buf)),
+		minio.PutObjectOptions{
+			ContentType: "image/webp",
+		},
+	)
 
 	if err != nil {
 		return fmt.Errorf("unable to put object to S3: %w", err)
