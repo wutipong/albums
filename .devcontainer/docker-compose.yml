@@ -27,12 +27,6 @@ services:
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
-  redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
-    restart: always
-
   # Garage S3 Service
   garage:
     image: dxflrs/garage:v2.3.0
