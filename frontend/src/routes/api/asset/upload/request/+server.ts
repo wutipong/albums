@@ -17,8 +17,6 @@ export const POST: RequestHandler = async ({ request }) => {
     const checksum = req.checksum;
     const network = req.network ?? 'private';
 
-    console.log(network)
-
     const album = await db.selectFrom('albums')
         .selectAll()
         .where('albums.id', '=', albumId)
