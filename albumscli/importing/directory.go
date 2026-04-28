@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/wutipong/albums/albums-importer/server/api"
+	"github.com/wutipong/albums/albumscli/server/api"
 )
 
 func ProcessDirectory(

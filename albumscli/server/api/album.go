@@ -4,7 +4,7 @@ import (
 	"context"
 	"path"
 
-	"github.com/wutipong/albums/albums-importer/server/types"
+	"github.com/wutipong/albums/albumscli/server/types"
 )
 
 type AlbumListResponse struct {
