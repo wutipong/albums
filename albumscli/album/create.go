@@ -6,11 +6,11 @@ import (
 	"log/slog"
 	"net/url"
 
-	"github.com/wutipong/albums/albums-importer/profile"
-	"github.com/wutipong/albums/albums-importer/server/api"
+	"github.com/wutipong/albums/albumscli/profile"
+	"github.com/wutipong/albums/albumscli/server/api"
 )
 
-func listAlbum(ctx context.Context, profileName string, dryRun bool) (err error) {
+func createAlbum(ctx context.Context, profileName string, dryRun bool, name string) (err error) {
 	config, err := profile.LoadProfile(ctx, profileName)
 	if err != nil {
 		return err
@@ -32,17 +32,15 @@ func listAlbum(ctx context.Context, profileName string, dryRun bool) (err error)
 		Network: string(config.Network),
 	}
 
-	albumList, err := api.GetAlbumList(ctx, server)
+	resp, err := api.CreateAlbum(ctx, server, name)
 	if err != nil {
 		return err
 	}
 
-	for _, album := range albumList.Albums {
-		slog.Info("album",
-			slog.String("id", album.ID),
-			slog.String("name", album.Name),
-		)
-	}
+	slog.Info("album created",
+		slog.String("id", resp.ID),
+		slog.String("name", resp.Name),
+	)
 
 	return nil
 }

@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/wutipong/albums/albums-importer/profile"
-	"github.com/wutipong/albums/albums-importer/server/api"
+	"github.com/wutipong/albums/albumscli/profile"
+	"github.com/wutipong/albums/albumscli/server/api"
 )
 
 func createAsset(ctx context.Context, profileName string, dryRun bool, path string, albumID string) error {

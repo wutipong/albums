@@ -10,10 +10,10 @@ import (
 
 	"github.com/lmittmann/tint"
 	"github.com/urfave/cli/v3"
-	"github.com/wutipong/albums/albums-importer/album"
-	"github.com/wutipong/albums/albums-importer/asset"
-	"github.com/wutipong/albums/albums-importer/importing"
-	"github.com/wutipong/albums/albums-importer/profile"
+	"github.com/wutipong/albums/albumscli/album"
+	"github.com/wutipong/albums/albumscli/asset"
+	"github.com/wutipong/albums/albumscli/importing"
+	"github.com/wutipong/albums/albumscli/profile"
 )
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 	profileStr := "default"
 
 	cmd := &cli.Command{
-		Name:  "albums-importer",
+		Name:  "albumscli",
 		Usage: "import assets to albums",
 		Flags: []cli.Flag{
 			&cli.StringFlag{

@@ -34,7 +34,7 @@ func createConfigPath() (path string, err error) {
 		)
 		return
 	}
-	path = filepath.Join(homeDir, ".albums-importer", "config.yaml")
+	path = filepath.Join(homeDir, ".albumscli", "config.yaml")
 
 	return
 }

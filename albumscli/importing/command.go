@@ -11,10 +11,10 @@ import (
 	"slices"
 
 	"github.com/urfave/cli/v3"
-	"github.com/wutipong/albums/albums-importer/log"
-	"github.com/wutipong/albums/albums-importer/profile"
-	"github.com/wutipong/albums/albums-importer/server/api"
-	"github.com/wutipong/albums/albums-importer/server/types"
+	"github.com/wutipong/albums/albumscli/log"
+	"github.com/wutipong/albums/albumscli/profile"
+	"github.com/wutipong/albums/albumscli/server/api"
+	"github.com/wutipong/albums/albumscli/server/types"
 )
 
 func Command(profileStr *string, displayLogLevel *string, fileLogLevel *string) *cli.Command {
@@ -73,7 +73,7 @@ func Command(profileStr *string, displayLogLevel *string, fileLogLevel *string) 
 			c, err := profile.LoadProfile(ctx, *profileStr)
 			if err != nil {
 				return fmt.Errorf(
-					"unable to load configuration. please run 'Albums-importer setup' first: %w",
+					"unable to load configuration. please run 'albumscli setup' first: %w",
 					err,
 				)
 			}

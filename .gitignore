@@ -1,6 +1,7 @@
 .continue
 cache/
-albums-importer/.input
+albumscli/.input
+albumscli/albumscli
 worker/worker
 db/schema.sql
 clip/.venv

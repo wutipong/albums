@@ -1,4 +1,4 @@
-module github.com/wutipong/albums/albums-importer
+module github.com/wutipong/albums/albumscli
 
 go 1.26.1
 

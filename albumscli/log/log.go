@@ -125,7 +125,7 @@ func CreateLogDirectoryPath() (path string, err error) {
 		)
 		return
 	}
-	path = filepath.Join(homeDir, ".Albums-importer", "logs")
+	path = filepath.Join(homeDir, ".albumscli", "logs")
 
 	return
 }
