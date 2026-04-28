@@ -10,7 +10,7 @@ import (
 	"github.com/wutipong/albums/albumscli/server/api"
 )
 
-func createAlbum(ctx context.Context, profileName string, dryRun bool, name string) (err error) {
+func deleteAlbum(ctx context.Context, profileName string, dryRun bool, id string) (err error) {
 	config, err := profile.LoadProfile(ctx, profileName)
 	if err != nil {
 		return err
@@ -32,14 +32,13 @@ func createAlbum(ctx context.Context, profileName string, dryRun bool, name stri
 		Network: string(config.Network),
 	}
 
-	resp, err := api.CreateAlbum(ctx, server, name)
+	resp, err := api.DeleteAlbum(ctx, server, id)
 	if err != nil {
 		return err
 	}
 
-	slog.Info("album created",
-		slog.String("id", resp.ID),
-		slog.String("name", resp.Name),
+	slog.Info("album delete result",
+		slog.Bool("sucess", resp.Success),
 	)
 
 	return nil

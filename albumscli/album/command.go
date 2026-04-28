@@ -13,7 +13,6 @@ import (
 func Command(profile *string, displayLogLevel *string, fileLogLevel *string) *cli.Command {
 	dryRun := false
 	id := ""
-	name := ""
 
 	return &cli.Command{
 		Name:  "album",
@@ -62,9 +61,9 @@ func Command(profile *string, displayLogLevel *string, fileLogLevel *string) *cl
 					return showAlbum(ctx, *profile, dryRun, id)
 				},
 			}, {
-				Name:    "create",
+				Name:    "delete",
 				Aliases: []string{"new", "n"},
-				Usage:   "Create a new album",
+				Usage:   "Delete an album",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:        "dry-run",
@@ -75,9 +74,9 @@ func Command(profile *string, displayLogLevel *string, fileLogLevel *string) *cl
 				},
 				Arguments: []cli.Argument{
 					&cli.StringArg{
-						Name:        "name",
-						UsageText:   "Album name",
-						Destination: &name,
+						Name:        "id",
+						UsageText:   "Album Id",
+						Destination: &id,
 					},
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
@@ -88,7 +87,7 @@ func Command(profile *string, displayLogLevel *string, fileLogLevel *string) *cl
 						})))
 					}
 
-					return createAlbum(ctx, *profile, dryRun, name)
+					return deleteAlbum(ctx, *profile, dryRun, id)
 				},
 			},
 		},

@@ -105,6 +105,12 @@ func Get[R any](
 	return DoRequestWithReturnObject[R](ctx, "GET", server, path, nil, "")
 }
 
+func Delete[R any](
+	ctx context.Context, server ServerConfig, path string,
+) (result R, err error) {
+	return DoRequestWithReturnObject[R](ctx, "DELETE", server, path, nil, "")
+}
+
 func Put[R any](
 	ctx context.Context, server ServerConfig, path string, request any,
 ) (result R, err error) {

@@ -40,6 +40,20 @@ func CreateAlbum(
 	return
 }
 
+type DeleteAlbumResponse struct {
+	Success bool `json:"success"`
+}
+
+func DeleteAlbum(
+	ctx context.Context,
+	server ServerConfig,
+	id string,
+) (resp DeleteAlbumResponse, err error) {
+
+	resp, err = Delete[DeleteAlbumResponse](ctx, server, path.Join("api", "album", id))
+	return
+}
+
 type PopulateAlbumCoverRequest struct {
 	AssetID string `json:"asset_id"`
 }
