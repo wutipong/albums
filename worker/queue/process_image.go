@@ -135,7 +135,7 @@ func populateView(
 
 func populatePreview(
 	ctx context.Context,
-	_ *minio.Client,
+	minioClient *minio.Client,
 	asset *db.Asset,
 	original *vips.Image,
 ) error {
@@ -149,8 +149,46 @@ func populatePreview(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	asset.Preview = asset.Original
-	asset.ImageFrames = int32(original.Pages())
+	if original.Pages() == 1 {
+		asset.Preview = asset.Original
+		asset.ImageFrames = int32(original.Pages())
+		return nil
+	}
+
+	preview, err := original.Copy(nil)
+	if err != nil {
+		return fmt.Errorf("unable to create a preview copy from original image: %w")
+	}
+
+	factor := float64(THUMBNAIL_HEIGHT) / float64(original.Height())
+	preview.Resize(factor, &vips.ResizeOptions{
+		Kernel: vips.KernelLanczos3,
+		Gap:    2,
+	})
+
+	params := vips.DefaultWebpsaveBufferOptions()
+	params.Q = THUMBNAIL_QUALITY
+
+	buf, err := preview.WebpsaveBuffer(params)
+	if err != nil {
+		return fmt.Errorf("unable to write preview image: %w", err)
+	}
+
+	asset.Preview = createAssetKey()
+
+	_, err = minioClient.PutObject(
+		ctx, os.Getenv("S3_BUCKET"),
+		asset.Preview,
+		bytes.NewReader(buf),
+		int64(len(buf)),
+		minio.PutObjectOptions{
+			ContentType: "image/webp",
+		},
+	)
+
+	if err != nil {
+		return fmt.Errorf("unable to put preview object to S3: %w", err)
+	}
 
 	return nil
 }
@@ -195,6 +233,12 @@ func populateThumbnail(
 	thumbnail.SetPages(1)
 	params := vips.DefaultWebpsaveBufferOptions()
 	params.Q = THUMBNAIL_QUALITY
+
+	factor := float64(THUMBNAIL_HEIGHT) / float64(original.Height())
+	thumbnail.Resize(factor, &vips.ResizeOptions{
+		Kernel: vips.KernelLanczos3,
+		Gap:    2,
+	})
 
 	buf, err := thumbnail.WebpsaveBuffer(params)
 	if err != nil {
