@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { s3 } from '$lib/server/s3';
 import { DeleteObjectsCommand } from '@aws-sdk/client-s3';
+import { env } from '$env/dynamic/private';
 
 export const GET: RequestHandler = async ({ params }) => {
   const { id } = params;
@@ -62,7 +63,7 @@ export const DELETE: RequestHandler = async ({ params }) => {
 
   try {
     await s3.send(new DeleteObjectsCommand({
-      Bucket: "",
+      Bucket: env.S3_BUCKET,
       Delete: {
         Objects: deletingObjs,
       }
