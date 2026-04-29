@@ -149,15 +149,17 @@ func populatePreview(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	if original.Pages() == 1 {
+	asset.ImageFrames = int32(original.Pages())
+
+	if asset.ImageFrames == 1 {
 		asset.Preview = asset.Original
-		asset.ImageFrames = int32(original.Pages())
+
 		return nil
 	}
 
 	preview, err := original.Copy(nil)
 	if err != nil {
-		return fmt.Errorf("unable to create a preview copy from original image: %w")
+		return fmt.Errorf("unable to create a preview copy from original image: %w", err)
 	}
 
 	factor := float64(THUMBNAIL_HEIGHT) / float64(original.Height())
