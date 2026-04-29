@@ -82,10 +82,10 @@
 	</div>
 {/snippet}
 
-<div class="relative flex h-screen w-screen flex-col bg-base-100">
+<div class="relative flex h-screen w-screen flex-col">
 	<NavBar {title}></NavBar>
 	<div class="mx-4 overflow-auto pt-8">
-		<div class="flex flex-wrap justify-evenly gap-4">
+		<div class="flex flex-wrap justify-evenly gap-1">
 			{#each data.assets as asset, index (asset)}
 				<AssetThumbnail
 					{asset}

@@ -18,7 +18,7 @@
 	</div>
 {/snippet}
 
-<div class="relative flex h-screen w-screen flex-col bg-base-100">
+<div class="relative flex h-screen w-screen flex-col border-base-100">
 	<NavBar {title} />
 
 	<div class="mx-4 overflow-auto pt-8">

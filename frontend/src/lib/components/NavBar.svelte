@@ -33,7 +33,7 @@
 	});
 </script>
 
-<div class="navbar bg-base-100 shadow-sm">
+<div class="navbar shadow-sm">
 	<div class="flex-1">
 		{@render title()}
 	</div>
@@ -45,10 +45,10 @@
 
 	<div class="flex gap-2 me-4">
 		<div class="join">
-			<label class="input join-item px-1">
-				<input type="text" placeholder="search" bind:this={searchInput} />
-			</label>
-			<button class="btn join-item btn-neutral" onclick={() => doSearch()}>
+			<div >
+				<input class="input join-item" type="text" placeholder="search" bind:this={searchInput} />
+			</div	>
+			<button class="btn join-item" onclick={() => doSearch()}>
 				<Icon path={mdiImageSearch} />
 			</button>
 		</div>
@@ -60,7 +60,7 @@
 			</div>
 			<ul
 				tabindex="-1"
-				class="dropdown-content menu z-1 mt-3 w-52 menu-sm rounded-box bg-base-300 p-2 shadow"
+				class="dropdown-content menu z-1 mt-3 w-52 menu-sm rounded-box bg-base-100 p-2 shadow-xl"
 			>
 				<li>
 					<a href="/user"><Icon path={mdiAccount} /> User</a>
