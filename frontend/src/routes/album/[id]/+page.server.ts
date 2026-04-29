@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
         if (asset.process_status === 'processed') {
             const video_duration = asset.video_duration.seconds
 
-            const bypass = asset.image_frames > 1
+            const bypass = asset.image_frames > 1 || asset.type == 'video'
 
             const thumbnail_url = generateImageUrl({
                 endpoint: env.IMGPROXY_URL,
