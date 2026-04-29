@@ -23,10 +23,13 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
         if (asset.process_status === 'processed') {
             const video_duration = asset.video_duration.seconds
 
+            const bypass = asset.image_frames > 1
+
             const thumbnail_url = generateImageUrl({
                 endpoint: env.IMGPROXY_URL,
                 url: `s3://${env.S3_BUCKET}/${asset.thumbnail}`,
                 options: {
+                    raw: bypass,
                     resizing_type: "auto",
                     height: 200,
                     enlarge: 1,
@@ -39,6 +42,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
                 endpoint: env.IMGPROXY_URL,
                 url: `s3://${env.S3_BUCKET}/${asset.preview}`,
                 options: {
+                    raw: bypass,
                     resizing_type: "auto",
                     height: 200,
                     enlarge: 1,
@@ -54,6 +58,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
                         endpoint: env.IMGPROXY_URL,
                         url: `s3://${env.S3_BUCKET}/${asset.view}`,
                         options: {
+                            raw: bypass,
                             resizing_type: "auto",
                             height: 2000,
                             enlarge: 1,
