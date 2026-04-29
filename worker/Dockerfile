@@ -24,6 +24,7 @@ FROM alpine:3.22
 # Install runtime native libraries (libvips, ffmpeg)
 RUN apk add --no-cache \
     vips \
+    vips-cpp \
     ffmpeg \
     ca-certificates
 
