@@ -14,11 +14,11 @@ import (
 	"github.com/wutipong/albums/worker/db"
 )
 
-const THUMBNAIL_QUALITY = 60
+const THUMBNAIL_QUALITY = 80
 
 var animationExts = []string{
 	".gif",
-	".webm",
+	".webp",
 }
 
 func hasAnimationExt(ext string) bool {

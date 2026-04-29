@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
-	"io"
 	"log/slog"
 	"math"
 	"os"
@@ -41,11 +40,8 @@ func processImageAsset(ctx context.Context, minioClient *minio.Client, asset *db
 	}
 	defer object.Close()
 
-	slog.Info("reading data", slog.String("id", asset.Original))
-	buff, err := io.ReadAll(object)
-	if err != nil {
-		return fmt.Errorf("unable to read object from s3: %w", err)
-	}
+	source := vips.NewSource(object)
+	defer source.Close()
 
 	slog.Info("read original image file.")
 
@@ -54,7 +50,7 @@ func processImageAsset(ctx context.Context, minioClient *minio.Client, asset *db
 		params.N = -1
 	}
 
-	original, err := vips.NewImageFromBuffer(buff, params)
+	original, err := vips.NewImageFromSource(source, params)
 	if err != nil {
 		return fmt.Errorf("unable to read original image: %w", err)
 	}
@@ -173,6 +169,7 @@ func populatePreview(
 
 	params := vips.DefaultWebpsaveBufferOptions()
 	params.Q = THUMBNAIL_QUALITY
+	params.PageHeight = preview.PageHeight()
 
 	buf, err := preview.WebpsaveBuffer(params)
 	if err != nil {
@@ -221,7 +218,7 @@ func createPreviewForAnimationImage(original *vips.Image) (*vips.Image, error) {
 		Gap:    2,
 	})
 
-	preview.SetPageHeight(preview.Height() / preview.Pages())
+	preview.SetPageHeight(THUMBNAIL_HEIGHT)
 
 	slog.Debug("preview image",
 		slog.Int("width", preview.Width()),
