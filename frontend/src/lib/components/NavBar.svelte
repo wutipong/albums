@@ -60,7 +60,7 @@
 			</div>
 			<ul
 				tabindex="-1"
-				class="dropdown-content menu z-1 mt-3 w-52 menu-sm rounded-box bg-base-300 p-2 shadow-xl"
+				class="dropdown-content menu z-1 mt-3 w-52 menu-sm rounded-box bg-base-100 p-2 shadow-xl"
 			>
 				<li>
 					<a href="/user"><Icon path={mdiAccount} /> User</a>

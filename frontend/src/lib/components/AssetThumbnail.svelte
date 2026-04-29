@@ -13,7 +13,7 @@
 
 <button
 	tabindex="0"
-	class={`block p-4 overflow-hidden rounded-xl cursor-pointer hover:shadow-xl hover:bg-base-300`}
+	class={`block p-4 overflow-hidden rounded-xl cursor-pointer hover:shadow-xl hover:bg-base-100`}
 	onmouseenter={() => (preview = true)}
 	onmouseleave={() => (preview = false)}
 	onclick={() => {

@@ -3,7 +3,7 @@
     let {album} = $props()
 </script>
 
-<div class='card w-[300px] h-[300px] border-base-300 border-1 hover:bg-base-300 hover:shadow-xl m-4'>
+<div class='card w-[300px] h-[300px] border-base-300 border-1 hover:bg-base-100 hover:shadow-xl m-4'>
     <figure>
         <a href={`/album/${album.id}/`}>
             {#if album.cover_url == ''}
