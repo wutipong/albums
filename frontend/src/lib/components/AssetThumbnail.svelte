@@ -13,8 +13,7 @@
 
 <button
 	tabindex="0"
-	class={`block h-[${thumbnailHeight}px] m-1 overflow-hidden rounded-xl cursor-pointer hover:shadow-xl`}
-	style={`width: ${thumbnailWidth}px;`}
+	class={`block p-4 overflow-hidden rounded-xl cursor-pointer hover:shadow-xl hover:bg-base-300`}
 	onmouseenter={() => (preview = true)}
 	onmouseleave={() => (preview = false)}
 	onclick={() => {
@@ -25,7 +24,7 @@
 	<div class="relative h-full w-full">
 		<div
 			class:hidden={preview}
-			class="box-border h-full w-full overflow-hidden rounded-xl"
+			class="box-border h-full w-full overflow-hidden rounded-xl border-base-100 border-1"
 			style={`width: ${thumbnailWidth}px; height: ${thumbnailHeight}px;`}
 		>
 			{#if asset.thumbnail_url ===''}
