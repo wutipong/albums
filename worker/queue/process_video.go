@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"time"
 
+	vips "github.com/cshum/vipsgen/vips816"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/minio/minio-go/v7"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
@@ -90,7 +91,9 @@ func processVideoView(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	asset.View = createAssetKey()
+	if asset.View == "" || asset.View == asset.Original {
+		asset.View = createAssetKey()
+	}
 	outputFile, err := os.CreateTemp("", "*view.mp4")
 	if err != nil {
 		return fmt.Errorf("unable to create temp file to transcode: %w", err)
@@ -175,6 +178,7 @@ func processVideoThumbnail(
 			"c:v":     "libwebp",
 			"vframes": "1",
 			"quality": fmt.Sprintf("%d", THUMBNAIL_QUALITY),
+			"vf":      fmt.Sprintf("scale=-2:%d", THUMBNAIL_HEIGHT),
 		}).OverWriteOutput().ErrorToStdOut().Run()
 
 	if err != nil {
@@ -187,6 +191,18 @@ func processVideoThumbnail(
 		Valid:        true,
 	}
 
+	image, err := vips.NewImageFromFile(outputFile.Name(), nil)
+	if err != nil {
+		return fmt.Errorf("unable to read image file with vips: %w", err)
+	}
+
+	asset.ThumbnailHeight = THUMBNAIL_HEIGHT
+	asset.ThumbnailWidth = int32((THUMBNAIL_HEIGHT * image.Width()) / image.Height())
+
+	if asset.Thumbnail == "" || asset.Thumbnail == asset.Original {
+		asset.Thumbnail = createAssetKey()
+	}
+
 	_, err = minioClient.PutObject(
 		ctx, os.Getenv("S3_BUCKET"),
 		asset.Thumbnail,
@@ -196,6 +212,7 @@ func processVideoThumbnail(
 			ContentType: "image/webp",
 		},
 	)
+
 	return nil
 }
 
@@ -229,14 +246,16 @@ func processVideoPreview(
 			"t":       "5",
 			"loop":    "0",
 			"quality": fmt.Sprintf("%d", THUMBNAIL_QUALITY),
-			"vf":      "fps=5",
+			"vf":      fmt.Sprintf("fps=5,scale=-2:%d", THUMBNAIL_HEIGHT),
 		}).OverWriteOutput().ErrorToStdOut().Run()
 
 	if err != nil {
 		return fmt.Errorf("unable to create thumbnail asset for video asset: %w", err)
 	}
 
-	asset.Preview = createAssetKey()
+	if asset.Preview == "" || asset.Preview == asset.Original {
+		asset.Preview = createAssetKey()
+	}
 	_, err = minioClient.PutObject(
 		ctx, os.Getenv("S3_BUCKET"),
 		asset.Preview,
