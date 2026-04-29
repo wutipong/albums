@@ -119,7 +119,9 @@ func populateView(
 		return fmt.Errorf("unable to save to webp image.")
 	}
 
-	asset.View = createAssetKey()
+	if asset.View == "" || asset.View == asset.Original {
+		asset.View = createAssetKey()
+	}
 
 	_, err = minioClient.PutObject(
 		ctx, os.Getenv("S3_BUCKET"),
@@ -175,7 +177,9 @@ func populatePreview(
 		return fmt.Errorf("unable to write preview image: %w", err)
 	}
 
-	asset.Preview = createAssetKey()
+	if asset.Preview == "" || asset.Preview == asset.Original {
+		asset.Preview = createAssetKey()
+	}
 
 	_, err = minioClient.PutObject(
 		ctx, os.Getenv("S3_BUCKET"),
@@ -264,7 +268,9 @@ func populateThumbnail(
 		return fmt.Errorf("unable to write preview image: %w", err)
 	}
 
-	asset.Thumbnail = createAssetKey()
+	if asset.Thumbnail == "" || asset.Thumbnail == asset.Original {
+		asset.Thumbnail = createAssetKey()
+	}
 
 	_, err = minioClient.PutObject(
 		ctx, os.Getenv("S3_BUCKET"),

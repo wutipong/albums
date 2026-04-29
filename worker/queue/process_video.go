@@ -91,7 +91,9 @@ func processVideoView(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	asset.View = createAssetKey()
+	if asset.View == "" || asset.View == asset.Original {
+		asset.View = createAssetKey()
+	}
 	outputFile, err := os.CreateTemp("", "*view.mp4")
 	if err != nil {
 		return fmt.Errorf("unable to create temp file to transcode: %w", err)
@@ -197,7 +199,9 @@ func processVideoThumbnail(
 	asset.ThumbnailHeight = THUMBNAIL_HEIGHT
 	asset.ThumbnailWidth = int32((THUMBNAIL_HEIGHT * image.Width()) / image.Height())
 
-	asset.Thumbnail = createAssetKey()
+	if asset.Thumbnail == "" || asset.Thumbnail == asset.Original {
+		asset.Thumbnail = createAssetKey()
+	}
 
 	_, err = minioClient.PutObject(
 		ctx, os.Getenv("S3_BUCKET"),
@@ -249,7 +253,9 @@ func processVideoPreview(
 		return fmt.Errorf("unable to create thumbnail asset for video asset: %w", err)
 	}
 
-	asset.Preview = createAssetKey()
+	if asset.Preview == "" || asset.Preview == asset.Original {
+		asset.Preview = createAssetKey()
+	}
 	_, err = minioClient.PutObject(
 		ctx, os.Getenv("S3_BUCKET"),
 		asset.Preview,
