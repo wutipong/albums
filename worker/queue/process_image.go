@@ -169,6 +169,8 @@ func populatePreview(
 		return err
 	}
 
+	defer preview.Close()
+
 	params := vips.DefaultWebpsaveBufferOptions()
 	params.Q = THUMBNAIL_QUALITY
 
@@ -259,6 +261,7 @@ func populateThumbnail(
 	if err != nil {
 		return err
 	}
+	defer thumbnail.Close()
 
 	params := vips.DefaultWebpsaveBufferOptions()
 	params.Q = THUMBNAIL_QUALITY
@@ -301,8 +304,6 @@ func createThumbnailForAnimationImage(original *vips.Image, err error) (*vips.Im
 	copyOptions := vips.DefaultCopyOptions()
 
 	thumbnail, _ := original.Copy(copyOptions)
-
-	defer thumbnail.Close()
 
 	err = thumbnail.Autorot(nil)
 	if err != nil {
