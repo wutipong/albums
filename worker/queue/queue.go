@@ -93,10 +93,6 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 
 	slog.Info("enqueueing asset", slog.String("id", id))
 
-	if status != db.ProcessStatusTPending {
-		return
-	}
-
 	j := &jobs.Job{
 		Queue: "asset-processing",
 		Payload: map[string]any{
