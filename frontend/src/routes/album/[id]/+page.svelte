@@ -3,7 +3,7 @@
 	import AssetViewer from '$lib/components/AssetViewer.svelte';
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
-	import { mdiDownload, mdiImageAlbum } from '@mdi/js';
+	import { mdiClose, mdiDownload, mdiImageAlbum, mdiInformationOutline } from '@mdi/js';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 
@@ -17,10 +17,12 @@
 	let showViewer = $state(false);
 	let currentIndex = $state(0);
 
-	let nextIndex = $state(-1)
-	let prevIndex = $state(-1)
+	let nextIndex = $state(-1);
+	let prevIndex = $state(-1);
 
 	let toast: Toast;
+
+	let infoModal: HTMLDialogElement;
 
 	function findPrevious(assets: any[], index: number): number {
 		return assets.slice(0, index).findLastIndex((asset: any, index, arr) => {
@@ -31,7 +33,7 @@
 
 	function findNext(assets: any[], index: number): number {
 		return assets.findIndex((asset: any, i, arr) => {
-			if (i <= index) return false
+			if (i <= index) return false;
 			if (asset == undefined) return false;
 			return asset.process_status == 'processed';
 		});
@@ -51,8 +53,8 @@
 
 	function next() {
 		if (nextIndex === -1) {
-			return
-		} 
+			return;
+		}
 
 		currentIndex = nextIndex;
 		onIndexUpdated(currentIndex);
@@ -60,9 +62,9 @@
 
 	function previous() {
 		if (prevIndex === -1) {
-			return
-		} 
-		currentIndex = prevIndex
+			return;
+		}
+		currentIndex = prevIndex;
 		onIndexUpdated(currentIndex);
 	}
 
@@ -76,9 +78,14 @@
 </script>
 
 {#snippet title()}
-	<div class="flex text-xl md:ms-4">
+	<div class="flex gap-2 align-middle text-xl md:ms-4">
 		<Icon path={mdiImageAlbum}></Icon>
-		{data.name}
+		<div class="tooltip tooltip-bottom" data-tip={data.name}>
+			<div class="hidden max-w-lg truncate sm:block">{data.name}</div>
+		</div>
+		<button class="btn btn-ghost" onclick={() => infoModal.showModal()}>
+			<Icon path={mdiInformationOutline} />
+		</button>
 	</div>
 {/snippet}
 
@@ -111,6 +118,38 @@
 </div>
 
 <Toast bind:this={toast} />
+
+<dialog bind:this={infoModal} class="modal">
+	<div class="modal-box">
+		<h3 class="text-lg font-bold">Information</h3>
+		<p class="py-4">{data.name}</p>
+		<table class="table w-full">
+			<tbody>
+				<tr>
+					<td>Created at</td>
+					<td>{new Date(data.created_at ?? new Date()).toLocaleString()}</td>
+				</tr>
+				<tr>
+					<td>Last modified at</td>
+					<td>{new Date(data.modified_at ?? new Date()).toLocaleString()}</td>
+				</tr>
+				<tr>
+					<td>Number of assets</td>
+					<td>{data.assets.length}</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="modal-action">
+			<form method="dialog">
+				<!-- if there is a button in form, it will close the modal -->
+				<button class="btn btn-secondary">
+					<Icon path={mdiClose} />
+					Close
+				</button>
+			</form>
+		</div>
+	</div>
+</dialog>
 
 {#snippet viewMenu()}
 	<li>
