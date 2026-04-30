@@ -1,15 +1,23 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { authClient } from '$lib/auth-client';
-	import { mdiImageSearch, mdiMagnify, mdiImageAlbum, mdiLogout, mdiAccount } from '@mdi/js';
+	import { mdiImageSearch, mdiImageAlbum, mdiLogout, mdiAccount } from '@mdi/js';
 	import Icon from 'mdi-svelte';
 	import { onMount } from 'svelte';
 	import { createHash } from '@better-auth/utils/hash';
 
 	let searchInput: HTMLInputElement;
 
-	let { title } = $props();
+	let { title, album = null } = $props();
 	let avatarSrc = $state('');
+
+	let albumsUrl = $derived.by(() => {
+		if (album) {
+			return `/album#${album.id}`;
+		} else {
+			return '/album';
+		}
+	});
 
 	function doSearch() {
 		const search = searchInput.value;
@@ -39,15 +47,17 @@
 	</div>
 	<div class="flex-none">
 		<ul class="menu menu-horizontal px-1">
-			<li><a href="/album"><Icon path={mdiImageAlbum} />Albums</a></li>
+			<li>
+				<a href={albumsUrl}><Icon path={mdiImageAlbum} />Albums</a>
+			</li>
 		</ul>
 	</div>
 
-	<div class="flex gap-2 me-4">
+	<div class="me-4 flex gap-2">
 		<div class="join">
-			<div >
+			<div>
 				<input class="input join-item" type="text" placeholder="search" bind:this={searchInput} />
-			</div	>
+			</div>
 			<button class="btn join-item" onclick={() => doSearch()}>
 				<Icon path={mdiImageSearch} />
 			</button>
@@ -67,7 +77,7 @@
 				</li>
 				<li></li>
 				<li>
-					<a href="/logout" data-sveltekit-preload-data="off"><Icon path={mdiLogout}/> Logout</a>
+					<a href="/logout" data-sveltekit-preload-data="off"><Icon path={mdiLogout} /> Logout</a>
 				</li>
 			</ul>
 		</div>

@@ -83,7 +83,7 @@
 {/snippet}
 
 <div class="relative flex h-screen w-screen flex-col">
-	<NavBar {title}></NavBar>
+	<NavBar {title} album={data}></NavBar>
 	<div class="mx-4 overflow-auto pt-8">
 		<div class="flex flex-wrap justify-evenly gap-1">
 			{#each data.assets as asset, index (asset)}
