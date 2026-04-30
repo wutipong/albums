@@ -11,8 +11,8 @@ import (
 	"github.com/lmittmann/tint"
 	"github.com/urfave/cli/v3"
 	"github.com/wutipong/albums/albumscli/album"
-	"github.com/wutipong/albums/albumscli/asset"
 	"github.com/wutipong/albums/albumscli/importing"
+	"github.com/wutipong/albums/albumscli/process"
 	"github.com/wutipong/albums/albumscli/profile"
 )
 
@@ -55,7 +55,7 @@ func main() {
 		Commands: []*cli.Command{
 			profile.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
 			album.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
-			asset.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
+			process.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
 			importing.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
 		},
 	}
