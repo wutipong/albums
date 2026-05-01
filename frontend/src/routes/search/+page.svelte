@@ -47,13 +47,19 @@
 {#snippet title()}
 	<div class="flex text-xl md:ms-4">
 		<Icon path={mdiImageSearchOutline}></Icon>
-		{data.search}
+		<span class="hidden md:block">Search</span>
 	</div>
 {/snippet}
 
 <div class="relative flex h-screen w-screen flex-col">
 	<NavBar {title} />
-	<div class="p-4 pt-8 overflow-auto">
+	<div class="flex w-full gap-2 border-1 border-base-300 bg-base-300 p-2 shadow">
+		<span class="label">
+			<Icon path={mdiImageSearch} />
+			Search: {data.search}
+		</span>
+	</div>
+	<div class="overflow-auto p-4 pt-8">
 		<div class="flex flex-wrap justify-evenly">
 			{#each data.assets as asset, index (asset)}
 				<AssetThumbnail
