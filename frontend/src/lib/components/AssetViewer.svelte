@@ -14,8 +14,6 @@
 		hasPrevious = false,
 		menu
 	} = $props();
-
-	$inspect(viewURL)
 </script>
 
 <style lang="scss">
