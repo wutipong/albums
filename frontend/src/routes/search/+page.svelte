@@ -44,15 +44,8 @@
 	}
 </script>
 
-{#snippet title()}
-	<div class="flex text-xl md:ms-4">
-		<Icon path={mdiImageSearchOutline}></Icon>
-		<span class="hidden md:block">Search</span>
-	</div>
-{/snippet}
-
 <div class="relative flex h-screen w-screen flex-col">
-	<NavBar {title} />
+	<NavBar />
 	<div class="flex w-full gap-2 border-1 border-base-300 bg-base-300 p-2 shadow">
 		<span class="label">
 			<Icon path={mdiImageSearch} />

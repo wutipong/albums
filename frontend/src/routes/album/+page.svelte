@@ -13,15 +13,8 @@
 	let filter = $state('');
 </script>
 
-{#snippet title()}
-	<div class="flex text-xl md:ms-4">
-		<Icon path={mdiImageAlbum}></Icon>
-		Albums
-	</div>
-{/snippet}
-
 <div class="relative flex h-screen w-screen flex-col">
-	<NavBar {title} />
+	<NavBar />
 
 	<div class="flex w-full justify-end gap-2 border-1 border-base-300 bg-base-300 p-2 shadow">
 		<label class="input w-full max-w-xs">

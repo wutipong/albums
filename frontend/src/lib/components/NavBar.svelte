@@ -10,7 +10,7 @@
 	let search = $state('');
 	let searchDialog: HTMLDialogElement;
 
-	let { title, album = null } = $props();
+	let { album = null } = $props();
 	let avatarSrc = $state('');
 
 	let albumsUrl = $derived.by(() => {

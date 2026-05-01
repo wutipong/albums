@@ -77,20 +77,9 @@
 	}
 </script>
 
-{#snippet title()}
-	<div class="flex align-middle text-xl md:ms-4">
-		<Icon path={mdiImageAlbum}></Icon>
-		<div class="tooltip tooltip-bottom" data-tip={data.name}>
-			<div class="hidden max-w-lg truncate sm:block">{data.name}</div>
-		</div>
-		<button class="btn btn-ghost" onclick={() => infoModal.showModal()}>
-			<Icon path={mdiInformationOutline} />
-		</button>
-	</div>
-{/snippet}
 
 <div class="relative flex h-screen w-screen flex-col">
-	<NavBar {title} album={data}></NavBar>
+	<NavBar album={data}></NavBar>
 	<div class="flex w-full items-center gap-2 border-1 border-base-300 bg-base-300 p-2 shadow">
 		<button class="btn btn-ghost" onclick={() => infoModal.showModal()}>
 			<Icon path={mdiInformationOutline} />
