@@ -6,7 +6,8 @@
 	import { onMount } from 'svelte';
 	import { createHash } from '@better-auth/utils/hash';
 
-	let searchInput: HTMLInputElement;
+	let search = $state('');
+	let searchDialog: HTMLDialogElement;
 
 	let { title, album = null } = $props();
 	let avatarSrc = $state('');
@@ -20,7 +21,6 @@
 	});
 
 	function doSearch() {
-		const search = searchInput.value;
 		const url = new URL('/search', location.origin);
 		url.searchParams.append('search', search);
 
@@ -39,8 +39,6 @@
 
 		avatarSrc = `https://gravatar.com/avatar/${hashVal} `;
 	});
-
-	let searchDialog: HTMLDialogElement;
 </script>
 
 <div class="navbar shadow-sm">
@@ -69,7 +67,7 @@
 	<div class="me-4 hidden gap-2 md:flex">
 		<div class="join">
 			<div>
-				<input class="input join-item" type="text" placeholder="search" bind:this={searchInput} />
+				<input class="input join-item" type="text" placeholder="search" bind:value={search} />
 			</div>
 			<button class="btn join-item" onclick={() => doSearch()}>
 				<Icon path={mdiImageSearch} />
@@ -105,7 +103,7 @@
 				class="input-bordered input w-full"
 				type="text"
 				placeholder="search"
-				bind:this={searchInput}
+				bind:value={search}
 				onkeydown={(e) => {
 					if (e.key === 'Enter') {
 						doSearch();
