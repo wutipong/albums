@@ -78,7 +78,7 @@
 </script>
 
 {#snippet title()}
-	<div class="flex gap-2 align-middle text-xl md:ms-4">
+	<div class="flex align-middle text-xl md:ms-4">
 		<Icon path={mdiImageAlbum}></Icon>
 		<div class="tooltip tooltip-bottom" data-tip={data.name}>
 			<div class="hidden max-w-lg truncate sm:block">{data.name}</div>
