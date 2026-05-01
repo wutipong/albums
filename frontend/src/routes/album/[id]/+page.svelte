@@ -91,10 +91,22 @@
 
 <div class="relative flex h-screen w-screen flex-col">
 	<NavBar {title} album={data}></NavBar>
-	<div class="flex w-full gap-2 border-1 border-base-300 bg-base-300 p-2 shadow">
-		<span class="label">
-			<Icon path={mdiAlbum} />
-			Album: {data.name}
+	<div class="flex w-full items-center gap-2 border-1 border-base-300 bg-base-300 p-2 shadow">
+		<button class="btn btn-ghost" onclick={() => infoModal.showModal()}>
+			<Icon path={mdiInformationOutline} />
+		</button>
+
+		<span class="flex-1 overflow-hidden md:hidden">
+			<div class="flex animate-marquee whitespace-nowrap">
+				{data.name}
+				{data.name}
+			</div>
+		</span>
+
+		<span class="hidden flex-1 overflow-ellipsis md:block">
+			<div class="flex whitespace-nowrap">
+				{data.name}
+			</div>
 		</span>
 	</div>
 	<div class="mx-4 overflow-auto pt-8">
