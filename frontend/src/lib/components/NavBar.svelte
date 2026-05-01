@@ -5,6 +5,7 @@
 	import Icon from 'mdi-svelte';
 	import { onMount } from 'svelte';
 	import { createHash } from '@better-auth/utils/hash';
+	import logo from '$lib/assets/logo.svg?raw';
 
 	let search = $state('');
 	let searchDialog: HTMLDialogElement;
@@ -43,7 +44,9 @@
 
 <div class="navbar shadow-sm">
 	<div class="flex-1">
-		{@render title()}
+		<div class="ms-2 w-32 text-base-content">
+			{@html logo}
+		</div>
 	</div>
 	<div class="flex-none">
 		<ul class="menu menu-horizontal px-1">

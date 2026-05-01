@@ -15,7 +15,7 @@
 		"kysely": "kysely-codegen --out-file ./src/lib/server/db_types.d.ts",
 		"protoc": "protoc --ts_proto_out=./src/lib/server/grpc/proto --ts_proto_opt=outputServices=nice-grpc,outputServices=generic-definitions,useExactTypes=false  -I /workspaces/grpc worker.proto clip.proto",
 		"codegen": "bun run kysely && bun run protoc",
-		"pwagen": "bunx pwa-icons -i ./static/logo.svg -o ./static/icons -p ios,android,favicon"
+		"pwagen": "bunx pwa-icons --padding 0 -i ./static/logo.svg -o ./static/icons -p ios,android,favicon"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.3",
