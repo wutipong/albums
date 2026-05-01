@@ -39,6 +39,8 @@
 
 		avatarSrc = `https://gravatar.com/avatar/${hashVal} `;
 	});
+
+	let searchDialog: HTMLDialogElement;
 </script>
 
 <div class="navbar shadow-sm">
@@ -56,10 +58,10 @@
 		</ul>
 		<ul class="menu menu-horizontal px-1 md:hidden">
 			<li>
-				<a href={albumsUrl}>
+				<button onclick={() => searchDialog.showModal()}>
 					<Icon path={mdiImageSearch} />
-					<div class="hidden md:block">Search</div></a
-				>
+					<div class="hidden md:block">Search</div>
+				</button>
 			</li>
 		</ul>
 	</div>
@@ -94,3 +96,23 @@
 		</ul>
 	</div>
 </div>
+
+<dialog class="modal" bind:this={searchDialog}>
+	<div class="modal-box">
+		<h3 class="text-lg font-bold">Search</h3>
+		<div class="py-4">
+			<input
+				class="input-bordered input w-full"
+				type="text"
+				placeholder="search"
+				bind:this={searchInput}
+				onkeydown={(e) => {
+					if (e.key === 'Enter') {
+						doSearch();
+						searchDialog.close();
+					}
+				}}
+			/>
+		</div>
+	</div>
+</dialog>
