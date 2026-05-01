@@ -3,7 +3,7 @@
 	import AssetViewer from '$lib/components/AssetViewer.svelte';
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
-	import { mdiClose, mdiDownload, mdiImageAlbum, mdiInformationOutline } from '@mdi/js';
+	import { mdiAlbum, mdiClose, mdiDownload, mdiImageAlbum, mdiInformationOutline } from '@mdi/js';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 
@@ -91,6 +91,12 @@
 
 <div class="relative flex h-screen w-screen flex-col">
 	<NavBar {title} album={data}></NavBar>
+	<div class="flex w-full gap-2 border-1 border-base-300 bg-base-300 p-2 shadow">
+		<span class="label">
+			<Icon path={mdiAlbum} />
+			Album: {data.name}
+		</span>
+	</div>
 	<div class="mx-4 overflow-auto pt-8">
 		<div class="flex flex-wrap justify-evenly gap-1">
 			{#each data.assets as asset, index (asset)}
