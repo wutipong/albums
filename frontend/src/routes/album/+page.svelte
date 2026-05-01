@@ -23,18 +23,14 @@
 <div class="relative flex h-screen w-screen flex-col">
 	<NavBar {title} />
 
-	<div class="bg-base-300 shadow w-full p-2 justify-end gap-2 border-1 border-base-300 flex">
-			<label class="input w-full max-w-xs">
-				<span class="label">
-					<Icon path={mdiFilter} />
-				</span>
-				<input
-					type="text"
-					placeholder="Type here to filter albums"
-					bind:value={filter}
-				/>
-			</label>
-		</div>
+	<div class="flex w-full justify-end gap-2 border-1 border-base-300 bg-base-300 p-2 shadow">
+		<label class="input w-full max-w-xs">
+			<span class="label">
+				<Icon path={mdiFilter} />
+			</span>
+			<input type="text" placeholder="Type here to filter albums" bind:value={filter} />
+		</label>
+	</div>
 
 	<div class="mx-4 overflow-auto pt-4 pb-20">
 		<div class="flex flex-wrap justify-evenly gap-2">
