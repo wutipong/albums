@@ -114,7 +114,6 @@ func Process(
 
 	for _, entry := range entries {
 		path := filepath.Join(sourceDir, entry.Name())
-		var assetIds []string
 
 		albumPath, err := filepath.Rel(sourceDir, path)
 		if err != nil {
@@ -122,7 +121,7 @@ func Process(
 				"failed to determine album name.",
 				slog.String("error", err.Error()),
 			)
-			return nil
+			continue
 		}
 
 		slog.Debug("processing path",
@@ -145,21 +144,25 @@ func Process(
 			slog.Warn(
 				"album already exists. skipping.",
 				slog.String("name", albumPath),
+				slog.String("id", matchingAlbums[0].ID),
 			)
-			return nil
+			continue
 		}
 
+		slog.Info("creating album",
+			slog.String("name", albumPath),
+			slog.String("entry", entry.Name()),
+		)
+
 		if entry.IsDir() {
-			// TODO: add support for nested directory
 			err = ProcessDirectory(ctx, server, sourceDir, albumPath)
 		} else {
 			if !IsArchiveFile(path) {
 				slog.Debug("skipping unsupported file",
 					slog.String("path", path),
 				)
-				return nil
+				continue
 			}
-			// TODO: add support for processing archive file without extracting it to a temporary directory
 			err = ProcessArchive(ctx, server, sourceDir, albumPath)
 		}
 
@@ -173,32 +176,8 @@ func Process(
 			if errors.Is(err, context.Canceled) {
 				return err
 			}
-			return nil
+			continue
 		}
-
-		if len(assetIds) == 0 {
-			slog.Debug(
-				"no assets uploaded. skip create album.",
-				slog.String("name", albumPath),
-			)
-			return nil
-		}
-
-		if len(matchingAlbums) > 0 {
-			slog.Info(
-				"album already exists. update existing album.",
-				slog.String("name", albumPath),
-			)
-
-			var albumIds []string
-			for _, album := range matchingAlbums {
-				albumIds = append(albumIds, album.ID)
-			}
-
-			return nil
-		}
-
-		return nil
 	}
 
 	return err

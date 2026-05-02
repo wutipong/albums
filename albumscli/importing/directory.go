@@ -31,7 +31,7 @@ func ProcessDirectory(
 		return fmt.Errorf("failed to create album for directory %s: %w", path, err)
 	}
 
-	filepath.WalkDir(path, func(path string, d fs.DirEntry, err error) error {
+	filepath.WalkDir(filepath.Join(sourceDir, path), func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			slog.Error(
 				"failed to access path",
@@ -91,7 +91,7 @@ func processMediaFile(
 		return nil
 	}
 
-	file, err := os.Open(filepath.Join(sourceDir, path))
+	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("failed to open file %s: %w", path, err)
 	}
@@ -132,7 +132,7 @@ func processArchive(
 		slog.String("path", path),
 	)
 
-	archiveFile, err := os.Open(filepath.Join(sourceDir, path))
+	archiveFile, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("failed to open archive: %s: %w.",
 			path,
