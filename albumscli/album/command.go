@@ -2,15 +2,11 @@ package album
 
 import (
 	"context"
-	"log/slog"
-	"os"
-	"time"
 
-	"github.com/lmittmann/tint"
 	"github.com/urfave/cli/v3"
 )
 
-func Command(profile *string, displayLogLevel *string, fileLogLevel *string) *cli.Command {
+func Command(profile *string) *cli.Command {
 	dryRun := false
 	id := ""
 
@@ -51,13 +47,6 @@ func Command(profile *string, displayLogLevel *string, fileLogLevel *string) *cl
 					},
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
-					if displayLogLevel != nil && *displayLogLevel == "debug" {
-						slog.SetDefault(slog.New(tint.NewHandler(os.Stderr, &tint.Options{
-							Level:      slog.LevelDebug,
-							TimeFormat: time.Kitchen,
-						})))
-					}
-
 					return showAlbum(ctx, *profile, dryRun, id)
 				},
 			}, {
@@ -80,13 +69,6 @@ func Command(profile *string, displayLogLevel *string, fileLogLevel *string) *cl
 					},
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
-					if displayLogLevel != nil && *displayLogLevel == "debug" {
-						slog.SetDefault(slog.New(tint.NewHandler(os.Stderr, &tint.Options{
-							Level:      slog.LevelDebug,
-							TimeFormat: time.Kitchen,
-						})))
-					}
-
 					return deleteAlbum(ctx, *profile, dryRun, id)
 				},
 			},

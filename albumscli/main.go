@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -12,6 +11,7 @@ import (
 	"github.com/urfave/cli/v3"
 	"github.com/wutipong/albums/albumscli/album"
 	"github.com/wutipong/albums/albumscli/importing"
+	"github.com/wutipong/albums/albumscli/log"
 	"github.com/wutipong/albums/albumscli/process"
 	"github.com/wutipong/albums/albumscli/profile"
 )
@@ -22,28 +22,13 @@ func main() {
 		TimeFormat: time.Kitchen,
 	})))
 
-	displayLogLevelStr := "warn"
-	fileLogLevelStr := "info"
 	profileStr := "default"
+	debug := false
 
 	cmd := &cli.Command{
 		Name:  "albumscli",
 		Usage: "import assets to albums",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "display-log",
-				Value:       "warn",
-				Usage:       "Minimum log-level on display (debug, info, warn, error).",
-				Destination: &displayLogLevelStr,
-				Category:    "Logging",
-			},
-			&cli.StringFlag{
-				Name:        "file-log",
-				Value:       "info",
-				Usage:       "Minimum log-level in log file (debug, info, warn, error).",
-				Destination: &fileLogLevelStr,
-				Category:    "Logging",
-			},
 			&cli.StringFlag{
 				Name:        "profile",
 				Value:       "default",
@@ -51,12 +36,31 @@ func main() {
 				Destination: &profileStr,
 				Category:    "albums Server",
 			},
+			&cli.BoolFlag{
+				Name:        "debug",
+				Value:       false,
+				Usage:       "enable loggin debug message",
+				Destination: &debug,
+			},
 		},
 		Commands: []*cli.Command{
-			profile.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
-			album.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
-			process.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
-			importing.Command(&profileStr, &displayLogLevelStr, &fileLogLevelStr),
+			profile.Command(&profileStr),
+			album.Command(&profileStr),
+			process.Command(&profileStr),
+			importing.Command(&profileStr),
+		},
+		Before: func(ctx context.Context, c *cli.Command) (context.Context, error) {
+			level := slog.LevelInfo.String()
+			if debug {
+				level = slog.LevelDebug.String()
+			}
+			log.Setup(profileStr, level, true, level)
+			return ctx, nil
+
+		},
+		After: func(ctx context.Context, c *cli.Command) error {
+			log.CleanUp()
+			return nil
 		},
 	}
 
@@ -64,6 +68,6 @@ func main() {
 	defer stop()
 
 	if err := cmd.Run(ctx, os.Args); err != nil {
-		log.Fatal(err)
+		slog.Error("Error running command", slog.String("error", err.Error()))
 	}
 }

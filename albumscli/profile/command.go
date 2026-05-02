@@ -6,7 +6,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func Command(profile *string, displayLogLevel *string, fileLogLevel *string) *cli.Command {
+func Command(profile *string) *cli.Command {
 	return &cli.Command{
 		Name:  "profile",
 		Usage: "Manage profiles for albums importer",

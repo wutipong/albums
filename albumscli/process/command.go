@@ -7,12 +7,11 @@ import (
 	"net/url"
 
 	"github.com/urfave/cli/v3"
-	"github.com/wutipong/albums/albumscli/log"
 	"github.com/wutipong/albums/albumscli/profile"
 	"github.com/wutipong/albums/albumscli/server/api"
 )
 
-func Command(profileStr *string, displayLogLevel *string, fileLogLevel *string) *cli.Command {
+func Command(profileStr *string) *cli.Command {
 	dryRun := false
 	id := ""
 
@@ -39,12 +38,6 @@ func Command(profileStr *string, displayLogLevel *string, fileLogLevel *string) 
 					},
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
-					err := log.Setup(*profileStr, *displayLogLevel, true, *fileLogLevel)
-					if err != nil {
-						return fmt.Errorf("unable to setup log: %w", err)
-					}
-					defer log.CleanUp()
-
 					c, err := profile.LoadProfile(ctx, *profileStr)
 					if err != nil {
 						return fmt.Errorf(
@@ -83,12 +76,6 @@ func Command(profileStr *string, displayLogLevel *string, fileLogLevel *string) 
 					},
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
-					err := log.Setup(*profileStr, *displayLogLevel, true, *fileLogLevel)
-					if err != nil {
-						return fmt.Errorf("unable to setup log: %w", err)
-					}
-					defer log.CleanUp()
-
 					c, err := profile.LoadProfile(ctx, *profileStr)
 					if err != nil {
 						return fmt.Errorf(
