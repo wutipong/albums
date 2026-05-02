@@ -2,6 +2,7 @@ package importing
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -163,6 +164,14 @@ func WalkArchive(
 			if IsMediaFile(f.NameInArchive) {
 				asset, err := uploadArchiveAsset(ctx, server, albumID, archivePath, filename, f)
 				if err != nil {
+					if errors.Is(err, ErrDuplicateAsset) {
+						slog.Warn(
+							"asset already exists. skipping file.",
+							slog.String("filename", filename),
+							slog.String("archive", archivePath),
+						)
+						return nil
+					}
 					return err
 				}
 

@@ -47,7 +47,7 @@ export const POST: RequestHandler = async ({ request }) => {
         .limit(1)
         .executeTakeFirst()
     if (existed) {
-        return json({success: false, err: "Dupplicate asset found."}, {status: 409})
+        return json({ success: false, error: "duplicate asset" }, { status: 409 })
     }
 
     const asset = await db.insertInto("assets")
@@ -73,8 +73,8 @@ export const POST: RequestHandler = async ({ request }) => {
     });
 
     const url = await getSignedUrl(
-        network === 'public' ? s3Public : s3, 
-        command, 
+        network === 'public' ? s3Public : s3,
+        command,
         { expiresIn: 3600 }
     );
 

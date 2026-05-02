@@ -17,6 +17,11 @@ import (
 	"github.com/wutipong/albums/albumscli/server/types"
 )
 
+var (
+	ErrDuplicateAsset     = errors.New("duplicate asset")
+	ErrAlbumAlreadyExists = errors.New("album already exists")
+)
+
 func Command(profileStr *string, displayLogLevel *string, fileLogLevel *string) *cli.Command {
 	sourceDir := ""
 	force := false

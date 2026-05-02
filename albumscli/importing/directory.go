@@ -2,6 +2,7 @@ package importing
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/fs"
 	"log/slog"
@@ -99,6 +100,13 @@ func processMediaFile(
 		info.Size(),
 	)
 	if err != nil {
+		if errors.Is(err, ErrDuplicateAsset) {
+			slog.Warn(
+				"asset already exists. skipping file.",
+				slog.String("path", path),
+			)
+			return nil
+		}
 		return fmt.Errorf("failed to upload asset for file %s: %w", path, err)
 	}
 

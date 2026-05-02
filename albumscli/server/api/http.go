@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -16,6 +17,10 @@ type ServerConfig struct {
 	DryRun  bool
 	APIKey  string
 	Network string
+}
+
+type ErrorResponse struct {
+	Message string `json:"message"`
 }
 
 func Post[R any](
@@ -60,11 +65,18 @@ func DoRequestWithReturnObject[R any](
 	}
 
 	if resp.StatusCode >= 300 {
-		err = fmt.Errorf(
-			"request failed with status code %d: %s",
-			resp.StatusCode,
-			string(respBuff),
-		)
+		errorResp := ErrorResponse{}
+		err = json.Unmarshal(respBuff, &errorResp)
+		if err != nil {
+			err = fmt.Errorf(
+				"request failed with status code %d and unable to parse error response: %w",
+				resp.StatusCode,
+				err,
+			)
+			return
+		}
+
+		err = errors.New(errorResp.Message)
 		return
 	}
 
