@@ -40,6 +40,16 @@ export const POST: RequestHandler = async ({ request }) => {
         return json({ success: false, error: "Unsupported asset type." }, { status: 400 })
     }
 
+    const existed = await db.selectFrom("assets")
+        .where("album_id", '=', albumId)
+        .where('filename', '=', filename)
+        .selectAll()
+        .limit(1)
+        .executeTakeFirst()
+    if (existed) {
+        return json({success: false, err: "Dupplicate asset found."}, {status: 409})
+    }
+
     const asset = await db.insertInto("assets")
         .values({
             album_id: albumId,
