@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 
 	"github.com/urfave/cli/v3"
 	"github.com/wutipong/albums/albumscli/profile"
@@ -160,6 +161,12 @@ func Process(
 		}
 
 		if entry.IsDir() {
+			if strings.HasPrefix(entry.Name(), ".") {
+				slog.Debug("skipping hidden directory",
+					slog.String("path", path),
+				)
+				continue
+			}
 			err = ProcessDirectory(ctx, server, album, sourceDir, albumPath)
 		} else {
 			if !IsArchiveFile(path) {
