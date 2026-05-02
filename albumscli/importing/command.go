@@ -21,8 +21,6 @@ func Command(profileStr *string, displayLogLevel *string, fileLogLevel *string) 
 	sourceDir := ""
 	force := false
 	dryRun := false
-	disableDirectory := true
-	disableArchive := true
 
 	return &cli.Command{
 		Name:  "import",
@@ -39,20 +37,6 @@ func Command(profileStr *string, displayLogLevel *string, fileLogLevel *string) 
 				Value:       false,
 				Usage:       "Processing assets without working with the Albums server.",
 				Destination: &dryRun,
-				Category:    "Processing",
-			},
-			&cli.BoolFlag{
-				Name:        "disable-directory",
-				Value:       false,
-				Usage:       "Disable processing media files in directories.",
-				Destination: &disableDirectory,
-				Category:    "Processing",
-			},
-			&cli.BoolFlag{
-				Name:        "disable-archive",
-				Value:       false,
-				Usage:       "Disable processing media files in archive files.",
-				Destination: &disableArchive,
 				Category:    "Processing",
 			},
 		},
@@ -99,8 +83,6 @@ func Command(profileStr *string, displayLogLevel *string, fileLogLevel *string) 
 				server,
 				sourceDir,
 				force,
-				!disableDirectory,
-				!disableArchive,
 			)
 		},
 	}
@@ -111,9 +93,6 @@ func Process(
 	server api.ServerConfig,
 	sourceDir string,
 	force bool,
-	processDirectory bool,
-	processArchive bool,
-
 ) error {
 	var albums []types.Album
 	var err error
@@ -127,115 +106,100 @@ func Process(
 		albums = resp.Albums
 		slog.Debug("albums", slog.Any("existing albums", albums))
 	}
-	err = filepath.WalkDir(sourceDir,
-		func(path string, d os.DirEntry, err error,
-		) error {
-			if err != nil {
-				slog.Warn(
-					"failed to access path. skipping.",
+
+	entries, err := os.ReadDir(sourceDir)
+	if err != nil {
+		return fmt.Errorf("failed to read source directory: %w", err)
+	}
+
+	for _, entry := range entries {
+		path := filepath.Join(sourceDir, entry.Name())
+		var assetIds []string
+
+		albumPath, err := filepath.Rel(sourceDir, path)
+		if err != nil {
+			slog.Error(
+				"failed to determine album name.",
+				slog.String("error", err.Error()),
+			)
+			return nil
+		}
+
+		slog.Debug("processing path",
+			slog.String("path", path),
+			slog.String("albumPath", albumPath),
+		)
+
+		matchingAlbums := slices.DeleteFunc(slices.Clone(albums),
+			func(album types.Album) bool {
+				return album.Name != albumPath
+			})
+
+		slog.Debug("matching albums",
+			slog.Any("album", albumPath),
+			slog.Any("existing", albums),
+			slog.Any("matchalbums", matchingAlbums),
+		)
+
+		if !force && len(matchingAlbums) > 0 {
+			slog.Warn(
+				"album already exists. skipping.",
+				slog.String("name", albumPath),
+			)
+			return nil
+		}
+
+		if entry.IsDir() {
+			// TODO: add support for nested directory
+			err = ProcessDirectory(ctx, server, sourceDir, albumPath)
+		} else {
+			if !IsArchiveFile(path) {
+				slog.Debug("skipping unsupported file",
 					slog.String("path", path),
-					slog.String("error", err.Error()),
 				)
 				return nil
 			}
+			// TODO: add support for processing archive file without extracting it to a temporary directory
+			err = ProcessArchive(ctx, server, sourceDir, albumPath)
+		}
 
-			var assetIds []string
-
-			albumPath, err := filepath.Rel(sourceDir, path)
-			if err != nil {
-				slog.Error(
-					"failed to determine album name.",
-					slog.String("error", err.Error()),
-				)
-				return nil
-			}
-
-			slog.Debug("processing path",
-				slog.String("path", path),
+		if err != nil {
+			slog.Error(
+				"failed upload assets.",
+				slog.String("error", err.Error()),
+				slog.String("sourceDir", sourceDir),
 				slog.String("albumPath", albumPath),
 			)
+			if errors.Is(err, context.Canceled) {
+				return err
+			}
+			return nil
+		}
 
-			matchingAlbums := slices.DeleteFunc(slices.Clone(albums),
-				func(album types.Album) bool {
-					return album.Name != albumPath
-				})
+		if len(assetIds) == 0 {
+			slog.Debug(
+				"no assets uploaded. skip create album.",
+				slog.String("name", albumPath),
+			)
+			return nil
+		}
 
-			slog.Debug("matching albums",
-				slog.Any("album", albumPath),
-				slog.Any("existing", albums),
-				slog.Any("matchalbums", matchingAlbums),
+		if len(matchingAlbums) > 0 {
+			slog.Info(
+				"album already exists. update existing album.",
+				slog.String("name", albumPath),
 			)
 
-			if !force && len(matchingAlbums) > 0 {
-				slog.Warn(
-					"album already exists. skipping.",
-					slog.String("name", albumPath),
-				)
-				return nil
-			}
-
-			if d.IsDir() {
-				if !processDirectory {
-					slog.Debug("skipping directory",
-						slog.String("path", path),
-					)
-					return nil
-				}
-				err = ProcessDirectory(ctx, server, sourceDir, albumPath)
-			} else {
-				if !processArchive {
-					slog.Debug("skipping file",
-						slog.String("path", path),
-					)
-					return nil
-				}
-				if !IsArchiveFile(path) {
-					slog.Debug("skipping unsupported file",
-						slog.String("path", path),
-					)
-					return nil
-				}
-
-				err = ProcessArchive(ctx, server, sourceDir, albumPath)
-			}
-
-			if err != nil {
-				slog.Error(
-					"failed upload assets.",
-					slog.String("error", err.Error()),
-					slog.String("sourceDir", sourceDir),
-					slog.String("albumPath", albumPath),
-				)
-				if errors.Is(err, context.Canceled) {
-					return err
-				}
-				return nil
-			}
-
-			if len(assetIds) == 0 {
-				slog.Debug(
-					"no assets uploaded. skip create album.",
-					slog.String("name", albumPath),
-				)
-				return nil
-			}
-
-			if len(matchingAlbums) > 0 {
-				slog.Info(
-					"album already exists. update existing album.",
-					slog.String("name", albumPath),
-				)
-
-				var albumIds []string
-				for _, album := range matchingAlbums {
-					albumIds = append(albumIds, album.ID)
-				}
-
-				return nil
+			var albumIds []string
+			for _, album := range matchingAlbums {
+				albumIds = append(albumIds, album.ID)
 			}
 
 			return nil
-		})
+		}
+
+		return nil
+	}
 
 	return err
 }
