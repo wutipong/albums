@@ -17,18 +17,16 @@ func ProcessDirectory(
 	ctx context.Context,
 	server api.ServerConfig,
 	album types.Album,
-	sourceDir string,
 	path string,
 ) error {
 	if ctx.Err() != nil {
 		return fmt.Errorf("context error: %w", ctx.Err())
 	}
 	slog.Debug("processing directory",
-		slog.String("sourceDir", sourceDir),
 		slog.String("path", path),
 	)
 
-	filepath.WalkDir(filepath.Join(sourceDir, path), func(path string, d fs.DirEntry, err error) error {
+	filepath.WalkDir(path, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			slog.Error(
 				"failed to access path",
@@ -41,9 +39,9 @@ func ProcessDirectory(
 		}
 
 		if IsMediaFile(path) {
-			err = processMediaFile(ctx, server, sourceDir, path, album)
+			err = processMediaFile(ctx, server, path, album)
 		} else if IsArchiveFile(path) {
-			err = processArchive(ctx, server, sourceDir, path, album)
+			err = ProcessArchive(ctx, server, album, path)
 		}
 
 		if err != nil {
@@ -63,12 +61,10 @@ func ProcessDirectory(
 func processMediaFile(
 	ctx context.Context,
 	server api.ServerConfig,
-	sourceDir string,
 	path string,
 	album types.Album,
 ) error {
 	slog.Debug("processing media file",
-		slog.String("sourceDir", sourceDir),
 		slog.String("path", path),
 	)
 
@@ -111,35 +107,6 @@ func processMediaFile(
 	}
 
 	slog.Info("uploaded asset", slog.Any("asset", asset))
-
-	return nil
-}
-
-func processArchive(
-	ctx context.Context,
-	server api.ServerConfig,
-	sourceDir string,
-	path string,
-	album types.Album,
-) error {
-	slog.Debug("processing archive file",
-		slog.String("sourceDir", sourceDir),
-		slog.String("path", path),
-	)
-
-	archiveFile, err := os.Open(path)
-	if err != nil {
-		return fmt.Errorf("failed to open archive: %s: %w.",
-			path,
-			err,
-		)
-	}
-	defer archiveFile.Close()
-
-	err = WalkArchive(ctx, server, album.ID, path, archiveFile)
-	if err != nil {
-		return fmt.Errorf("failed to process archive %s: %w", path, err)
-	}
 
 	return nil
 }

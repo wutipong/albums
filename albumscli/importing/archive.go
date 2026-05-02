@@ -22,13 +22,12 @@ func ProcessArchive(
 	ctx context.Context,
 	server api.ServerConfig,
 	album types.Album,
-	sourceDir string,
 	albumPath string,
 ) error {
 	if !IsArchiveFile(filepath.Ext(albumPath)) {
 		return fmt.Errorf("file is not an archive: %s", albumPath)
 	}
-	archiveFile, err := os.Open(filepath.Join(sourceDir, albumPath))
+	archiveFile, err := os.Open(albumPath)
 	if err != nil {
 		return fmt.Errorf("failed to open archive: %s: %w.",
 			albumPath,
