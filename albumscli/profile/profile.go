@@ -73,6 +73,7 @@ func openConfigMap(ctx context.Context) (profileMap map[string]Profile, err erro
 			slog.String("path", path),
 		)
 		profileMap = make(map[string]Profile)
+		err = nil
 		return
 	} else if err != nil {
 		err = fmt.Errorf("failed to parse existing configuration file: %w", err)
