@@ -58,11 +58,8 @@ func main() {
 			return ctx, nil
 
 		},
-		After: func(ctx context.Context, c *cli.Command) error {
-			log.CleanUp()
-			return nil
-		},
 	}
+	defer log.CleanUp()
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
