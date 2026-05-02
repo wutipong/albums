@@ -15,6 +15,7 @@ import (
 func ProcessDirectory(
 	ctx context.Context,
 	server api.ServerConfig,
+	album types.Album,
 	sourceDir string,
 	path string,
 ) error {
@@ -25,11 +26,6 @@ func ProcessDirectory(
 		slog.String("sourceDir", sourceDir),
 		slog.String("path", path),
 	)
-
-	album, err := api.CreateAlbum(ctx, server, path)
-	if err != nil {
-		return fmt.Errorf("failed to create album for directory %s: %w", path, err)
-	}
 
 	filepath.WalkDir(filepath.Join(sourceDir, path), func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -60,15 +56,6 @@ func ProcessDirectory(
 		return nil
 	})
 
-	slog.Info("notify populate album cover",
-		slog.String("album", album.Name),
-		slog.String("id", album.ID),
-	)
-
-	_, err = api.PopulateAlbumCover(ctx, server, album.ID)
-	if err != nil {
-		return fmt.Errorf("failed to queue populate album cover: %w", err)
-	}
 	return nil
 }
 

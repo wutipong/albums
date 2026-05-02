@@ -20,6 +20,7 @@ import (
 func ProcessArchive(
 	ctx context.Context,
 	server api.ServerConfig,
+	album types.Album,
 	sourceDir string,
 	albumPath string,
 ) error {
@@ -35,19 +36,9 @@ func ProcessArchive(
 	}
 	defer archiveFile.Close()
 
-	album, err := api.CreateAlbum(ctx, server, albumPath)
-	if err != nil {
-		return fmt.Errorf("failed to create album for archive %s: %w", albumPath, err)
-	}
-
 	err = WalkArchive(ctx, server, album.ID, albumPath, archiveFile)
 	if err != nil {
 		return fmt.Errorf("failed to process archive %s: %w", albumPath, err)
-	}
-
-	_, err = api.PopulateAlbumCover(ctx, server, album.ID)
-	if err != nil {
-		return fmt.Errorf("failed to queue populate album cover: %w", err)
 	}
 
 	return nil

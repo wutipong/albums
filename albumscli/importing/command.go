@@ -97,15 +97,13 @@ func Process(
 	var albums []types.Album
 	var err error
 
-	if !force {
-		resp, err := api.GetAlbumList(ctx, server)
-		if err != nil {
-			err = fmt.Errorf("unable to retrieved existing albums: %w", err)
-			return err
-		}
-		albums = resp.Albums
-		slog.Debug("albums", slog.Any("existing albums", albums))
+	resp, err := api.GetAlbumList(ctx, server)
+	if err != nil {
+		err = fmt.Errorf("unable to retrieved existing albums: %w", err)
+		return err
 	}
+	albums = resp.Albums
+	slog.Debug("albums", slog.Any("existing albums", albums))
 
 	entries, err := os.ReadDir(sourceDir)
 	if err != nil {
@@ -140,22 +138,31 @@ func Process(
 			slog.Any("matchalbums", matchingAlbums),
 		)
 
+		existing := false
+		var album types.Album
 		if !force && len(matchingAlbums) > 0 {
 			slog.Warn(
-				"album already exists. skipping.",
+				"album already exists. use existing album.",
 				slog.String("name", albumPath),
 				slog.String("id", matchingAlbums[0].ID),
 			)
-			continue
+
+			album = matchingAlbums[0]
+			existing = true
+		} else {
+			slog.Info("creating album",
+				slog.String("name", albumPath),
+				slog.String("entry", entry.Name()),
+			)
+
+			album, err = api.CreateAlbum(ctx, server, path)
+			if err != nil {
+				return fmt.Errorf("failed to create album for directory %s: %w", path, err)
+			}
 		}
 
-		slog.Info("creating album",
-			slog.String("name", albumPath),
-			slog.String("entry", entry.Name()),
-		)
-
 		if entry.IsDir() {
-			err = ProcessDirectory(ctx, server, sourceDir, albumPath)
+			err = ProcessDirectory(ctx, server, album, sourceDir, albumPath)
 		} else {
 			if !IsArchiveFile(path) {
 				slog.Debug("skipping unsupported file",
@@ -163,7 +170,7 @@ func Process(
 				)
 				continue
 			}
-			err = ProcessArchive(ctx, server, sourceDir, albumPath)
+			err = ProcessArchive(ctx, server, album, sourceDir, albumPath)
 		}
 
 		if err != nil {
@@ -177,6 +184,18 @@ func Process(
 				return err
 			}
 			continue
+		}
+
+		if !existing {
+			slog.Info("notify populate album cover",
+				slog.String("album", album.Name),
+				slog.String("id", album.ID),
+			)
+
+			_, err = api.PopulateAlbumCover(ctx, server, album.ID)
+			if err != nil {
+				return fmt.Errorf("failed to queue populate album cover: %w", err)
+			}
 		}
 	}
 
