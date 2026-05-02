@@ -57,20 +57,14 @@
 	}
 </script>
 
-{#snippet title()}
-	<div class="ms-4 flex flex-row gap-4 text-xl">
-		<Icon path={mdiAccount} />
-		User
-	</div>
-{/snippet}
-
 <div class="flex h-screen w-screen flex-col">
-	<NavBar {title}></NavBar>
+	<NavBar />
+
 	<div class="overflow-auto p-4 pt-8">
 		<article class="mx-auto prose h-full w-full md:w-200">
 			<div class="flex flex-row gap-8">
 				<div class="avatar">
-					<div class="w-24 h-24 rounded-full">
+					<div class="h-24 w-24 rounded-full">
 						<img src={avatarSrc} alt="avatar" class="my-0!" />
 					</div>
 				</div>

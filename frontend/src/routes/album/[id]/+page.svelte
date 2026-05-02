@@ -3,7 +3,7 @@
 	import AssetViewer from '$lib/components/AssetViewer.svelte';
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
-	import { mdiClose, mdiDownload, mdiImageAlbum, mdiInformationOutline } from '@mdi/js';
+	import { mdiAlbum, mdiClose, mdiDownload, mdiImageAlbum, mdiInformationOutline } from '@mdi/js';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 
@@ -77,20 +77,27 @@
 	}
 </script>
 
-{#snippet title()}
-	<div class="flex align-middle text-xl md:ms-4">
-		<Icon path={mdiImageAlbum}></Icon>
-		<div class="tooltip tooltip-bottom" data-tip={data.name}>
-			<div class="hidden max-w-lg truncate sm:block">{data.name}</div>
-		</div>
+
+<div class="relative flex h-screen w-screen flex-col">
+	<NavBar album={data}></NavBar>
+	<div class="flex w-full items-center gap-2 border-1 border-base-300 bg-base-300 p-2 shadow">
 		<button class="btn btn-ghost" onclick={() => infoModal.showModal()}>
 			<Icon path={mdiInformationOutline} />
 		</button>
-	</div>
-{/snippet}
 
-<div class="relative flex h-screen w-screen flex-col">
-	<NavBar {title} album={data}></NavBar>
+		<span class="flex-1 overflow-hidden md:hidden">
+			<div class="flex animate-marquee whitespace-nowrap">
+				{data.name}
+				{data.name}
+			</div>
+		</span>
+
+		<span class="hidden flex-1 overflow-ellipsis md:block">
+			<div class="flex whitespace-nowrap">
+				{data.name}
+			</div>
+		</span>
+	</div>
 	<div class="mx-4 overflow-auto pt-8">
 		<div class="flex flex-wrap justify-evenly gap-1">
 			{#each data.assets as asset, index (asset)}
