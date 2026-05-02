@@ -100,7 +100,7 @@ func processMediaFile(
 		info.Size(),
 	)
 	if err != nil {
-		if errors.Is(err, ErrDuplicateAsset) {
+		if errors.Is(err, api.ErrDuplicateAsset) {
 			slog.Warn(
 				"asset already exists. skipping file.",
 				slog.String("path", path),

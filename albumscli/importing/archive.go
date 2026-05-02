@@ -163,16 +163,18 @@ func WalkArchive(
 
 			if IsMediaFile(f.NameInArchive) {
 				asset, err := uploadArchiveAsset(ctx, server, albumID, archivePath, filename, f)
+				if errors.Is(err, api.ErrDuplicateAsset) {
+					slog.Warn(
+						"asset already exists. skipping file.",
+						slog.String("path", archivePath),
+					)
+					return nil
+				}
 				if err != nil {
-					if errors.Is(err, ErrDuplicateAsset) {
-						slog.Warn(
-							"asset already exists. skipping file.",
-							slog.String("filename", filename),
-							slog.String("archive", archivePath),
-						)
-						return nil
-					}
-					return err
+					return fmt.Errorf(
+						"failed to upload asset for file %s in archive %s: %w",
+						filename, archivePath, err,
+					)
 				}
 
 				slog.Info("uploaded asset", slog.Any("asset", asset))

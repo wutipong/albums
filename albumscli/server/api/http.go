@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -20,7 +19,11 @@ type ServerConfig struct {
 }
 
 type ErrorResponse struct {
-	Message string `json:"message"`
+	Message string `json:"error"`
+}
+
+func (err ErrorResponse) Error() string {
+	return err.Message
 }
 
 func Post[R any](
@@ -76,7 +79,7 @@ func DoRequestWithReturnObject[R any](
 			return
 		}
 
-		err = errors.New(errorResp.Message)
+		err = errorResp
 		return
 	}
 

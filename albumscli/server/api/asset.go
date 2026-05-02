@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"hash/crc32"
 	"io"
@@ -20,6 +21,10 @@ type PostAssetResposnse struct {
 	Asset   types.Asset `json:"asset"`
 	Success bool        `json:"success"`
 }
+
+var (
+	ErrDuplicateAsset = errors.New("duplicate asset")
+)
 
 func PostAsset(
 	ctx context.Context,
@@ -71,6 +76,9 @@ func PostAsset(
 			Network:  server.Network,
 		})
 	if err != nil {
+		if err.Error() == "duplicate asset" {
+			err = ErrDuplicateAsset
+		}
 		err = fmt.Errorf("request to upload failed: %w", err)
 		return
 	}
