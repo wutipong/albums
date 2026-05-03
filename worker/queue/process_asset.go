@@ -84,6 +84,6 @@ func ProcessAsset(ctx context.Context, minioClient *minio.Client, id string) err
 	return nil
 }
 
-func createAssetKey() string {
-	return fmt.Sprintf("public/%s", uuid.NewString())
+func createAssetKey(extension string) string {
+	return fmt.Sprintf("public/%s.%s", uuid.NewString(), extension)
 }

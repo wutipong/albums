@@ -116,7 +116,7 @@ func populateView(
 	}
 
 	if asset.View == "" || asset.View == asset.Original {
-		asset.View = createAssetKey()
+		asset.View = createAssetKey("webp")
 	}
 
 	_, err = minioClient.PutObject(
@@ -177,7 +177,7 @@ func populatePreview(
 	}
 
 	if asset.Preview == "" || asset.Preview == asset.Original {
-		asset.Preview = createAssetKey()
+		asset.Preview = createAssetKey("webp")
 	}
 
 	_, err = minioClient.PutObject(
@@ -269,7 +269,7 @@ func populateThumbnail(
 	}
 
 	if asset.Thumbnail == "" || asset.Thumbnail == asset.Original {
-		asset.Thumbnail = createAssetKey()
+		asset.Thumbnail = createAssetKey("webp")
 	}
 
 	_, err = minioClient.PutObject(

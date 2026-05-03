@@ -92,7 +92,7 @@ func processVideoView(
 	}
 
 	if asset.View == "" || asset.View == asset.Original {
-		asset.View = createAssetKey()
+		asset.View = createAssetKey("mp4")
 	}
 	outputFile, err := os.CreateTemp("", "*view.mp4")
 	if err != nil {
@@ -200,7 +200,7 @@ func processVideoThumbnail(
 	asset.ThumbnailWidth = int32((THUMBNAIL_HEIGHT * image.Width()) / image.Height())
 
 	if asset.Thumbnail == "" || asset.Thumbnail == asset.Original {
-		asset.Thumbnail = createAssetKey()
+		asset.Thumbnail = createAssetKey("webp")
 	}
 
 	_, err = minioClient.PutObject(
@@ -254,7 +254,7 @@ func processVideoPreview(
 	}
 
 	if asset.Preview == "" || asset.Preview == asset.Original {
-		asset.Preview = createAssetKey()
+		asset.Preview = createAssetKey("webp")
 	}
 	_, err = minioClient.PutObject(
 		ctx, os.Getenv("S3_BUCKET"),

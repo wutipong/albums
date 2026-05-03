@@ -27,7 +27,9 @@ export const POST: RequestHandler = async ({ request }) => {
     if (!album) {
         return json({ success: false, error: "Album not found" }, { status: 404 });
     }
-    const key = `pending/${randomUUID()}`
+
+    const extension = mime.extension(mime.lookup(filename) || '')
+    const key = `pending/${randomUUID()}.${extension}`
 
     const contentType = mime.contentType(path.basename(filename))
 
