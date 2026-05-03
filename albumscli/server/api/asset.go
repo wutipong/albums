@@ -12,6 +12,7 @@ import (
 	"log/slog"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/wutipong/albums/albumscli/server/types"
@@ -89,13 +90,29 @@ func PostAsset(
 		return
 	}
 	req.ContentLength = size
+	for i := range 10 {
+		_, err = http.DefaultClient.Do(req)
+		if err == nil {
+			break
+		}
 
-	resp, err := http.DefaultClient.Do(req)
+		slog.Warn("Error occurred when uploading to S3, retrying.",
+			slog.Int("retry", i),
+			slog.String("error", err.Error()),
+		)
+
+		select {
+		case <-ctx.Done():
+			err = fmt.Errorf("context error during put object: %w", ctx.Err())
+			return
+		case <-time.After(time.Duration(i+1) * 10 * time.Second):
+		}
+	}
+
 	if err != nil {
 		err = fmt.Errorf("failed to put object: %w", err)
 		return
 	}
-	defer resp.Body.Close()
 
 	postAssetCommit, err := Post[PostAssetCommitResponse](
 		ctx, server, "/api/asset/upload/commit",
