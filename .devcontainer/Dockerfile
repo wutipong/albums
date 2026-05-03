@@ -1,12 +1,7 @@
-FROM oven/bun:debian
-
-# Config Bun
-ENV PATH="~/.bun/bin:${PATH}"
-RUN ln -s /usr/local/bin/bun /usr/local/bin/node
+FROM ubuntu:26.04
 
 # Update packages
-RUN if [ "debian" == "alpine" ] ; then apk update ; else apt-get update ; fi
+RUN apt-get update
 
 # Install Git
-RUN if [ "debian" == "alpine" ] ; then apk add git ; else apt-get install -y git ; fi
-
+RUN apt-get install -y git

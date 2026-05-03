@@ -1,47 +1,45 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/marcosgomesneto/bun-devcontainers/tree/main/src/bun-postgresql
 {
-	"name": "github/wutipong/albums",
-	"dockerComposeFile": "docker-compose.yml",
-	"service": "app",
-	"workspaceFolder": "/workspaces/",
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2": {},
-		"ghcr.io/devcontainers/features/git:1": {},
-		"ghcr.io/devcontainers/features/go:1": {},
-		"ghcr.io/robbert229/devcontainer-features/postgresql-client:1": {
-			"version": 18
-		},
-		"ghcr.io/devcontainers-extra/features/act:1": {},
-		"ghcr.io/devcontainers-extra/features/protoc:1": {},
-		"ghcr.io/devcontainers/features/python:1": {
-			"version": "3.11"
-		},
-		"ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
-		"ghcr.io/azutake/devcontainer-features/go-packages-install:0": {
-			"PACKAGES":"github.com/sqlc-dev/sqlc/cmd/sqlc@latest,github.com/amacneil/dbmate@latest,google.golang.org/protobuf/cmd/protoc-gen-go@latest,google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest"
-		},
-		"ghcr.io/devcontainers-extra/features/apt-packages:1": {
-			"packages": "libvips-dev,libvpx9,libopus0,ffmpeg"
-		},
-		"ghcr.io/devcontainers/features/aws-cli:1": {}
-	},
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// This can be used to network with other containers or with the host.
-	"forwardPorts": [
-		8080,
-		5432,
-		5173,
-		3000,
-		3900,
-		3901,
-		3902
-	]
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": ".devcontainer/post-create.sh",
-	// Configure tool-specific properties.
-	// "customizations": {},
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root" 
+  "name": "github/wutipong/albums",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/",
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/go:1": {
+      "golangciLintVersion": "2.11.4",
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers-extra/features/bun:1": {
+      "version": "latest"
+    },
+    "ghcr.io/robbert229/devcontainer-features/postgresql-client:1": {
+      "version": 18
+    },
+    "ghcr.io/devcontainers-extra/features/act:1": {},
+    "ghcr.io/devcontainers-extra/features/protoc:1": {},
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    },
+    "ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
+    "ghcr.io/azutake/devcontainer-features/go-packages-install:0": {
+      "PACKAGES": "github.com/sqlc-dev/sqlc/cmd/sqlc@latest,github.com/amacneil/dbmate@latest,google.golang.org/protobuf/cmd/protoc-gen-go@latest,google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest"
+    },
+    "ghcr.io/devcontainers-extra/features/apt-packages:1": {
+      "packages": "libvips-dev,libvpx12,libopus0,ffmpeg"
+    },
+    "ghcr.io/devcontainers/features/aws-cli:1": {}
+  },
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // This can be used to network with other containers or with the host.
+  "forwardPorts": [8080, 5432, 5173, 3000, 3900, 3901, 3902]
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": ".devcontainer/post-create.sh",
+  // Configure tool-specific properties.
+  // "customizations": {},
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
 }
