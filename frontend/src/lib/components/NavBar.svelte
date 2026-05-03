@@ -22,6 +22,7 @@
 	});
 
 	function doSearch() {
+		if (!search) return;
 		const url = new URL('/search', location.origin);
 		url.searchParams.append('search', search);
 
