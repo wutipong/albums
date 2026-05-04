@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { mdiChevronLeft, mdiChevronRight, mdiClose, mdiDotsVertical } from '@mdi/js';
+	import Hammer from 'hammerjs';
 	import Icon from 'mdi-svelte';
 	import 'vidstack/bundle';
 
@@ -14,10 +15,120 @@
 		hasPrevious = false,
 		menu
 	} = $props();
+
+	function handleKeyDown(event: KeyboardEvent) {
+		if (!show) return;
+		if (event.key === 'Escape') {
+			show = false;
+		} else if (event.key === 'ArrowRight' && hasNext) {
+			if (hasNext) {
+				next();
+			}
+		} else if (event.key === 'ArrowLeft' && hasPrevious) {
+			if (hasPrevious) {
+				previous();
+			}
+		}
+	}
+
+	function hammerJsAttachment(element: HTMLElement) {
+		let manager = new Hammer.Manager(element);
+		let swipe = new Hammer.Swipe();
+		manager.add(swipe);
+		manager.on('swipeleft', () => {
+			if (hasNext) {
+				next();
+			}
+		});
+
+		manager.on('swiperight', () => {
+			if (hasPrevious) {
+				previous();
+			}
+		});
+	}
 </script>
 
+<svelte:window onkeydown={handleKeyDown} />
+
+<div
+	role="presentation"
+	class="absolute top-0 right-0 bottom-0 left-0 backdrop-blur-lg backdrop-brightness-50"
+	class:hidden={!show}
+	{@attach hammerJsAttachment}
+>
+	{#if assetType === 'image'}
+		<div class="h-full w-full">
+			<img src={viewURL} alt={filename} class="m-auto h-full w-full object-contain" />
+		</div>
+	{/if}
+	{#if assetType === 'video'}
+		{#key viewURL}
+			<media-player title={filename} src={viewURL}>
+				<media-provider>
+					<source src={viewURL} type="video/mp4" />
+				</media-provider>
+				<media-video-layout></media-video-layout>
+			</media-player>
+		{/key}
+	{/if}
+	<div
+		class="absolute top-1/2 left-4 -translate-y-1/2 bg-transparent"
+		data-theme={assetType === 'video' ? 'dark' : null}
+	>
+		<button
+			class="btn btn-circle btn-ghost btn-lg"
+			class:btn-disabled={!hasPrevious}
+			onclick={() => {
+				previous();
+			}}
+		>
+			<Icon path={mdiChevronLeft} />
+		</button>
+	</div>
+	<div
+		class="absolute top-1/2 right-4 -translate-y-1/2 bg-transparent"
+		data-theme={assetType === 'video' ? 'dark' : null}
+	>
+		<button
+			class="btn btn-circle btn-ghost btn-lg"
+			class:btn-disabled={!hasNext}
+			onclick={() => {
+				next();
+			}}
+		>
+			<Icon path={mdiChevronRight} />
+		</button>
+	</div>
+	<div
+		class="absolute top-4 right-4 flex flex-row-reverse gap-4 rounded-full bg-transparent"
+		data-theme={assetType === 'video' ? 'dark' : null}
+	>
+		<button class="btn btn-circle btn-ghost btn-lg" onclick={() => (show = false)}>
+			<Icon path={mdiClose} />
+		</button>
+		{#if menu}
+			<button
+				class="btn btn-circle btn-ghost btn-lg"
+				popovertarget="popover-1"
+				style="anchor-name:--anchor-1"
+			>
+				<Icon path={mdiDotsVertical} />
+			</button>
+			<ul
+				class="menu dropdown w-52 rounded-box bg-base-100 shadow-sm"
+				popover
+				id="popover-1"
+				style="position-anchor:--anchor-1"
+			>
+				{@render menu()}
+			</ul>
+		{/if}
+	</div>
+</div>
+
 <style lang="scss">
-	media-player{
+	media-player {
 		width: 100%;
 		height: 100%;
 		aspect-ratio: unset;
@@ -26,89 +137,5 @@
 	:global(media-provider video) {
 		width: 95%;
 		height: 95%;
-		
 	}
 </style>
-
-{#if show}
-	<div
-		role="presentation"
-		class="absolute top-0 right-0 bottom-0 left-0 backdrop-blur-lg backdrop-brightness-50"
-	>
-		{#if assetType === 'image'}
-			<div class="h-full w-full">
-				<img
-					src={viewURL}
-					alt={filename}
-					class="m-auto h-full w-full object-contain"
-				/>
-			</div>
-		{/if}
-		{#if assetType === 'video'}
-			{#key viewURL}
-				<media-player
-					title={filename}
-					src={viewURL}
-				>
-					<media-provider >
-						<source src={viewURL} type="video/mp4" />
-					</media-provider>
-					<media-video-layout></media-video-layout>
-				</media-player>
-			{/key}
-		{/if}
-		<div
-			class="absolute top-1/2 left-4 -translate-y-1/2 bg-transparent"
-			data-theme={assetType === 'video' ? 'dark' : null}
-		>
-			<button
-				class="btn btn-circle btn-ghost btn-lg"
-				class:btn-disabled={!hasPrevious}
-				onclick={() => {
-					previous();
-				}}
-			>
-				<Icon path={mdiChevronLeft} />
-			</button>
-		</div>
-		<div
-			class="absolute top-1/2 right-4 -translate-y-1/2 bg-transparent"
-			data-theme={assetType === 'video' ? 'dark' : null}
-		>
-			<button
-				class="btn btn-circle btn-ghost btn-lg"
-				class:btn-disabled={!hasNext}
-				onclick={() => {
-					next();
-				}}
-			>
-				<Icon path={mdiChevronRight} />
-			</button>
-		</div>
-		<div
-			class="absolute top-4 right-4 flex flex-row-reverse gap-4 rounded-full bg-transparent"
-			data-theme={assetType === 'video' ? 'dark' : null}
-		>
-			<button class="btn btn-circle btn-ghost btn-lg" onclick={() => (show = false)}>
-				<Icon path={mdiClose} />
-			</button>
-			{#if menu}
-				<button
-					class="btn btn-circle btn-ghost btn-lg"
-					popovertarget="popover-1"
-					style="anchor-name:--anchor-1"
-				>
-					<Icon path={mdiDotsVertical} />
-				</button>
-				<ul
-					class="menu dropdown w-52 rounded-box bg-base-100 shadow-sm"
-					popover
-					id="popover-1"
-					style="position-anchor:--anchor-1"
-				>
-					{@render menu()}
-				</ul>
-			{/if}
-		</div>
-	</div>
-{/if}
