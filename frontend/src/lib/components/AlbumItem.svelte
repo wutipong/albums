@@ -1,6 +1,7 @@
 <script lang="ts>
     import notAvailableSvg from '$lib/assets/not-available-small.svg?raw'
     let {album} = $props()
+    let coverLoading = $state(true);
 </script>
 
 <div 
@@ -17,7 +18,11 @@
                     alt={album.id} 
                     width='300' 
                     height='200'
+                    class:hidden={coverLoading}
+                    onload={() => coverLoading = false}
                 />
+
+                <div class='skeleton h-full w-full bg-base-100' class:hidden={!coverLoading}></div>
             {/if}
         </a>
     </figure>

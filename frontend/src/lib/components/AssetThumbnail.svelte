@@ -9,6 +9,10 @@
 	let thumbnailHeight = TARGET_HEIGHT;
 	let assetType = $derived(asset.type);
 	let imageFrames = $derived(asset.image_frames);
+
+	let thumbnailLoading = $state(true);
+	let previewLoading = $state(true);
+
 </script>
 
 <button
@@ -36,8 +40,10 @@
 					height={thumbnailHeight}
 					src={asset.thumbnail_url}
 					alt={asset.id}
-					class:hidden={preview}
+					class:hidden={thumbnailLoading}
+					onload={()=>thumbnailLoading = false}
 				/>
+				<div class="skeleton h-full w-full bg-base-100" class:hidden={!thumbnailLoading}></div>
 			{/if}
 		</div>
 
@@ -55,7 +61,9 @@
 					src={asset.preview_url}
 					alt={asset.id}
 					class="h-full w-full"
+					onload={()=>previewLoading = false}
 				/>
+				<div class="skeleton h-full w-full animate-pulse bg-base-200" class:hidden={!previewLoading}></div>
 			{/if}
 		</div>
 
