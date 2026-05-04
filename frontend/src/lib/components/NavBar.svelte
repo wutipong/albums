@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { authClient } from '$lib/auth-client';
-	import { mdiImageSearch, mdiImageAlbum, mdiLogout, mdiAccount } from '@mdi/js';
+	import { mdiImageSearch, mdiImageAlbum, mdiLogout, mdiAccount, mdiClose } from '@mdi/js';
 	import Icon from 'mdi-svelte';
 	import { onMount } from 'svelte';
 	import { createHash } from '@better-auth/utils/hash';
@@ -71,7 +71,15 @@
 	<div class="me-4 hidden gap-2 md:flex">
 		<div class="join">
 			<div>
-				<input class="input join-item" type="text" placeholder="search" bind:value={search} />
+				<input
+					class="input join-item"
+					type="text"
+					placeholder="search"
+					bind:value={search}
+					onkeypress={(e) => {
+						if (e.key == 'Enter') doSearch();
+					}}
+				/>
 			</div>
 			<button class="btn join-item" onclick={() => doSearch()}>
 				<Icon path={mdiImageSearch} />
@@ -101,6 +109,12 @@
 
 <dialog class="modal" bind:this={searchDialog}>
 	<div class="modal-box">
+		<form method="dialog">
+			<button class="btn absolute top-2 right-2 btn-circle btn-ghost btn-sm">
+				<Icon path={mdiClose} />
+				<span class="sr-only">Close</span>
+			</button>
+		</form>
 		<h3 class="text-lg font-bold">Search</h3>
 		<div class="py-4">
 			<input
