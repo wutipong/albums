@@ -5,9 +5,9 @@
 	import 'vidstack/bundle';
 
 	let {
-		viewURL = $bindable('http://example.com'),
-		assetType = $bindable('image'),
-		filename = $bindable(''),
+		viewURL = 'http://example.com',
+		assetType = 'image',
+		filename = '',
 		show = $bindable(false),
 		next,
 		previous,
@@ -15,6 +15,12 @@
 		hasPrevious = false,
 		menu
 	} = $props();
+
+	let loading = $state(true);
+
+	$effect(() => {
+		loading = true;
+	});
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (!show) return;
@@ -59,7 +65,14 @@
 >
 	{#if assetType === 'image'}
 		<div class="h-full w-full">
-			<img src={viewURL} alt={filename} class="m-auto h-full w-full object-contain" />
+			<img
+				class:hidden={loading}
+				onload={() => (loading = false)}
+				onerror={() => (loading = false)}
+				src={viewURL}
+				alt={filename}
+				class="m-auto h-full w-full object-contain"
+			/>
 		</div>
 	{/if}
 	{#if assetType === 'video'}

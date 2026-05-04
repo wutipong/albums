@@ -112,9 +112,9 @@
 		</div>
 	</div>
 	<AssetViewer
-		bind:assetType={asset.type}
-		bind:viewURL={asset.view_url}
-		bind:filename={asset.filename}
+		assetType={asset.type}
+		viewURL={asset.view_url}
+		filename={asset.filename}
 		bind:show={showViewer}
 		{next}
 		{previous}
