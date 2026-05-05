@@ -3,6 +3,7 @@
 	import Hammer from 'hammerjs';
 	import Icon from 'mdi-svelte';
 	import 'vidstack/bundle';
+	import { MediaPlayerElement } from 'vidstack/elements';
 
 	let {
 		viewURL = 'http://example.com',
@@ -17,22 +18,44 @@
 	} = $props();
 
 	let loading = $state(true);
+	let mediaPlayer: MediaPlayerElement | null = $state(null);
 
 	$effect(() => {
 		loading = true;
 	});
 
+	function doNext() {
+		if (mediaPlayer) {
+			mediaPlayer.pause();
+		}
+		next();
+	}
+
+	function doPrevious() {
+		if (mediaPlayer) {
+			mediaPlayer.pause();
+		}
+		previous();
+	}
+
+	function doClose() {
+		if (mediaPlayer) {
+			mediaPlayer.pause();
+		}
+		show = false;
+	}
+
 	function handleKeyDown(event: KeyboardEvent) {
 		if (!show) return;
 		if (event.key === 'Escape') {
-			show = false;
+			doClose();
 		} else if (event.key === 'ArrowRight' && hasNext) {
 			if (hasNext) {
-				next();
+				doNext();
 			}
 		} else if (event.key === 'ArrowLeft' && hasPrevious) {
 			if (hasPrevious) {
-				previous();
+				doPrevious();
 			}
 		}
 	}
@@ -43,13 +66,13 @@
 		manager.add(swipe);
 		manager.on('swipeleft', () => {
 			if (hasNext) {
-				next();
+				doNext();
 			}
 		});
 
 		manager.on('swiperight', () => {
 			if (hasPrevious) {
-				previous();
+				doPrevious();
 			}
 		});
 	}
@@ -77,7 +100,7 @@
 	{/if}
 	{#if assetType === 'video'}
 		{#key viewURL}
-			<media-player title={filename} src={viewURL}>
+			<media-player title={filename} src={viewURL} bind:this={mediaPlayer} autoplay controls>
 				<media-provider>
 					<source src={viewURL} type="video/mp4" />
 				</media-provider>
@@ -90,7 +113,7 @@
 			class="btn btn-circle btn-lg btn-neutral"
 			class:btn-disabled={!hasPrevious}
 			onclick={() => {
-				previous();
+				doPrevious();
 			}}
 		>
 			<Icon path={mdiChevronLeft} />
@@ -101,7 +124,7 @@
 			class="btn btn-circle btn-lg btn-neutral"
 			class:btn-disabled={!hasNext}
 			onclick={() => {
-				next();
+				doNext();
 			}}
 		>
 			<Icon path={mdiChevronRight} />
@@ -111,7 +134,12 @@
 		class="absolute top-4 right-4 flex flex-row-reverse gap-4 rounded-full bg-transparent"
 		data-theme={assetType === 'video' ? 'dark' : null}
 	>
-		<button class="btn btn-circle btn-lg btn-neutral" onclick={() => (show = false)}>
+		<button
+			class="btn btn-circle btn-lg btn-neutral"
+			onclick={() => {
+				doClose();
+			}}
+		>
 			<Icon path={mdiClose} />
 		</button>
 		{#if menu}
