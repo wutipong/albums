@@ -19,5 +19,5 @@
 		Login
 	</button>
 
-	<div class="absolute right-0 bottom-0 left-0 m-4">Albums &COPY; 20027 Wutipong Wongsakuldej</div>
+	<div class="absolute right-0 bottom-0 left-0 m-4">Albums &COPY; 2026 Wutipong Wongsakuldej</div>
 </div>
