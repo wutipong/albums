@@ -3,7 +3,7 @@
 # Configuration: Set your DB URL or rely on .env
 # export DATABASE_URL="mysql://root:password@localhost:3306/my_db"
 
-cd /workspaces
+pushd /workspaces
 
 echo "Starting to roll back all migrations..."
 
@@ -38,3 +38,4 @@ dbmate up
 bun run --cwd /workspaces/frontend better-auth-migrate
 
 echo "Done."
+popd
