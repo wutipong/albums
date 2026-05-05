@@ -35,4 +35,6 @@ mc rm --recursive --force garage/${S3_BUCKET}/
 
 dbmate up
 
+bun run --cwd /workspaces/frontend better-auth-migrate
+
 echo "Done."
