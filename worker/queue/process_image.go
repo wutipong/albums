@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	vips "github.com/cshum/vipsgen/vips816"
+	vips "github.com/cshum/vipsgen/vips"
 	"github.com/minio/minio-go/v7"
 	"github.com/pgvector/pgvector-go"
 	"github.com/wutipong/albums/worker/clip"

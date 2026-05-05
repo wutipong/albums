@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	vips "github.com/cshum/vipsgen/vips816"
+	vips "github.com/cshum/vipsgen/vips"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/minio/minio-go/v7"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
