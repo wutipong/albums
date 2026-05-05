@@ -85,12 +85,9 @@
 			</media-player>
 		{/key}
 	{/if}
-	<div
-		class="absolute top-1/2 left-4 -translate-y-1/2 bg-transparent"
-		data-theme={assetType === 'video' ? 'dark' : null}
-	>
+	<div class="absolute top-1/2 left-4 -translate-y-1/2 bg-transparent">
 		<button
-			class="btn btn-circle btn-ghost btn-lg"
+			class="btn btn-circle btn-lg btn-neutral"
 			class:btn-disabled={!hasPrevious}
 			onclick={() => {
 				previous();
@@ -99,12 +96,9 @@
 			<Icon path={mdiChevronLeft} />
 		</button>
 	</div>
-	<div
-		class="absolute top-1/2 right-4 -translate-y-1/2 bg-transparent"
-		data-theme={assetType === 'video' ? 'dark' : null}
-	>
+	<div class="absolute top-1/2 right-4 -translate-y-1/2 bg-transparent">
 		<button
-			class="btn btn-circle btn-ghost btn-lg"
+			class="btn btn-circle btn-lg btn-neutral"
 			class:btn-disabled={!hasNext}
 			onclick={() => {
 				next();
@@ -117,12 +111,12 @@
 		class="absolute top-4 right-4 flex flex-row-reverse gap-4 rounded-full bg-transparent"
 		data-theme={assetType === 'video' ? 'dark' : null}
 	>
-		<button class="btn btn-circle btn-ghost btn-lg" onclick={() => (show = false)}>
+		<button class="btn btn-circle btn-lg btn-neutral" onclick={() => (show = false)}>
 			<Icon path={mdiClose} />
 		</button>
 		{#if menu}
 			<button
-				class="btn btn-circle btn-ghost btn-lg"
+				class="btn btn-circle btn-lg btn-neutral"
 				popovertarget="popover-1"
 				style="anchor-name:--anchor-1"
 			>
