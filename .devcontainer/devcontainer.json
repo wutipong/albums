@@ -26,16 +26,37 @@
     },
     "ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
     "ghcr.io/azutake/devcontainer-features/go-packages-install:0": {
-      "PACKAGES": "github.com/sqlc-dev/sqlc/cmd/sqlc@latest,github.com/amacneil/dbmate@latest,google.golang.org/protobuf/cmd/protoc-gen-go@latest,google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest"
+      "PACKAGES": "github.com/sqlc-dev/sqlc/cmd/sqlc@latest,github.com/amacneil/dbmate@latest,google.golang.org/protobuf/cmd/protoc-gen-go@latest,google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest,go install github.com/minio/mc@latest"
     },
     "ghcr.io/devcontainers-extra/features/apt-packages:1": {
       "packages": "libvips-dev,libvpx12,libopus0,ffmpeg"
-    },
-    "ghcr.io/devcontainers/features/aws-cli:1": {}
+    }
   },
+  "mounts": [
+    "source=./mc,target=/home/vscode/.mc,type=bind,consistency=cached",
+    "source=./bin,target=/home/vscode/bin,type=bind,consistency=cached",
+  ],
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // This can be used to network with other containers or with the host.
-  "forwardPorts": [8080, 5432, 5173, 3000, 3900, 3901, 3902]
+  "forwardPorts": [
+    8080,
+    5432,
+    5173,
+    3000,
+    3900,
+    3901,
+    3902
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "svelte.svelte-vscode"
+      ],
+      "settings": {
+        "python.terminal.activateEnvironment": false
+      }
+    }
+  }
   // Use 'postCreateCommand' to run commands after the container is created.
   // "postCreateCommand": ".devcontainer/post-create.sh",
   // Configure tool-specific properties.

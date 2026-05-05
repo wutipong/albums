@@ -31,7 +31,7 @@ while true; do
     sleep 0.5
 done
 
-aws s3 rm s3://${S3_BUCKET} --recursive
+mc rm --recursive --force garage/${S3_BUCKET}/
 
 dbmate up
 

@@ -1,7 +1,4 @@
-FROM ubuntu:26.04
+FROM mcr.microsoft.com/devcontainers/base:dev-ubuntu26.04
 
-# Update packages
-RUN apt-get update
-
-# Install Git
-RUN apt-get install -y git
+RUN mkdir -p /home/vscode/.mc
+RUN mkdir -p /home/vscode/bin
