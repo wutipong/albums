@@ -110,7 +110,7 @@
 	{/if}
 	<div class="absolute top-1/2 left-4 -translate-y-1/2 bg-transparent">
 		<button
-			class="btn btn-circle btn-lg btn-neutral"
+			class="btn btn-circle btn-lg btn-soft"
 			class:btn-disabled={!hasPrevious}
 			onclick={() => {
 				doPrevious();
@@ -121,7 +121,7 @@
 	</div>
 	<div class="absolute top-1/2 right-4 -translate-y-1/2 bg-transparent">
 		<button
-			class="btn btn-circle btn-lg btn-neutral"
+			class="btn btn-circle btn-lg btn-soft"
 			class:btn-disabled={!hasNext}
 			onclick={() => {
 				doNext();
@@ -135,7 +135,7 @@
 		data-theme={assetType === 'video' ? 'dark' : null}
 	>
 		<button
-			class="btn btn-circle btn-lg btn-neutral"
+			class="btn btn-circle btn-lg btn-soft"
 			onclick={() => {
 				doClose();
 			}}
@@ -144,7 +144,7 @@
 		</button>
 		{#if menu}
 			<button
-				class="btn btn-circle btn-lg btn-neutral"
+				class="btn btn-circle btn-lg btn-soft"
 				popovertarget="popover-1"
 				style="anchor-name:--anchor-1"
 			>
