@@ -6,9 +6,7 @@ import (
 	"log/slog"
 	"net"
 	"os"
-	"time"
 
-	"github.com/lmittmann/tint"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/urfave/cli/v3"
@@ -23,14 +21,9 @@ import (
 //go:generate sqlc generate
 
 func main() {
-	slog.SetDefault(slog.New(tint.NewHandler(os.Stderr, &tint.Options{
-		Level:      slog.LevelDebug,
-		TimeFormat: time.Kitchen,
-	})))
-
 	id := ""
 	processPending := false
-
+	debug := false
 	cmd := &cli.Command{
 		Name:  "worker",
 		Usage: "process assets to albums",
@@ -44,6 +37,24 @@ func main() {
 				Usage:       "process pending items in the queue.",
 				Destination: &processPending,
 			},
+			&cli.BoolFlag{
+				Name:        "debug",
+				Usage:       "enable debug logging.",
+				Destination: &debug,
+			},
+		},
+		Before: func(ctx context.Context, c *cli.Command) (cctx context.Context, err error) {
+			level := slog.LevelInfo
+			if debug {
+				level = slog.LevelDebug
+			}
+			slog.SetDefault(slog.New(
+				slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+					Level: level,
+				}),
+			))
+
+			return
 		},
 		Commands: []*cli.Command{
 			{

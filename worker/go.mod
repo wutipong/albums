@@ -6,7 +6,6 @@ require (
 	github.com/acaloiaro/neoq v0.71.3
 	github.com/cshum/vipsgen v1.3.9
 	github.com/jackc/pgx/v5 v5.9.1
-	github.com/lmittmann/tint v1.1.3
 	github.com/minio/minio-go/v7 v7.0.100
 	github.com/pgvector/pgvector-go v0.3.0
 	github.com/u2takey/ffmpeg-go v0.5.0
