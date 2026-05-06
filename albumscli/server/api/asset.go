@@ -36,6 +36,14 @@ func PostAsset(
 	reader io.Reader,
 	size int64,
 ) (result PostAssetResposnse, err error) {
+	start := time.Now()
+	defer func() {
+		slog.Info("PostAsset completed",
+			slog.Duration("duration", time.Since(start)),
+			slog.String("path", path),
+		)
+	}()
+
 	if ctx.Err() != nil {
 		err = fmt.Errorf("context error: %w", ctx.Err())
 		return
