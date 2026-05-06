@@ -74,7 +74,7 @@
 				<input
 					class="input join-item"
 					type="text"
-					placeholder="search"
+					placeholder="Search..."
 					bind:value={search}
 					onkeypress={(e) => {
 						if (e.key == 'Enter') doSearch();
@@ -120,7 +120,7 @@
 			<input
 				class="input-bordered input w-full"
 				type="text"
-				placeholder="search"
+				placeholder="Search..."
 				bind:value={search}
 				onkeydown={(e) => {
 					if (e.key === 'Enter') {
