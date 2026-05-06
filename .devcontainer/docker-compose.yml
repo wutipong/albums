@@ -7,6 +7,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ..:/workspaces:cached
+      - hf-cache:/home/vscode/.cache/huggingface:cached
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
@@ -74,9 +75,9 @@ services:
       IMGPROXY_S3_ENDPOINT_USE_PATH_STYLE: ${S3_FORCE_PATH_STYLE}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      IMGPROXY_MAX_ANIMATION_FRAMES: 2000000000
+      
 volumes:
   postgres-data:
   garage-meta:
   garage-data:
-
+  hf-cache:
