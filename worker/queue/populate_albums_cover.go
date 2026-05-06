@@ -2,6 +2,8 @@ package queue
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -57,10 +59,16 @@ func PopulateAlbumCover(ctx context.Context, albumId string, assetId string) err
 		}
 		asset, err = queries.GetAsset(ctx, assetIdUUID)
 	} else {
-		asset, err = queries.GetRandomAlbumAsset(ctx, album.ID)
+		asset, err = queries.GetRandomAlbumAssetForCover(ctx, album.ID)
+		if errors.Is(err, sql.ErrNoRows) {
+			slog.Info(
+				"no asset with matching criteria found for album, try another one",
+				slog.Any("id", album.ID),
+			)
+			asset, err = queries.GetRandomAlbumAsset(ctx, album.ID)
+		}
 		if err != nil {
 			return fmt.Errorf("unable to retrive random asset: %w", err)
-
 		}
 	}
 

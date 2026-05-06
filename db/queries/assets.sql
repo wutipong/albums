@@ -104,3 +104,15 @@ WHERE
     AND deleted_at IS NULL
 ORDER BY RANDOM()
 LIMIT 1;
+
+-- name: GetRandomAlbumAssetForCover :one
+SELECT *
+from assets
+WHERE
+    type <> 'audio'
+    AND album_id = $1
+    AND process_status = 'processed'
+    AND view_width > view_height
+    AND deleted_at IS NULL
+ORDER BY RANDOM()
+LIMIT 1;
