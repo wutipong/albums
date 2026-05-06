@@ -132,7 +132,6 @@
 	</div>
 	<div
 		class="absolute top-4 right-4 flex flex-row-reverse gap-4 rounded-full bg-transparent"
-		data-theme={assetType === 'video' ? 'dark' : null}
 	>
 		<button
 			class="btn btn-circle btn-lg btn-soft"

@@ -173,7 +173,7 @@
 	</li>
 	<li>
 		<a href={`/api/asset/${asset.id}/original/`} target="_blank">
-			<Icon path={mdiDownload} /> Download.
+			<Icon path={mdiDownload} /> Download
 		</a>
 	</li>
 	<li>
@@ -182,7 +182,7 @@
 				setAlbumCover(params.id, asset.id);
 			}}
 		>
-			<Icon path={mdiImageAlbum} /> Set as album cover.
+			<Icon path={mdiImageAlbum} /> Set as album cover
 		</button>
 	</li>
 {/snippet}

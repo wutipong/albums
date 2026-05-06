@@ -99,12 +99,12 @@
 	</li>
 	<li>
 		<a href={`/album/${asset.album_id}/`}>
-			<Icon path={mdiImageAlbum} /> View album.
+			<Icon path={mdiImageAlbum} /> View album
 		</a>
 	</li>
 	<li>
 		<a href={`/api/asset/${asset.id}/original/`} target="_blank">
-			<Icon path={mdiDownload} /> Download.
+			<Icon path={mdiDownload} /> Download
 		</a>
 	</li>
 {/snippet}

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { mdiClose } from '@mdi/js';
 	import Icon from 'mdi-svelte';
-	import PostgresInterval from 'postgres-interval';
+	import { Temporal } from '@js-temporal/polyfill';
 
-    interface Asset {
-        created_at: Date;
+	interface Asset {
+		created_at: Date;
 		id: string;
 		modified_at: Date;
 		album_id: string;
@@ -15,28 +15,29 @@
 		process_status: 'pending' | 'processed' | 'processing' | 'uploading';
 		thumbnail: string;
 		type: 'animated' | 'audio' | 'image' | 'video';
-		video_duration: PostgresInterval.IPostgresInterval;
+		video_duration: Temporal.Duration;
 		view: string;
 	}
 
-    let asset: Asset = $state({
-        created_at: new Date(),
-        id: '',
-        modified_at: new Date(),
-        album_id: '',
-        filename: '',
-        image_frames: 0,
-        original: '',
-        preview: '',
-        process_status: 'pending',
-        thumbnail: '',
-        type: 'image',
-        video_duration: PostgresInterval('00:00:00'),
-        view: '',
-    });
+	let asset: Asset = $state({
+		created_at: new Date(),
+		id: '',
+		modified_at: new Date(),
+		album_id: '',
+		filename: '',
+		image_frames: 0,
+		original: '',
+		preview: '',
+		process_status: 'pending',
+		thumbnail: '',
+		type: 'image',
+		video_duration: Temporal.Duration.from({ seconds: 0 }),
+		view: ''
+	});
 
 	export function show(a: Asset) {
 		asset = a;
+        console
 		dialog.showModal();
 	}
 
@@ -59,10 +60,10 @@
 						<th>Asset ID</th>
 						<td>{asset.id}</td>
 					</tr>
-                    <tr>
-                        <th>Filename</th>
-                        <td>{asset.filename}</td>
-                    </tr>
+					<tr>
+						<th>Filename</th>
+						<td>{asset.filename}</td>
+					</tr>
 					<tr>
 						<th>Created At</th>
 						<td>{asset.created_at.toLocaleString()}</td>
@@ -75,30 +76,30 @@
 						<th>Type</th>
 						<td>{asset.type}</td>
 					</tr>
-                    {#if asset.type === 'video'}
+					{#if asset.type === 'video'}
+						<tr>
+							<th>Video Duration</th>
+							<td>{asset.video_duration.toLocaleString("en-US", { style: "digital" })}</td>
+						</tr>
+					{/if}
+					{#if asset.image_frames > 1}
+						<tr>
+							<th>Image Frames</th>
+							<td>{asset.image_frames}</td>
+						</tr>
+					{/if}
 					<tr>
-						<th>Video Duration</th>
-						<td>{asset.video_duration}</td>
+						<th>Original </th>
+						<td>{asset.original}</td>
 					</tr>
-                    {/if}
-                    {#if asset.image_frames > 1}
-                    <tr>
-                        <th>Image Frames</th>
-                        <td>{asset.image_frames}</td>
-                    </tr>
-                    {/if}
-                    <tr> 
-                        <th>Original </th>
-                        <td>{asset.original}</td>
-                    </tr>
-                    <tr> 
-                        <th>Preview </th>
-                        <td>{asset.preview}</td>
-                    </tr>
-                    <tr>
-                        <th>Thumbnail </th>
-                        <td>{asset.thumbnail}</td>
-                    </tr>
+					<tr>
+						<th>Preview </th>
+						<td>{asset.preview}</td>
+					</tr>
+					<tr>
+						<th>Thumbnail </th>
+						<td>{asset.thumbnail}</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>

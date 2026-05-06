@@ -5,6 +5,7 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import type { PageServerLoad } from "./$types";
 import { generateImageUrl } from '@imgproxy/imgproxy-node'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { Temporal } from '@js-temporal/polyfill';
 
 export const ssr = false;
 
@@ -21,7 +22,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
     const outAssets = []
     for (const asset of assets) {
         if (asset.process_status === 'processed') {
-            const video_duration = asset.video_duration.seconds
+            const video_duration = Temporal.Duration.from(asset.video_duration.toISOString())
 
             const bypass = asset.image_frames > 1 || asset.type == 'video'
 
