@@ -3,12 +3,13 @@
 	import AssetViewer from '$lib/components/AssetViewer.svelte';
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
-	import { mdiAlbum, mdiClose, mdiDownload, mdiImageAlbum, mdiInformationOutline } from '@mdi/js';
+	import { mdiClose, mdiDownload, mdiImageAlbum, mdiInformationOutline } from '@mdi/js';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import Toast from '$lib/components/Toast.svelte';
+	import AssetInfoDialog from '$lib/components/AssetInfoDialog.svelte';
 
 	let { data, params }: PageProps = $props();
-	let asset = $state({
+	let asset:any = $state({
 		id: '<placeholder>',
 		type: 'image',
 		view_url: 'http://example.com',
@@ -23,6 +24,7 @@
 	let toast: Toast;
 
 	let infoModal: HTMLDialogElement;
+	let assetInfoDialog: AssetInfoDialog;
 
 	function findPrevious(assets: any[], index: number): number {
 		return assets.slice(0, index).findLastIndex((asset: any, index, arr) => {
@@ -76,7 +78,6 @@
 		asset = data.assets[index];
 	}
 </script>
-
 
 <div class="relative flex h-screen w-screen flex-col">
 	<NavBar album={data}></NavBar>
@@ -158,7 +159,18 @@
 	</div>
 </dialog>
 
+<AssetInfoDialog bind:this={assetInfoDialog} />
+
 {#snippet viewMenu()}
+	<li>
+		<button
+			onclick={() => {
+				assetInfoDialog.show(asset);
+			}}
+		>
+			<Icon path={mdiInformationOutline} /> Asset information
+		</button>
+	</li>
 	<li>
 		<a href={`/api/asset/${asset.id}/original/`} target="_blank">
 			<Icon path={mdiDownload} /> Download.

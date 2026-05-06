@@ -3,15 +3,22 @@
 	import AssetViewer from '$lib/components/AssetViewer.svelte';
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
-	import { mdiDownload, mdiImageAlbum, mdiImageSearch, mdiImageSearchOutline } from '@mdi/js';
+	import {
+		mdiDownload,
+		mdiImageAlbum,
+		mdiImageSearch,
+		mdiInformationOutline
+	} from '@mdi/js';
 	import NavBar from '$lib/components/NavBar.svelte';
+	import AssetInfoDialog from '$lib/components/AssetInfoDialog.svelte';
 
 	let { data, params }: PageProps = $props();
-	let asset = $state({ id: '<placeholder>', album_id: '' });
+	let asset: any = $state({ id: '<placeholder>', album_id: '' });
 	let showViewer = $state(false);
 	let currentIndex = $state(0);
 	let hasNext = $state(true);
 	let hasPrevious = $state(true);
+	let assetInfoDialog: AssetInfoDialog;
 
 	function next() {
 		if (hasNext) {
@@ -78,7 +85,18 @@
 	/>
 </div>
 
+<AssetInfoDialog bind:this={assetInfoDialog} />
+
 {#snippet viewMenu()}
+	<li>
+		<button
+			onclick={() => {
+				assetInfoDialog.show(asset);
+			}}
+		>
+			<Icon path={mdiInformationOutline} /> Asset information
+		</button>
+	</li>
 	<li>
 		<a href={`/album/${asset.album_id}/`}>
 			<Icon path={mdiImageAlbum} /> View album.
