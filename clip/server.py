@@ -1,6 +1,8 @@
 
 from concurrent import futures
+import logging
 import threading
+import time
 from PIL import Image
 from transformers import CLIPModel, CLIPProcessor, CLIPConfig
 import clip_pb2
@@ -10,24 +12,56 @@ import io
 import os
 import torch
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 MODEL_ID = "openai/clip-vit-base-patch32"
+INACTIVITY_TIMEOUT = 300  # 5 minutes in seconds
 
 lock = threading.Lock()
 
 class EncodingServer(clip_pb2_grpc.EncodingService):
     def __init__(self) -> None:
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model = CLIPModel.from_pretrained(
-            MODEL_ID,
-        ).to(self.device)
-
+        self.model = None
         self.processor = CLIPProcessor.from_pretrained(MODEL_ID)
         self.config = CLIPConfig.from_pretrained(MODEL_ID)
+        self.logit_scale = None
+        self._inactivity_timer = None
+        self._load_model()
 
-        self.logit_scale = self.model.logit_scale.item(
-        ) if self.model.logit_scale.item() else 4.60517
-        
-        print("Model clip loaded", "device:", self.device)
+    def _load_model(self):
+        """Load the model into memory."""
+        if self.model is None:
+            self.model = CLIPModel.from_pretrained(
+                MODEL_ID,
+            ).to(self.device)
+            self.logit_scale = self.model.logit_scale.item(
+            ) if self.model.logit_scale.item() else 4.60517
+            logger.info("Model clip loaded, device: %s", self.device)
+
+    def _unload_model(self):
+        """Unload the model from memory after inactivity timeout."""
+        with lock:
+            if self.model is not None:
+                del self.model
+                self.model = None
+                if self.device == "cuda":
+                    torch.cuda.empty_cache()
+                logger.info("Model clip unloaded due to inactivity")
+
+    def _reset_inactivity_timer(self):
+        """Reset the inactivity timer. Call this on every request."""
+        if self._inactivity_timer is not None:
+            self._inactivity_timer.cancel()
+        self._inactivity_timer = threading.Timer(INACTIVITY_TIMEOUT, self._unload_model)
+        self._inactivity_timer.daemon = True
+        self._inactivity_timer.start()
+
+    def _ensure_model_loaded(self):
+        """Ensure the model is loaded before processing a request."""
+        self._load_model()
+        self._reset_inactivity_timer()
 
     def EncodeText(self, request, context):
         '''
@@ -35,6 +69,7 @@ class EncodingServer(clip_pb2_grpc.EncodingService):
         '''
 
         with lock:
+            self._ensure_model_loaded()
             inputs = self.processor(
                 text=request.input, return_tensors="pt", padding=True).to(self.device)
             text_embeddings = self.model.get_text_features(**inputs)
@@ -47,6 +82,7 @@ class EncodingServer(clip_pb2_grpc.EncodingService):
         generate the 512-d embeddings of the images
         '''
         with lock:
+            self._ensure_model_loaded()
             image_data = request.image
             image = Image.open(io.BytesIO(image_data))
 
