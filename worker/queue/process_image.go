@@ -18,6 +18,7 @@ import (
 )
 
 const THUMBNAIL_HEIGHT = 200
+const MAX_VIEW_PIXEL = 50_000_000
 
 func processImageAsset(ctx context.Context, minioClient *minio.Client, asset *db.Asset) error {
 	slog.Info("processing image asset", slog.String("id", asset.ID.String()))
@@ -56,17 +57,23 @@ func processImageAsset(ctx context.Context, minioClient *minio.Client, asset *db
 	}
 	defer original.Close()
 
-	err = populateView(ctx, minioClient, asset, original)
+	view, err := populateView(ctx, minioClient, asset, original)
 	if err != nil {
 		return fmt.Errorf("unable to populate view image: %e", err)
 	}
 
-	err = populatePreview(ctx, minioClient, asset, original)
+	if view == nil {
+		view = original
+	} else {
+		defer view.Close()
+	}
+
+	err = populatePreview(ctx, minioClient, asset, view)
 	if err != nil {
 		return fmt.Errorf("unable to populate preview image: %e", err)
 	}
 
-	err = populateThumbnail(ctx, minioClient, asset, original)
+	err = populateThumbnail(ctx, minioClient, asset, view)
 	if err != nil {
 		return fmt.Errorf("unable to populate thumbnail: %e", err)
 	}
@@ -83,12 +90,13 @@ func populateView(
 	minioClient *minio.Client,
 	asset *db.Asset,
 	original *vips.Image,
-) error {
+) (view *vips.Image, err error) {
 	slog.Info("populating view media for asset", slog.String("id", asset.ID.String()))
 
-	err := ctx.Err()
+	err = ctx.Err()
 	if err != nil {
-		return fmt.Errorf("context cancelled: %w", err)
+		err = fmt.Errorf("context cancelled: %w", err)
+		return
 	}
 
 	asset.ViewWidth = int32(original.Width())
@@ -102,17 +110,35 @@ func populateView(
 	if filepath.Ext(asset.Filename) != ".gif" {
 		asset.View = asset.Original
 
-		return nil
+		return
 	}
 
-	view, err := original.Copy(nil)
+	view, err = original.Copy(nil)
 	if err != nil {
-		return fmt.Errorf("unable to copy original image: %w", err)
+		err = fmt.Errorf("unable to copy original image: %w", err)
+		return
+	}
+
+	if view.Width()*view.Height() > MAX_VIEW_PIXEL {
+		factor := math.Sqrt(float64(MAX_VIEW_PIXEL) / float64(view.Width()*view.Height()))
+
+		err = view.Resize(factor, &vips.ResizeOptions{
+			Kernel: vips.KernelLanczos3,
+			Gap:    2,
+		})
+		if err != nil {
+			err = fmt.Errorf("unable to resize view image: %w", err)
+			return
+		}
+
+		asset.ViewWidth = int32(view.Width())
+		asset.ViewHeight = int32(view.Height())
 	}
 
 	buf, err := view.WebpsaveBuffer(nil)
 	if err != nil {
-		return fmt.Errorf("unable to save to webp image.")
+		err = fmt.Errorf("unable to save to webp image: %w", err)
+		return
 	}
 
 	if asset.View == "" || asset.View == asset.Original {
@@ -130,17 +156,18 @@ func populateView(
 	)
 
 	if err != nil {
-		return fmt.Errorf("unable to put object to S3: %w", err)
+		err = fmt.Errorf("unable to put object to S3: %w", err)
+		return
 	}
 
-	return nil
+	return
 }
 
 func populatePreview(
 	ctx context.Context,
 	minioClient *minio.Client,
 	asset *db.Asset,
-	original *vips.Image,
+	view *vips.Image,
 ) error {
 	slog.Info(
 		"populating preview media for asset",
@@ -152,15 +179,15 @@ func populatePreview(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	asset.ImageFrames = int32(original.Pages())
+	asset.ImageFrames = int32(view.Pages())
 
 	if asset.ImageFrames == 1 {
-		asset.Preview = asset.Original
+		asset.Preview = asset.View
 
 		return nil
 	}
 
-	preview, err := createPreviewForAnimationImage(original)
+	preview, err := createPreviewForAnimationImage(view)
 	if err != nil {
 		return err
 	}
@@ -176,7 +203,7 @@ func populatePreview(
 		return fmt.Errorf("unable to write preview image: %w", err)
 	}
 
-	if asset.Preview == "" || asset.Preview == asset.Original {
+	if asset.Preview == "" || asset.Preview == asset.View {
 		asset.Preview = createAssetKey("webp")
 	}
 
@@ -234,7 +261,7 @@ func populateThumbnail(
 	ctx context.Context,
 	minioClient *minio.Client,
 	asset *db.Asset,
-	original *vips.Image,
+	view *vips.Image,
 ) error {
 	slog.Info("populating thumbnail media for asset", slog.String("id", asset.ID.String()))
 
@@ -243,18 +270,18 @@ func populateThumbnail(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	asset.ThumbnailWidth = int32((original.Width() * THUMBNAIL_HEIGHT) / original.Height())
+	asset.ThumbnailWidth = int32((view.Width() * THUMBNAIL_HEIGHT) / view.Height())
 	asset.ThumbnailHeight = THUMBNAIL_HEIGHT
 
-	if original.Pages() == 1 {
-		asset.Thumbnail = asset.Original
+	if view.Pages() == 1 {
+		asset.Thumbnail = asset.View
 
 		return nil
 	}
 
-	asset.ThumbnailWidth = int32((original.Width() * THUMBNAIL_HEIGHT) / original.PageHeight())
+	asset.ThumbnailWidth = int32((view.Width() * THUMBNAIL_HEIGHT) / view.PageHeight())
 
-	thumbnail, err := createThumbnailForAnimationImage(original, err)
+	thumbnail, err := createThumbnailForAnimationImage(view, err)
 	if err != nil {
 		return err
 	}
