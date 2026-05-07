@@ -19,6 +19,7 @@ import (
 
 const THUMBNAIL_HEIGHT = 200
 const MAX_VIEW_PIXEL = 50_000_000
+const VIEW_HEIGHT = 2000
 
 func processImageAsset(ctx context.Context, minioClient *minio.Client, asset *db.Asset) error {
 	slog.Info("processing image asset", slog.String("id", asset.ID.String()))
@@ -105,9 +106,7 @@ func populateView(
 		asset.ViewHeight = int32(original.PageHeight())
 	}
 
-	slog.Info("filename", slog.String("name", asset.Filename))
-
-	if filepath.Ext(asset.Filename) != ".gif" {
+	if view.Width()*view.Height() < MAX_VIEW_PIXEL || original.Pages() == 1 {
 		asset.View = asset.Original
 
 		return
@@ -120,7 +119,7 @@ func populateView(
 	}
 
 	if view.Width()*view.Height() > MAX_VIEW_PIXEL {
-		factor := math.Sqrt(float64(MAX_VIEW_PIXEL) / float64(view.Width()*view.Height()))
+		factor := float64(view.Height()) / float64(VIEW_HEIGHT)
 
 		err = view.Resize(factor, &vips.ResizeOptions{
 			Kernel: vips.KernelLanczos3,
