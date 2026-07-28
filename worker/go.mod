@@ -4,7 +4,6 @@ go 1.26.1
 
 require (
 	github.com/acaloiaro/neoq v0.71.3
-	github.com/cshum/vipsgen v1.3.10
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/minio/minio-go/v7 v7.2.1
 	github.com/pgvector/pgvector-go v0.4.0

@@ -10,11 +10,11 @@ import (
 	"os"
 	"path/filepath"
 
-	vips "github.com/cshum/vipsgen/vips"
 	"github.com/minio/minio-go/v7"
 	"github.com/pgvector/pgvector-go"
 	"github.com/wutipong/albums/worker/clip"
 	"github.com/wutipong/albums/worker/db"
+	vips "github.com/wutipong/albums/worker/vips"
 )
 
 const THUMBNAIL_HEIGHT = 200
@@ -58,6 +58,8 @@ func processImageAsset(ctx context.Context, minioClient *minio.Client, asset *db
 	}
 	defer original.Close()
 
+	slog.Info("original", slog.Any("image", original), slog.Bool("available", original != nil), slog.Int("width", original.Width()))
+
 	view, err := populateView(ctx, minioClient, asset, original)
 	if err != nil {
 		return fmt.Errorf("unable to populate view image: %e", err)
@@ -100,13 +102,18 @@ func populateView(
 		return
 	}
 
+	if original == nil {
+		err = fmt.Errorf("Invalid image")
+		return
+	}
+
 	asset.ViewWidth = int32(original.Width())
 	asset.ViewHeight = int32(original.Height())
 	if original.Pages() > 1 {
 		asset.ViewHeight = int32(original.PageHeight())
 	}
 
-	if view.Width()*view.Height() < MAX_VIEW_PIXEL || original.Pages() == 1 {
+	if original.Width()*original.Height() < MAX_VIEW_PIXEL || original.Pages() == 1 {
 		asset.View = asset.Original
 
 		return

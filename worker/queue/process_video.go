@@ -11,11 +11,11 @@ import (
 	"strconv"
 	"time"
 
-	vips "github.com/cshum/vipsgen/vips"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/minio/minio-go/v7"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"github.com/wutipong/albums/worker/db"
+	vips "github.com/wutipong/albums/worker/vips"
 )
 
 const VIDEO_WIDTH = 1280

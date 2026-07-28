@@ -10,3 +10,4 @@ clip/clip.egg-info
 clip/.eggs
 clip/__pycache__
 albumscli/.DS_Store
+.DS_Store
