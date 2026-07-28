@@ -40,8 +40,8 @@
 					height={thumbnailHeight}
 					src={asset.thumbnail_url}
 					alt={asset.id}
-					class:hidden={thumbnailLoading}
 					onload={()=>thumbnailLoading = false}
+					loading='lazy'
 				/>
 				<div class="skeleton h-full w-full bg-base-100" class:hidden={!thumbnailLoading}></div>
 			{/if}
@@ -62,6 +62,7 @@
 					alt={asset.id}
 					class="h-full w-full"
 					onload={()=>previewLoading = false}
+					loading='lazy'
 				/>
 				<div class="skeleton h-full w-full animate-pulse bg-base-200" class:hidden={!previewLoading}></div>
 			{/if}

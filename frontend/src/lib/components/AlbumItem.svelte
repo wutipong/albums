@@ -18,8 +18,8 @@
                     alt={album.id} 
                     width='300' 
                     height='200'
-                    class:hidden={coverLoading}
                     onload={() => coverLoading = false}
+                    loading='lazy'
                 />
 
                 <div class='skeleton h-full w-full bg-base-100' class:hidden={!coverLoading}></div>
