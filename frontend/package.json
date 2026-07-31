@@ -54,7 +54,6 @@
 		"@better-auth/utils": "^0.4.3",
 		"@bufbuild/protobuf": "^2.13.0",
 		"@imgproxy/imgproxy-node": "^1.1.0",
-		"@js-temporal/polyfill": "^0.5.1",
 		"@mdi/js": "^7.4.47",
 		"@types/hammerjs": "^2.0.46",
 		"@types/mime-types": "^3.0.1",
@@ -69,6 +68,7 @@
 		"pgvector": "^0.2.1",
 		"postgres-interval": "^4.1.0",
 		"svelte-adapter-bun": "^1.0.1",
+		"temporal-polyfill": "^1.0.2",
 		"vidstack": "^1.15.6"
 	}
 }

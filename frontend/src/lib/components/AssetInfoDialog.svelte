@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { mdiClose } from '@mdi/js';
 	import Icon from 'mdi-svelte';
-	import { Temporal } from '@js-temporal/polyfill';
+	import { Temporal } from 'temporal-polyfill';
 
 	interface Asset {
 		created_at: Date;
