@@ -9,7 +9,7 @@
   "features": {
     "ghcr.io/devcontainers/features/common-utils:": {},
     "ghcr.io/devcontainers/features/git:1": {},
-    "ghcr.io/devcontainers/features/go:1": {
+    "ghcr.io/devcontainers/features/go:": {
       "golangciLintVersion": "2.11.4",
       "version": "latest"
     },
@@ -26,7 +26,7 @@
     },
     "ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
     "ghcr.io/azutake/devcontainer-features/go-packages-install:0": {
-      "PACKAGES": "github.com/sqlc-dev/sqlc/cmd/sqlc@latest,github.com/amacneil/dbmate@latest,google.golang.org/protobuf/cmd/protoc-gen-go@latest,google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest,go install github.com/minio/mc@latest"
+      "PACKAGES": "github.com/sqlc-dev/sqlc/cmd/sqlc@latest,github.com/amacneil/dbmate@latest,google.golang.org/protobuf/cmd/protoc-gen-go@latest,google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest,github.com/minio/mc@latest,github.com/cshum/vipsgen/cmd/vipsgen@latest"
     },
     "ghcr.io/devcontainers-extra/features/apt-packages:1": {
       "packages": "libvips-dev,libvpx12,libopus0,ffmpeg"

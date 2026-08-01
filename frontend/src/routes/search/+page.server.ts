@@ -5,7 +5,7 @@ import { db } from "$lib/server/db";
 import { cosineDistance } from "pgvector/kysely";
 import { env } from "$env/dynamic/private";
 import { generateImageUrl } from "@imgproxy/imgproxy-node";
-import { Temporal } from '@js-temporal/polyfill';
+import { Temporal } from 'temporal-polyfill';
 
 export const load: PageServerLoad = async ({ params, fetch, url }) => {
     const search = url.searchParams.get('search')

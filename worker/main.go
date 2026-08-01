@@ -19,6 +19,7 @@ import (
 
 //go:generate protoc --go_out=. --go-grpc_out=. -I/workspaces/grpc worker.proto clip.proto
 //go:generate sqlc generate
+//go:generate vipsgen -out ./vips
 
 func main() {
 	id := ""
