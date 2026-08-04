@@ -24,6 +24,11 @@
 				<div class="stat-value text-primary">{formatter.format(data.pendingCount)}</div>
 			</div>
 
+            <div class="stat">
+                <div class="stat-title">Failed Assets</div>
+                <div class="stat-value text-error">{formatter.format(data.failedCount)}</div>
+            </div>
+
 			<div class="stat">
 				<div class="stat-title">Total Albums</div>
 				<div class="stat-value text-primary">{formatter.format(data.albumCount)}</div>

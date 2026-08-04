@@ -13,12 +13,13 @@ export const load: PageServerLoad = async () => {
         limit(20).execute();
 
     const pendingCount = await db.selectFrom("assets").select((eb) => [eb.fn.countAll().as("count")]).where("process_status", "=", "pending").executeTakeFirst();
-    
+    const failedCount = await db.selectFrom("assets").select((eb) => [eb.fn.countAll().as("count")]).where("process_status", "=", "failed").executeTakeFirst();
     const album_count = await db.selectFrom("albums").select((eb) => [eb.fn.countAll().as("count")]).executeTakeFirst();
 
     return { 
         count: count ? BigInt(count.count) : 0n, 
         pendings, 
+        failedCount: failedCount ? BigInt(failedCount.count) : 0n,
         pendingCount: pendingCount ? BigInt(pendingCount.count) : 0n,
         albumCount: album_count ? BigInt(album_count.count) : 0n,
      };
