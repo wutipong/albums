@@ -103,7 +103,7 @@
 		</a>
 	</li>
 	<li>
-		<a href={`/api/asset/${asset.id}/original/`} target="_blank">
+		<a href={asset.original_url} target="_blank">
 			<Icon path={mdiDownload} /> Download
 		</a>
 	</li>
