@@ -79,11 +79,19 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
                     )
                     break;
             }
-            const out = { ...asset, video_duration, thumbnail_url, preview_url, view_url }
+
+            const original_url = await getSignedUrl(
+                s3Public,
+                new GetObjectCommand({
+                    Bucket: env.S3_BUCKET,
+                    Key: asset.original
+                })
+            )
+            const out = { ...asset, video_duration, thumbnail_url, preview_url, view_url, original_url }
             outAssets.push(out)
         }
         else {
-            const out = { ...asset, video_duration: 0, thumbnail_url: '', preview_url: '', view_url: '' }
+            const out = { ...asset, video_duration: 0, thumbnail_url: '', preview_url: '', view_url: '', original_url: '' }
             outAssets.push(out)
         }
 
