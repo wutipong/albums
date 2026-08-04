@@ -44,21 +44,31 @@ func ProcessAsset(ctx context.Context, minioClient *minio.Client, id string) err
 	case "image":
 		err = processImageAsset(ctx, minioClient, &asset)
 		if err != nil {
-			slog.Info("error processing image asset.", slog.String("error", err.Error()))
-			return fmt.Errorf("unable to process image asset: %w", err)
+			slog.Error("error processing image asset.",
+				slog.String("error", err.Error()),
+				slog.String("id", id),
+			)
 		}
 	case "video":
 		err = processVideoAsset(ctx, minioClient, &asset)
 		if err != nil {
-			slog.Info("error proessing video.", slog.String("error", err.Error()))
-			return fmt.Errorf("unable to process video asset: %w", err)
+			slog.Error("error processing video asset.",
+				slog.String("error", err.Error()),
+				slog.String("id", id),
+			)
 		}
 	default:
 		asset.DeletedAt = pgtype.Timestamptz{Time: time.Now(), Valid: true}
 		slog.Info("asset not recongnized will be deleted")
 	}
 
-	_, err = queries.UpdateAsset(ctx, db.UpdateAssetParams{
+	if err == nil {
+		asset.ProcessStatus = db.ProcessStatusTProcessed
+	} else {
+		asset.ProcessStatus = db.ProcessStatusTFailed
+	}
+
+	_, e := queries.UpdateAsset(ctx, db.UpdateAssetParams{
 		ID:              uuid,
 		Filename:        asset.Filename,
 		Type:            asset.Type,
@@ -66,7 +76,7 @@ func ProcessAsset(ctx context.Context, minioClient *minio.Client, id string) err
 		Preview:         asset.Preview,
 		Thumbnail:       asset.Thumbnail,
 		View:            asset.View,
-		ProcessStatus:   db.ProcessStatusTProcessed,
+		ProcessStatus:   asset.ProcessStatus,
 		ThumbnailWidth:  asset.ThumbnailWidth,
 		ThumbnailHeight: asset.ThumbnailHeight,
 		ViewWidth:       asset.ViewWidth,
@@ -76,10 +86,16 @@ func ProcessAsset(ctx context.Context, minioClient *minio.Client, id string) err
 		ImageEmbedding:  asset.ImageEmbedding,
 	})
 
-	if err != nil {
-		slog.Error("update asset fails.", slog.String("error", err.Error()))
-		return fmt.Errorf("unable to save image metadata: %w", err)
+	if e != nil {
+		slog.Error("update asset fails.", slog.String("error", e.Error()))
+		return fmt.Errorf("unable to save asset metadata: %w", e)
 	}
+
+	if err != nil {
+		return fmt.Errorf("unable to process asset: %w", err)
+	}
+
+	slog.Info("asset processed successfully", slog.String("id", id))
 
 	return nil
 }
