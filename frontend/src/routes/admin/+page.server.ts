@@ -53,7 +53,7 @@ export const load: PageServerLoad = async () => {
 			.where('assets.id', '=', asset_id)
 			.executeTakeFirst();
 		if (asset) {
-			queueItems.push(asset);
+			queueItems.push({id: job.id, ...asset});
 		}
 	}
 	return {

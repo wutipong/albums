@@ -50,10 +50,10 @@
 			<table class="table">
 				<thead>
 					<tr>
-						<th>#</th>
 						<th>ID</th>
+						<th>Asset ID</th>
 						<th>Type</th>
-						<th>Albums</th>
+						<th>Album</th>
 						<th>Created At</th>
 					</tr>
 				</thead>
@@ -65,7 +65,7 @@
 					{:else}
 						{#each data.queueItems as asset, index}
 							<tr>
-								<th>{index + 1}</th>
+								<th>{asset.id}</th>
 								<td>{asset.asset_id}</td>
 								<td>{asset.type}</td>
 								<td
@@ -80,10 +80,10 @@
 				</tbody>
 				<tfoot>
 					<tr>
-						<th>#</th>
 						<th>ID</th>
+						<th>Asset ID</th>
 						<th>Type</th>
-						<th>Albums</th>
+						<th>Album</th>
 						<th>Created At</th>
 					</tr>
 				</tfoot>
