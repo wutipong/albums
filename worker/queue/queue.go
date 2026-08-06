@@ -20,6 +20,8 @@ var queue neoq.Neoq
 
 // var done = make(chan bool)
 
+const MAX_RETRIES = 2 // maximum number of retries for a job
+
 func Init(ctx context.Context) error {
 	var err error
 
@@ -87,7 +89,7 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 	uuid.Scan(id)
 
 	queries, _ := db.Get()
-
+	maxRetries := MAX_RETRIES
 	status, err = queries.GetAssetProcessStatus(ctx, uuid)
 	slog.Info("asset status", slog.Any("status", status))
 
@@ -99,6 +101,7 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 			"command": "process-asset",
 			"id":      id,
 		},
+		MaxRetries: &maxRetries,
 	}
 
 	jobId, err := queue.Enqueue(ctx, j)
@@ -117,6 +120,7 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 }
 
 func EnqueuePopulateAlbumsCover(ctx context.Context, albumId string, assetId string) error {
+	maxRetries := MAX_RETRIES
 	j := &jobs.Job{
 		Queue: "asset-processing",
 		Payload: map[string]any{
@@ -124,6 +128,7 @@ func EnqueuePopulateAlbumsCover(ctx context.Context, albumId string, assetId str
 			"albumId": albumId,
 			"assetId": assetId,
 		},
+		MaxRetries: &maxRetries,
 	}
 
 	jobId, err := queue.Enqueue(ctx, j)
