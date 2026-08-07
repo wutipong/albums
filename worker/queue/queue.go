@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/acaloiaro/neoq"
 	"github.com/acaloiaro/neoq/backends/postgres"
@@ -98,8 +99,9 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 	j := &jobs.Job{
 		Queue: "asset-processing",
 		Payload: map[string]any{
-			"command": "process-asset",
-			"id":      id,
+			"command":    "process-asset",
+			"id":         id,
+			"created_at": time.Now().UTC(),
 		},
 		MaxRetries: &maxRetries,
 	}
@@ -124,9 +126,10 @@ func EnqueuePopulateAlbumsCover(ctx context.Context, albumId string, assetId str
 	j := &jobs.Job{
 		Queue: "asset-processing",
 		Payload: map[string]any{
-			"command": "populate-album-cover",
-			"albumId": albumId,
-			"assetId": assetId,
+			"command":    "populate-album-cover",
+			"albumId":    albumId,
+			"assetId":    assetId,
+			"created_at": time.Now().UTC(),
 		},
 		MaxRetries: &maxRetries,
 	}
