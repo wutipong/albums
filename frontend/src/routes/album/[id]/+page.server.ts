@@ -1,15 +1,11 @@
-import { env } from '$env/dynamic/private';
 import { db } from '$lib/server/db';
-import { s3Public } from '$lib/server/s3';
-import { GetObjectCommand } from '@aws-sdk/client-s3';
 import type { PageServerLoad } from './$types';
-import { generateImageUrl } from '@imgproxy/imgproxy-node';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { Temporal } from 'temporal-polyfill';
+
+import { createResponseAssetList } from '$lib/server/asset';
 
 export const ssr = false;
 
-export const load: PageServerLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ params }) => {
 	const { id } = params;
 
 	const assets = await db
@@ -20,99 +16,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 		.orderBy('filename')
 		.execute();
 
-	const outAssets = [];
-	for (const asset of assets) {
-		if (asset.process_status === 'processed') {
-			const video_duration = Temporal.Duration.from(asset.video_duration.toISOString());
-
-			const bypass = asset.image_frames > 1 || asset.type == 'video';
-
-			const thumbnail_url = generateImageUrl({
-				endpoint: env.IMGPROXY_URL,
-				url: `s3://${env.S3_BUCKET}/${asset.thumbnail}`,
-				options: {
-					raw: bypass,
-					resizing_type: 'auto',
-					height: 200,
-					enlarge: 1
-				},
-				salt: env.IMGPROXY_SALT,
-				key: env.IMGPROXY_KEY
-			});
-
-			const preview_url = generateImageUrl({
-				endpoint: env.IMGPROXY_URL,
-				url: `s3://${env.S3_BUCKET}/${asset.preview}`,
-				options: {
-					raw: bypass,
-					resizing_type: 'auto',
-					height: 200,
-					enlarge: 1
-				},
-				salt: env.IMGPROXY_SALT,
-				key: env.IMGPROXY_KEY
-			});
-
-			let view_url = '';
-			switch (asset.type) {
-				case 'image':
-					view_url = generateImageUrl({
-						endpoint: env.IMGPROXY_URL,
-						url: `s3://${env.S3_BUCKET}/${asset.view}`,
-						options: {
-							raw: bypass,
-							resizing_type: 'auto',
-							height: 2000,
-							enlarge: 1
-						},
-						salt: env.IMGPROXY_SALT,
-						key: env.IMGPROXY_KEY
-					});
-					break;
-
-				case 'video':
-					view_url = await getSignedUrl(
-						s3Public,
-						new GetObjectCommand({
-							Bucket: env.S3_BUCKET,
-							Key: asset.view
-						})
-					);
-					break;
-			}
-
-			const copy_url = asset.type === 'video' ? '' : `/api/asset/${asset.id}/original/`;
-
-			const original_url = await getSignedUrl(
-				s3Public,
-				new GetObjectCommand({
-					Bucket: env.S3_BUCKET,
-					Key: asset.original
-				})
-			);
-			const out = {
-				...asset,
-				video_duration,
-				thumbnail_url,
-				preview_url,
-				view_url,
-				original_url,
-				copy_url
-			};
-			outAssets.push(out);
-		} else {
-			const out = {
-				...asset,
-				video_duration: 0,
-				thumbnail_url: '',
-				preview_url: '',
-				view_url: '',
-				original_url: ''
-			};
-			outAssets.push(out);
-		}
-	}
-
+	const outAssets = await createResponseAssetList(assets);
 	const album = await db.selectFrom('albums').selectAll().where('id', '=', id).executeTakeFirst();
 
 	return { ...album, assets: outAssets };
