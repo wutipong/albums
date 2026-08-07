@@ -180,6 +180,7 @@
 			disabled={asset.copy_url == undefined || asset.copy_url == ''}
 			onclick={() => {
 				copyImageToClipboard(asset.copy_url);
+				toast.add('Image copied to clipboard', 'success');
 			}}
 		>
 			<Icon path={mdiClipboardOutline} /> Copy to clipboard
