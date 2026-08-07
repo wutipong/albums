@@ -3,6 +3,9 @@
 	import type { PageProps } from './$types';
     import Icon from 'mdi-svelte';
     import {mdiInformationOutline} from '@mdi/js';
+    import { authClient } from '$lib/auth-client';
+
+	const session = authClient.useSession();
 
 	let { data }: PageProps = $props();
 	const formatter = new Intl.NumberFormat('en-US', {

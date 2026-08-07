@@ -4,6 +4,7 @@
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
 	import {
+	mdiClipboardOutline,
 		mdiDownload,
 		mdiImageAlbum,
 		mdiImageSearch,
@@ -11,6 +12,8 @@
 	} from '@mdi/js';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import AssetInfoDialog from '$lib/components/AssetInfoDialog.svelte';
+	import Toast from '$lib/components/Toast.svelte';
+	import { copyImageToClipboard } from '$lib/clipboard';
 
 	let { data, params }: PageProps = $props();
 	let asset: any = $state({ id: '<placeholder>', album_id: '' });
@@ -19,6 +22,7 @@
 	let hasNext = $state(true);
 	let hasPrevious = $state(true);
 	let assetInfoDialog: AssetInfoDialog;
+	let toast: Toast;
 
 	function next() {
 		if (hasNext) {
@@ -85,6 +89,8 @@
 	/>
 </div>
 
+<Toast bind:this={toast} />
+
 <AssetInfoDialog bind:this={assetInfoDialog} />
 
 {#snippet viewMenu()}
@@ -101,6 +107,17 @@
 		<a href={`/album/${asset.album_id}/`}>
 			<Icon path={mdiImageAlbum} /> View album
 		</a>
+	</li>
+	<li>
+		<button
+			disabled={asset.copy_url == undefined || asset.copy_url == ''}
+			onclick={() => {
+				copyImageToClipboard(asset.copy_url);
+				toast.add('Image copied to clipboard', 'success');
+			}}
+		>
+			<Icon path={mdiClipboardOutline} /> Copy to clipboard
+		</button>
 	</li>
 	<li>
 		<a href={asset.original_url} target="_blank">

@@ -3,12 +3,16 @@
 	import AssetViewer from '$lib/components/AssetViewer.svelte';
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
-	import { mdiClose, mdiDownload, mdiImageAlbum, mdiInformationOutline } from '@mdi/js';
+	import { mdiClipboardOutline, mdiClose, mdiDownload, mdiImageAlbum, mdiInformationOutline } from '@mdi/js';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import AssetInfoDialog from '$lib/components/AssetInfoDialog.svelte';
+	import {copyImageToClipboard} from '$lib/clipboard';
 
 	let { data, params }: PageProps = $props();
+
+	$inspect(data);
+
 	let asset:any = $state({
 		id: '<placeholder>',
 		type: 'image',
@@ -169,6 +173,17 @@
 			}}
 		>
 			<Icon path={mdiInformationOutline} /> Asset information
+		</button>
+	</li>
+	<li>
+		<button
+			disabled={asset.copy_url == undefined || asset.copy_url == ''}
+			onclick={() => {
+				copyImageToClipboard(asset.copy_url);
+				toast.add('Image copied to clipboard', 'success');
+			}}
+		>
+			<Icon path={mdiClipboardOutline} /> Copy to clipboard
 		</button>
 	</li>
 	<li>
