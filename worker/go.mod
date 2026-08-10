@@ -5,7 +5,7 @@ go 1.26.1
 require (
 	github.com/acaloiaro/neoq v0.71.3
 	github.com/jackc/pgx/v5 v5.10.0
-	github.com/minio/minio-go/v7 v7.2.1
+	github.com/minio/minio-go/v7 v7.0.100
 	github.com/pgvector/pgvector-go v0.4.0
 	github.com/u2takey/ffmpeg-go v0.5.0
 	github.com/urfave/cli/v3 v3.10.1
