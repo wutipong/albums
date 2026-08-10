@@ -41,13 +41,14 @@ func Init(ctx context.Context) error {
 
 	slog.Info("using S3 endpoint.", slog.String("endpoint", endpoint))
 
+	accessKeyId := os.Getenv("AWS_ACCESS_KEY_ID")
+	secret := os.Getenv("AWS_SECRET_ACCESS_KEY")
+
 	minioClient, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewEnvAWS(),
-		Secure: secure,
+		Creds:        credentials.NewStaticV4(accessKeyId, secret, ""),
+		Secure:       secure,
+		BucketLookup: minio.BucketLookupPath,
 	})
-	if err != nil {
-		return fmt.Errorf("unable to create minio client: %w", err)
-	}
 
 	// create a handler that listens for new job on the "greetings" queue
 	h := handler.New("asset-processing", func(ctx context.Context) (err error) {

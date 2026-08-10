@@ -220,9 +220,13 @@ func processSingle(ctx context.Context, id string) error {
 		return fmt.Errorf("unable to get endpoint: %w", err)
 	}
 
+	accessKeyId := os.Getenv("AWS_ACCESS_KEY_ID")
+	secret := os.Getenv("AWS_SECRET_ACCESS_KEY")
+
 	minioClient, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewEnvAWS(),
-		Secure: secure,
+		Creds:        credentials.NewStaticV4(accessKeyId, secret, ""),
+		Secure:       secure,
+		BucketLookup: minio.BucketLookupPath,
 	})
 	if err != nil {
 		return fmt.Errorf("unable to create minio client: %w", err)
