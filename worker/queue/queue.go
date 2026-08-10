@@ -42,8 +42,9 @@ func Init(ctx context.Context) error {
 	slog.Info("using S3 endpoint.", slog.String("endpoint", endpoint))
 
 	minioClient, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewEnvAWS(),
-		Secure: secure,
+		Creds:        credentials.NewEnvAWS(),
+		Secure:       secure,
+		BucketLookup: minio.BucketLookupPath,
 	})
 	if err != nil {
 		return fmt.Errorf("unable to create minio client: %w", err)
