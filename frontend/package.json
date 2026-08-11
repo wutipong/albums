@@ -15,7 +15,7 @@
 		"kysely": "kysely-codegen --out-file ./src/lib/server/db_types.d.ts",
 		"protoc": "protoc --ts_proto_out=./src/lib/server/grpc/proto --ts_proto_opt=outputServices=nice-grpc,outputServices=generic-definitions,useExactTypes=false  -I /workspaces/grpc worker.proto clip.proto",
 		"codegen": "bun run kysely && bun run protoc",
-		"pwagen": "bunx pwa-icons --padding 0 -i ./static/logo.svg -o ./static/icons -p ios,android,favicon",
+		"pwa:generate": "pwa-assets-generator && pwa-assets-generator -c pwa-favicon.config.ts",
 		"better-auth-migrate": "bunx @better-auth/cli@latest migrate"
 	},
 	"devDependencies": {
@@ -28,6 +28,8 @@
 		"@tailwindcss/typography": "^0.5.20",
 		"@tailwindcss/vite": "^4.3.3",
 		"@types/node": "^25.9.5",
+		"@vite-pwa/assets-generator": "^1.0.2",
+		"@vite-pwa/sveltekit": "^1.1.0",
 		"daisyui": "^5.7.4",
 		"eslint": "^10.8.0",
 		"eslint-config-prettier": "^10.1.8",
@@ -45,7 +47,8 @@
 		"ts-proto": "^2.12.0",
 		"typescript": "^7.0.2",
 		"typescript-eslint": "^8.65.0",
-		"vite": "^7.3.6"
+		"vite": "^7.3.6",
+		"vite-plugin-pwa": "^1.3.0"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.1095.0",
