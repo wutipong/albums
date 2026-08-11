@@ -45,7 +45,8 @@
     3000,
     3900,
     3901,
-    3902
+    3902,
+    "dex:5556"
   ],
   // Configure tool-specific properties.
   "customizations": {
