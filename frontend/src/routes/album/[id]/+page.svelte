@@ -83,6 +83,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Albums: {data.name}</title>
+</svelte:head>
+
 <div class="relative flex h-screen w-screen flex-col">
 	<NavBar album={data}></NavBar>
 	<div class="flex w-full items-center gap-2 border-1 border-base-300 bg-base-300 p-2 shadow">

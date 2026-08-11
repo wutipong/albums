@@ -17,6 +17,10 @@
 	$inspect(data);
 </script>
 
+<svelte:head>
+	<title>Albums: Administration</title>
+</svelte:head>
+
 <div class="relative flex h-screen w-screen flex-col">
 	<NavBar />
 	<div class="overflow-auto p-4 pt-8">
