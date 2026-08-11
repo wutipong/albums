@@ -57,6 +57,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Albums: User</title>
+</svelte:head>
+
 <div class="flex h-screen w-screen flex-col">
 	<NavBar />
 

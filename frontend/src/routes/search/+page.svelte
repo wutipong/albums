@@ -55,6 +55,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Albums: Search -- {data.search}</title>
+</svelte:head>
+
 <div class="relative flex h-screen w-screen flex-col">
 	<NavBar />
 	<div class="flex w-full gap-2 border-1 border-base-300 bg-base-300 p-2 shadow">

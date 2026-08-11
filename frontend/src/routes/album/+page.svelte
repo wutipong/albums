@@ -13,6 +13,10 @@
 	let filter = $state('');
 </script>
 
+<svelte:head>
+	<title>Albums</title>
+</svelte:head>
+
 <div class="relative flex h-screen w-screen flex-col">
 	<NavBar />
 
