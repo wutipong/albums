@@ -75,7 +75,14 @@ services:
       IMGPROXY_S3_ENDPOINT_USE_PATH_STYLE: ${S3_FORCE_PATH_STYLE}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      
+  dex:
+    image: ghcr.io/dexidp/dex:v2.41.0
+    command: dex serve /etc/dex/cfg/config.yaml
+    volumes:
+      - ./dex-config.yaml:/etc/dex/cfg/config.yaml:ro
+    ports:
+      - "5556:5556" # Maps the browser-facing localhost:5556 port
+
 volumes:
   postgres-data:
   garage-meta:
