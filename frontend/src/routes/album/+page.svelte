@@ -68,7 +68,7 @@
 	<div class="mx-4 overflow-auto pt-4 pb-20">
 		<div class="flex flex-wrap justify-evenly gap-2">
 			{#each albums as album (album.id)}
-				<AlbumItem {album} />
+				<AlbumItem {album} aspect="landscape"/>
 			{/each}
 		</div>
 	</div>
