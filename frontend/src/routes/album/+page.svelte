@@ -1,6 +1,6 @@
 <script lang="ts">
 	import AlbumItem from '$lib/components/AlbumItem.svelte';
-	import type { PageProps } from './$types';
+	import type { PageData, PageProps } from './$types';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import { mdiFilter, mdiOrderBoolAscending } from '@mdi/js';
 	import Icon from 'mdi-svelte';
@@ -68,7 +68,7 @@
 	<div class="mx-4 overflow-auto pt-4 pb-20">
 		<div class="flex flex-wrap justify-evenly gap-2">
 			{#each albums as album (album.id)}
-				<AlbumItem {album} />
+				<AlbumItem {album} aspect={data.aspect}/>
 			{/each}
 		</div>
 	</div>
