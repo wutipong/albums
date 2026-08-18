@@ -3,186 +3,191 @@
  * Please do not edit it manually.
  */
 
-import type { ColumnType } from "kysely";
-import type { IPostgresInterval } from "postgres-interval";
+import type { ColumnType } from 'kysely';
+import type { IPostgresInterval } from 'postgres-interval';
 
-export type AssetTypeT = "animated" | "audio" | "image" | "video";
+export type AssetTypeT = 'animated' | 'audio' | 'image' | 'video';
 
-export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
-  ? ColumnType<S, I | undefined, U>
-  : ColumnType<T, T | undefined, T>;
+export type Generated<T> =
+	T extends ColumnType<infer S, infer I, infer U>
+		? ColumnType<S, I | undefined, U>
+		: ColumnType<T, T | undefined, T>;
 
 export type Int8 = ColumnType<string, bigint | number | string, bigint | number | string>;
 
-export type Interval = ColumnType<IPostgresInterval, IPostgresInterval | number | string, IPostgresInterval | number | string>;
+export type Interval = ColumnType<
+	IPostgresInterval,
+	IPostgresInterval | number | string,
+	IPostgresInterval | number | string
+>;
 
-export type JobStatus = "failed" | "new" | "processed";
+export type JobStatus = 'failed' | 'new' | 'processed';
 
 export type Json = JsonValue;
 
 export type JsonArray = JsonValue[];
 
 export type JsonObject = {
-  [x: string]: JsonValue | undefined;
+	[x: string]: JsonValue | undefined;
 };
 
 export type JsonPrimitive = boolean | number | string | null;
 
 export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
-export type ProcessStatusT = "failed" | "pending" | "processed" | "processing" | "uploading";
+export type ProcessStatusT = 'failed' | 'pending' | 'processed' | 'processing' | 'uploading';
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export interface Account {
-  accessToken: string | null;
-  accessTokenExpiresAt: Timestamp | null;
-  accountId: string;
-  createdAt: Generated<Timestamp>;
-  id: string;
-  idToken: string | null;
-  password: string | null;
-  providerId: string;
-  refreshToken: string | null;
-  refreshTokenExpiresAt: Timestamp | null;
-  scope: string | null;
-  updatedAt: Timestamp;
-  userId: string;
+	accessToken: string | null;
+	accessTokenExpiresAt: Timestamp | null;
+	accountId: string;
+	createdAt: Generated<Timestamp>;
+	id: string;
+	idToken: string | null;
+	password: string | null;
+	providerId: string;
+	refreshToken: string | null;
+	refreshTokenExpiresAt: Timestamp | null;
+	scope: string | null;
+	updatedAt: Timestamp;
+	userId: string;
 }
 
 export interface Albums {
-  cover: Generated<string>;
-  created_at: Generated<Timestamp>;
-  deleted_at: Timestamp | null;
-  id: Generated<string>;
-  modified_at: Generated<Timestamp>;
-  name: string;
+	cover: Generated<string>;
+	created_at: Generated<Timestamp>;
+	deleted_at: Timestamp | null;
+	id: Generated<string>;
+	modified_at: Generated<Timestamp>;
+	name: string;
 }
 
 export interface Apikey {
-  configId: string;
-  createdAt: Timestamp;
-  enabled: boolean | null;
-  expiresAt: Timestamp | null;
-  id: string;
-  key: string;
-  lastRefillAt: Timestamp | null;
-  lastRequest: Timestamp | null;
-  metadata: string | null;
-  name: string | null;
-  permissions: string | null;
-  prefix: string | null;
-  rateLimitEnabled: boolean | null;
-  rateLimitMax: number | null;
-  rateLimitTimeWindow: number | null;
-  referenceId: string;
-  refillAmount: number | null;
-  refillInterval: number | null;
-  remaining: number | null;
-  requestCount: number | null;
-  start: string | null;
-  updatedAt: Timestamp;
+	configId: string;
+	createdAt: Timestamp;
+	enabled: boolean | null;
+	expiresAt: Timestamp | null;
+	id: string;
+	key: string;
+	lastRefillAt: Timestamp | null;
+	lastRequest: Timestamp | null;
+	metadata: string | null;
+	name: string | null;
+	permissions: string | null;
+	prefix: string | null;
+	rateLimitEnabled: boolean | null;
+	rateLimitMax: number | null;
+	rateLimitTimeWindow: number | null;
+	referenceId: string;
+	refillAmount: number | null;
+	refillInterval: number | null;
+	remaining: number | null;
+	requestCount: number | null;
+	start: string | null;
+	updatedAt: Timestamp;
 }
 
 export interface Assets {
-  album_id: string;
-  created_at: Generated<Timestamp>;
-  deleted_at: Timestamp | null;
-  filename: string;
-  id: Generated<string>;
-  image_embedding: Generated<string | null>;
-  image_frames: Generated<number>;
-  modified_at: Generated<Timestamp>;
-  original: Generated<string>;
-  preview: Generated<string>;
-  process_status: Generated<ProcessStatusT>;
-  thumbnail: Generated<string>;
-  thumbnail_height: Generated<number>;
-  thumbnail_width: Generated<number>;
-  type: Generated<AssetTypeT>;
-  video_duration: Generated<Interval>;
-  view: Generated<string>;
-  view_height: Generated<number>;
-  view_width: Generated<number>;
+	album_id: string;
+	created_at: Generated<Timestamp>;
+	deleted_at: Timestamp | null;
+	filename: string;
+	id: Generated<string>;
+	image_embedding: Generated<string | null>;
+	image_frames: Generated<number>;
+	modified_at: Generated<Timestamp>;
+	original: Generated<string>;
+	preview: Generated<string>;
+	process_status: Generated<ProcessStatusT>;
+	thumbnail: Generated<string>;
+	thumbnail_height: Generated<number>;
+	thumbnail_width: Generated<number>;
+	type: Generated<AssetTypeT>;
+	video_duration: Generated<Interval>;
+	view: Generated<string>;
+	view_height: Generated<number>;
+	view_width: Generated<number>;
 }
 
 export interface NeoqDeadJobs {
-  created_at: Generated<Timestamp | null>;
-  deadline: Timestamp | null;
-  error: string | null;
-  fingerprint: string;
-  id: Generated<number>;
-  max_retries: number | null;
-  payload: Json | null;
-  queue: string;
-  retries: number | null;
-  status: Generated<JobStatus>;
+	created_at: Generated<Timestamp | null>;
+	deadline: Timestamp | null;
+	error: string | null;
+	fingerprint: string;
+	id: Generated<number>;
+	max_retries: number | null;
+	payload: Json | null;
+	queue: string;
+	retries: number | null;
+	status: Generated<JobStatus>;
 }
 
 export interface NeoqJobs {
-  created_at: Generated<Timestamp | null>;
-  deadline: Timestamp | null;
-  error: string | null;
-  fingerprint: string;
-  id: Generated<Int8>;
-  max_retries: Generated<number | null>;
-  payload: Json | null;
-  queue: string;
-  ran_at: Timestamp | null;
-  retries: Generated<number | null>;
-  run_after: Generated<Timestamp | null>;
-  status: Generated<JobStatus>;
+	created_at: Generated<Timestamp | null>;
+	deadline: Timestamp | null;
+	error: string | null;
+	fingerprint: string;
+	id: Generated<Int8>;
+	max_retries: Generated<number | null>;
+	payload: Json | null;
+	queue: string;
+	ran_at: Timestamp | null;
+	retries: Generated<number | null>;
+	run_after: Generated<Timestamp | null>;
+	status: Generated<JobStatus>;
 }
 
 export interface NeoqSchemaMigrations {
-  dirty: boolean;
-  version: Int8;
+	dirty: boolean;
+	version: Int8;
 }
 
 export interface SchemaMigrations {
-  version: string;
+	version: string;
 }
 
 export interface Session {
-  createdAt: Generated<Timestamp>;
-  expiresAt: Timestamp;
-  id: string;
-  ipAddress: string | null;
-  token: string;
-  updatedAt: Timestamp;
-  userAgent: string | null;
-  userId: string;
+	createdAt: Generated<Timestamp>;
+	expiresAt: Timestamp;
+	id: string;
+	ipAddress: string | null;
+	token: string;
+	updatedAt: Timestamp;
+	userAgent: string | null;
+	userId: string;
 }
 
 export interface User {
-  createdAt: Generated<Timestamp>;
-  email: string;
-  emailVerified: boolean;
-  id: string;
-  image: string | null;
-  name: string;
-  updatedAt: Generated<Timestamp>;
+	createdAt: Generated<Timestamp>;
+	email: string;
+	emailVerified: boolean;
+	id: string;
+	image: string | null;
+	name: string;
+	updatedAt: Generated<Timestamp>;
 }
 
 export interface Verification {
-  createdAt: Generated<Timestamp>;
-  expiresAt: Timestamp;
-  id: string;
-  identifier: string;
-  updatedAt: Generated<Timestamp>;
-  value: string;
+	createdAt: Generated<Timestamp>;
+	expiresAt: Timestamp;
+	id: string;
+	identifier: string;
+	updatedAt: Generated<Timestamp>;
+	value: string;
 }
 
 export interface DB {
-  account: Account;
-  albums: Albums;
-  apikey: Apikey;
-  assets: Assets;
-  neoq_dead_jobs: NeoqDeadJobs;
-  neoq_jobs: NeoqJobs;
-  neoq_schema_migrations: NeoqSchemaMigrations;
-  schema_migrations: SchemaMigrations;
-  session: Session;
-  user: User;
-  verification: Verification;
+	account: Account;
+	albums: Albums;
+	apikey: Apikey;
+	assets: Assets;
+	neoq_dead_jobs: NeoqDeadJobs;
+	neoq_jobs: NeoqJobs;
+	neoq_schema_migrations: NeoqSchemaMigrations;
+	schema_migrations: SchemaMigrations;
+	session: Session;
+	user: User;
+	verification: Verification;
 }

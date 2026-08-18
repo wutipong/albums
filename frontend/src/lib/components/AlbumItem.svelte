@@ -12,7 +12,7 @@
 </script>
 
 <div class="block rounded-xl p-4 hover:bg-base-100 hover:shadow-xl" id={album.id}>
-	<div class="rounded-xl border-1 border-base-300 overflow-clip">
+	<div class="overflow-clip rounded-xl border-1 border-base-300">
 		<figure
 			class="block w-[300px]"
 			class:h-[450px]={aspect === 'portrait'}
@@ -20,7 +20,7 @@
 		>
 			<a href={`/album/${album.id}/`} class="block h-full w-full">
 				<div
-					class="relative rounded-xl w-[300px]"
+					class="relative w-[300px] rounded-xl"
 					class:h-[450px]={aspect === 'portrait'}
 					class:h-[200px]={aspect === 'landscape'}
 				>

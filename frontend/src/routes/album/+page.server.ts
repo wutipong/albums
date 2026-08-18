@@ -3,14 +3,14 @@ import { db } from '$lib/server/db';
 import type { PageServerLoad } from './$types';
 import { generateImageUrl } from '@imgproxy/imgproxy-node';
 
-interface AlbumItem{
+interface AlbumItem {
 	cover: string;
-    created_at: Date;
-    deleted_at: Date | null;
-    id: string;
-    modified_at: Date;
-    name: string;
-	cover_url: String
+	created_at: Date;
+	deleted_at: Date | null;
+	id: string;
+	modified_at: Date;
+	name: string;
+	cover_url: String;
 }
 
 export const load: PageServerLoad = async () => {

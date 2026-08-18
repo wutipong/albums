@@ -34,13 +34,3 @@ export async function copyImageToClipboard(imageUrl: string | URL) {
 		}
 	}, 'image/png'); // Forces the output to be a PNG
 }
-
-export async function copyToClipboard(url: string | URL) {
-	// Implementation for copying to clipboard
-
-	const src = await fetch(url.toString());
-	const blob = await src.blob();
-
-	const data = [new ClipboardItem({ [blob.type]: blob })];
-	await navigator.clipboard.write(data);
-}

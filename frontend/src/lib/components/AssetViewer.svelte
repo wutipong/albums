@@ -110,7 +110,7 @@
 	{/if}
 	<div class="absolute top-1/2 left-4 -translate-y-1/2 bg-transparent">
 		<button
-			class="btn btn-circle btn-lg btn-soft"
+			class="btn btn-circle btn-soft btn-lg"
 			class:btn-disabled={!hasPrevious}
 			onclick={() => {
 				doPrevious();
@@ -121,7 +121,7 @@
 	</div>
 	<div class="absolute top-1/2 right-4 -translate-y-1/2 bg-transparent">
 		<button
-			class="btn btn-circle btn-lg btn-soft"
+			class="btn btn-circle btn-soft btn-lg"
 			class:btn-disabled={!hasNext}
 			onclick={() => {
 				doNext();
@@ -130,11 +130,9 @@
 			<Icon path={mdiChevronRight} />
 		</button>
 	</div>
-	<div
-		class="absolute top-4 right-4 flex flex-row-reverse gap-4 rounded-full bg-transparent"
-	>
+	<div class="absolute top-4 right-4 flex flex-row-reverse gap-4 rounded-full bg-transparent">
 		<button
-			class="btn btn-circle btn-lg btn-soft"
+			class="btn btn-circle btn-soft btn-lg"
 			onclick={() => {
 				doClose();
 			}}
@@ -143,7 +141,7 @@
 		</button>
 		{#if menu}
 			<button
-				class="btn btn-circle btn-lg btn-soft"
+				class="btn btn-circle btn-soft btn-lg"
 				popovertarget="popover-1"
 				style="anchor-name:--anchor-1"
 			>

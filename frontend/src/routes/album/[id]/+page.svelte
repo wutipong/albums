@@ -3,17 +3,23 @@
 	import AssetViewer from '$lib/components/AssetViewer.svelte';
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
-	import { mdiClipboardOutline, mdiClose, mdiDownload, mdiImageAlbum, mdiInformationOutline } from '@mdi/js';
+	import {
+		mdiClipboardOutline,
+		mdiClose,
+		mdiDownload,
+		mdiImageAlbum,
+		mdiInformationOutline
+	} from '@mdi/js';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import AssetInfoDialog from '$lib/components/AssetInfoDialog.svelte';
-	import {copyImageToClipboard} from '$lib/clipboard';
+	import { copyImageToClipboard } from '$lib/clipboard';
 
 	let { data, params }: PageProps = $props();
 
 	$inspect(data);
 
-	let asset:any = $state({
+	let asset: any = $state({
 		id: '<placeholder>',
 		type: 'image',
 		view_url: 'http://example.com',

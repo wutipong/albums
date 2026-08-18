@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from 'mdi-svelte';
-    import {mdiInformationOutline, mdiCheck, mdiAlertCircleOutline, mdiAlertCircle} from '@mdi/js'
+	import { mdiInformationOutline, mdiCheck, mdiAlertCircleOutline, mdiAlertCircle } from '@mdi/js';
 
 	let messages: {
 		body: string;

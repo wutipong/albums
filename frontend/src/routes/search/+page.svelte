@@ -4,7 +4,7 @@
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
 	import {
-	mdiClipboardOutline,
+		mdiClipboardOutline,
 		mdiDownload,
 		mdiImageAlbum,
 		mdiImageSearch,

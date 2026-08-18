@@ -1,9 +1,9 @@
 <script lang="ts">
 	import NavBar from '$lib/components/NavBar.svelte';
 	import type { PageProps } from './$types';
-    import Icon from 'mdi-svelte';
-    import {mdiInformationOutline} from '@mdi/js';
-    import { authClient } from '$lib/auth-client';
+	import Icon from 'mdi-svelte';
+	import { mdiInformationOutline } from '@mdi/js';
+	import { authClient } from '$lib/auth-client';
 
 	const session = authClient.useSession();
 
@@ -24,7 +24,7 @@
 <div class="relative flex h-screen w-screen flex-col">
 	<NavBar />
 	<div class="overflow-auto p-4 pt-8">
-        <h2 class="text-2xl font-semibold">Statistics</h2>
+		<h2 class="text-2xl font-semibold">Statistics</h2>
 		<div class="stats shadow">
 			<div class="stat">
 				<div class="stat-title">Total Assets</div>

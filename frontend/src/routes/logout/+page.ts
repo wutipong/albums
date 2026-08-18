@@ -1,9 +1,9 @@
-import { authClient } from "$lib/auth-client";
-import { redirect } from "@sveltejs/kit";
-import type { PageLoad } from "./$types";
+import { authClient } from '$lib/auth-client';
+import { redirect } from '@sveltejs/kit';
+import type { PageLoad } from './$types';
 
 export const load: PageLoad = async () => {
-   authClient.signOut();
+	authClient.signOut();
 
-   redirect(308, '/login')
+	redirect(308, '/login');
 };

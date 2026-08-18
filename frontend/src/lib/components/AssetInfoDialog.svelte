@@ -37,7 +37,7 @@
 
 	export function show(a: Asset) {
 		asset = a;
-        console
+		console;
 		dialog.showModal();
 	}
 
@@ -79,7 +79,7 @@
 					{#if asset.type === 'video'}
 						<tr>
 							<th>Video Duration</th>
-							<td>{asset.video_duration.toLocaleString("en-US", { style: "digital" })}</td>
+							<td>{asset.video_duration.toLocaleString('en-US', { style: 'digital' })}</td>
 						</tr>
 					{/if}
 					{#if asset.image_frames > 1}

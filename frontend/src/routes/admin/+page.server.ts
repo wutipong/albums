@@ -46,14 +46,14 @@ export const load: PageServerLoad = async () => {
 			.selectFrom('assets')
 			.leftJoin('albums', 'assets.album_id', 'albums.id')
 			.select('assets.id as asset_id')
-            .select('type')
+			.select('type')
 			.select('albums.name as album_name')
-            .select('album_id')
+			.select('album_id')
 			.select('assets.created_at as created_at')
 			.where('assets.id', '=', asset_id)
 			.executeTakeFirst();
 		if (asset) {
-			queueItems.push({id: job.id, ...asset});
+			queueItems.push({ id: job.id, ...asset });
 		}
 	}
 	return {

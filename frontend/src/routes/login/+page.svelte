@@ -16,7 +16,7 @@
 
 <div class="relative h-screen w-screen items-center justify-center">
 	<button
-		class="btn absolute top-1/2 left-1/2 -translate-1/2 gap-4 btn-outline btn-xl btn-primary"
+		class="btn absolute top-1/2 left-1/2 -translate-1/2 gap-4 btn-outline btn-primary btn-xl"
 		onclick={() => performLogin()}
 	>
 		<Icon path={mdiLogin} />
