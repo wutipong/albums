@@ -3,6 +3,16 @@ import { db } from '$lib/server/db';
 import type { PageServerLoad } from './$types';
 import { generateImageUrl } from '@imgproxy/imgproxy-node';
 
+interface AlbumItem{
+	cover: string;
+    created_at: Date;
+    deleted_at: Date | null;
+    id: string;
+    modified_at: Date;
+    name: string;
+	cover_url: String
+}
+
 export const load: PageServerLoad = async () => {
 	let aspect: 'portrait' | 'landscape' = env.COVER_ASPECT == 'portrait' ? 'portrait' : 'landscape';
 
@@ -13,7 +23,7 @@ export const load: PageServerLoad = async () => {
 		.orderBy('name')
 		.execute();
 
-	const outAlbums = [];
+	const outAlbums: AlbumItem[] = [];
 	for (const album of albums) {
 		let cover_url = '';
 		if (album.cover != '') {

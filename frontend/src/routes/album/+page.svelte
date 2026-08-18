@@ -1,6 +1,6 @@
 <script lang="ts">
 	import AlbumItem from '$lib/components/AlbumItem.svelte';
-	import type { PageProps } from './$types';
+	import type { PageData, PageProps } from './$types';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import { mdiFilter, mdiOrderBoolAscending } from '@mdi/js';
 	import Icon from 'mdi-svelte';
