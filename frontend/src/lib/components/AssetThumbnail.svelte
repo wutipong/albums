@@ -1,5 +1,5 @@
 <script lang="ts">
-	import notAvailableSvg from '$lib/assets/not-available-small.svg?raw'
+	import notAvailableSvg from '$lib/assets/not-available-small.svg?raw';
 	let { asset, onclick = (id: string) => {} } = $props();
 
 	const TARGET_HEIGHT = 200;
@@ -12,13 +12,12 @@
 
 	let thumbnailLoading = $state(true);
 	let previewLoading = $state(true);
-
 </script>
 
 <button
 	tabindex="0"
-	class={`block p-4 overflow-hidden rounded-xl cursor-pointer 
-		hover:shadow-xl hover:bg-base-100`}
+	class={`block cursor-pointer overflow-hidden rounded-xl p-4 
+		hover:bg-base-100 hover:shadow-xl`}
 	onmouseenter={() => (preview = true)}
 	onmouseleave={() => (preview = false)}
 	onclick={() => {
@@ -29,10 +28,10 @@
 	<div class="relative h-full w-full">
 		<div
 			class:hidden={preview}
-			class="box-border h-full w-full overflow-hidden rounded-xl border-base-100 border-1 shadow"
+			class="box-border h-full w-full overflow-hidden rounded-xl border-1 border-base-300"
 			style={`width: ${thumbnailWidth}px; height: ${thumbnailHeight}px;`}
 		>
-			{#if asset.thumbnail_url ===''}
+			{#if asset.thumbnail_url === ''}
 				{@html notAvailableSvg}
 			{:else}
 				<img
@@ -40,16 +39,17 @@
 					height={thumbnailHeight}
 					src={asset.thumbnail_url}
 					alt={asset.id}
-					onload={()=>thumbnailLoading = false}
-					loading='lazy'
+					class="h-full w-full"
+					onload={() => (thumbnailLoading = false)}
+					loading="lazy"
 				/>
-				<div class="skeleton h-full w-full bg-base-100" class:hidden={!thumbnailLoading}></div>
+				<div class="h-full w-full skeleton bg-base-100" class:hidden={!thumbnailLoading}></div>
 			{/if}
 		</div>
 
 		<div
 			class:hidden={!preview}
-			class="box-border h-full w-full overflow-hidden rounded-xl"
+			class="box-border h-full w-full overflow-hidden rounded-xl border-1 border-base-300"
 			style={`width: ${thumbnailWidth}px; height: ${thumbnailHeight}px;`}
 		>
 			{#if asset.preview_url == ''}
@@ -61,10 +61,13 @@
 					src={asset.preview_url}
 					alt={asset.id}
 					class="h-full w-full"
-					onload={()=>previewLoading = false}
-					loading='lazy'
+					onload={() => (previewLoading = false)}
+					loading="lazy"
 				/>
-				<div class="skeleton h-full w-full animate-pulse bg-base-200" class:hidden={!previewLoading}></div>
+				<div
+					class="h-full w-full skeleton animate-pulse bg-base-200"
+					class:hidden={!previewLoading}
+				></div>
 			{/if}
 		</div>
 
