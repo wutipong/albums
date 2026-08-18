@@ -11,7 +11,9 @@
     <figure>
         <a href={`/album/${album.id}/`}>
             {#if album.cover_url == ''}
+            <div class='flex flex items-center justify-center w-[300px] h-[200px]'>
                 {@html notAvailableSvg}
+            </div>
             {:else}
                 <img 
                     src={album.cover_url} 
