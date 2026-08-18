@@ -7,12 +7,10 @@
 	}
 
 	let { album, aspect = 'landscape' }: Props = $props();
-
-	let coverLoading = $state(true);
 </script>
 
 <div class="block rounded-xl p-4 hover:bg-base-100 hover:shadow-xl" id={album.id}>
-	<div class="overflow-clip rounded-xl border-1 border-base-300">
+	<div class="w-[300px] overflow-clip rounded-xl border-1 border-base-300">
 		<figure
 			class="block w-[300px]"
 			class:h-[450px]={aspect === 'portrait'}
@@ -20,7 +18,7 @@
 		>
 			<a href={`/album/${album.id}/`} class="block h-full w-full">
 				<div
-					class="relative w-[300px] rounded-xl"
+					class="relative w-[300px]"
 					class:h-[450px]={aspect === 'portrait'}
 					class:h-[200px]={aspect === 'landscape'}
 				>
@@ -28,7 +26,7 @@
 						{@html notAvailableSvg}
 					{:else}
 						<img
-							class="w-[300px] rounded-xl object-cover"
+							class="w-[300px] object-cover"
 							src={album.cover_url}
 							alt={album.id}
 							class:h-[450px]={aspect === 'portrait'}
@@ -45,7 +43,7 @@
 				</div>
 			</a>
 		</figure>
-		<div class="card-body h-4 overflow-clip" class:hidden={aspect != 'landscape'}>
+		<div class="h-[100px] w-full overflow-clip p-4" class:hidden={aspect != 'landscape'}>
 			<a href={`/album/${album.id}/`}>
 				{album.name}
 			</a>
