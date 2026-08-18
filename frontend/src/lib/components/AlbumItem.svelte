@@ -35,7 +35,9 @@
 						/>
 					{/if}
 					<div
-						class="absolute bottom-0 left-0 h-[100px] w-full bg-gradient-to-b from-base-100/0 via-base-100/70 via-30% to-base-100/100 p-4"
+						class={`absolute bottom-0 left-0 h-[100px] w-full 
+                            bg-gradient-to-b from-base-100/0 via-base-100/70 via-30% to-base-100/100 
+                            p-4 break-all`}
 						class:hidden={aspect != 'portrait'}
 					>
 						{album.name}
@@ -43,7 +45,7 @@
 				</div>
 			</a>
 		</figure>
-		<div class="h-[100px] w-full overflow-clip p-4" class:hidden={aspect != 'landscape'}>
+		<div class="h-[100px] w-full overflow-clip p-4 break-all" class:hidden={aspect != 'landscape'}>
 			<a href={`/album/${album.id}/`}>
 				{album.name}
 			</a>
