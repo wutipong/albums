@@ -6,6 +6,7 @@ import { vite as vidstack } from 'vidstack/plugins';
 
 export default defineConfig({
 	plugins: [
+		vidstack(),
 		tailwindcss(),
 		sveltekit(),
 		SvelteKitPWA({
