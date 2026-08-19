@@ -14,6 +14,8 @@
 		maximumFractionDigits: 1 // Controls decimal points (e.g., 1.5K vs 1.52K)
 	});
 
+	let progress = $derived(Number(100n * data.queueProcessed / data.queueTotal))
+
 	$inspect(data);
 </script>
 
@@ -24,7 +26,7 @@
 <div class="relative flex h-screen w-screen flex-col">
 	<NavBar />
 	<div class="overflow-auto p-4 pt-8">
-		<h2 class="text-2xl font-semibold">Statistics</h2>
+		<h2 class="text-2xl font-semibold p-4">Statistics</h2>
 		<div class="stats shadow">
 			<div class="stat">
 				<div class="stat-title">Total Assets</div>
@@ -47,7 +49,34 @@
 			</div>
 		</div>
 
-		<h2 class="text-2xl font-semibold">Processing Queue</h2>
+		<hr />
+		<h2 class="text-2xl font-semibold p-4">Processing Queue</h2>
+		<div class="m-4">
+			<progress 
+				class="progress w-full" 
+				value={progress} 
+				max={100}
+			></progress>
+			{data.queueProcessed}/{data.queueTotal}
+		</div>
+
+		<div class="stats shadow">
+			<div class="stat">
+				<div class="stat-title">#Jobs</div>
+				<div class="stat-value text-primary">{formatter.format(data.queueTotal)}</div>
+			</div>
+
+			<div class="stat">
+				<div class="stat-title">Pending Jobs</div>
+				<div class="stat-value text-primary">{formatter.format(data.queuePending)}</div>
+			</div>
+
+			<div class="stat">
+				<div class="stat-title">Failed Jobs</div>
+				<div class="stat-value text-error">{formatter.format(data.queueFailed)}</div>
+			</div>
+		</div>
+
 		<div role="alert" class="alert alert-info">
 			<Icon path={mdiInformationOutline} />
 			<span>This table shows up to 20 items being wait in the queue.</span>
