@@ -19,7 +19,7 @@ export const auth = betterAuth({
 			config: [
 				{
 					providerId: env.OIDC_PROVIDER_ID || 'placeholder-provider',
-					clientId: env.OIDC_CLIENT || 'placeholder-client',
+					clientId: env.OIDC_CLIENT_ID || 'placeholder-client',
 					clientSecret: env.OIDC_SECRET || 'placeholder-secret',
 					issuer: env.OIDC_ISSUER || 'https://placeholder-issuer.com',
 					tokenUrl: env.OIDC_TOKEN || 'https://placeholder-issuer.com',
