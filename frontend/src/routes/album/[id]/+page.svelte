@@ -94,7 +94,7 @@
 
 	async function doDeleteAlbum(id: string) {
 		await fetch(`/api/album/${id}`, { method: 'DELETE' });
-		goto('/')
+		goto('/');
 	}
 </script>
 
@@ -198,7 +198,7 @@
 		<p class="py-4">Delete the album {data.name}??</p>
 		<div class="modal-action">
 			<form method="dialog">
-				<button class="btn btn-soft btn-error" onclick={()=>doDeleteAlbum(data.id)}>
+				<button class="btn btn-soft btn-error" onclick={() => doDeleteAlbum(data.id)}>
 					<Icon path={mdiDelete} />
 					Delete
 				</button>
@@ -240,13 +240,15 @@
 			<Icon path={mdiDownload} /> Download
 		</a>
 	</li>
-	<li>
-		<button
-			onclick={() => {
-				setAlbumCover(params.id, asset.id);
-			}}
-		>
-			<Icon path={mdiImageAlbum} /> Set as album cover
-		</button>
-	</li>
+	{#if data.user.role == 'admin'}
+		<li>
+			<button
+				onclick={() => {
+					setAlbumCover(params.id, asset.id);
+				}}
+			>
+				<Icon path={mdiImageAlbum} /> Set as album cover
+			</button>
+		</li>
+	{/if}
 {/snippet}
