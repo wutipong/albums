@@ -1,33 +1,18 @@
 <script lang="ts">
 	import { authClient } from '$lib/auth-client';
 	import NavBar from '$lib/components/NavBar.svelte';
-	import { mdiAccount, mdiAlert, mdiLogout } from '@mdi/js';
+	import { mdiAlert, mdiKeyMinus, mdiKeyPlus, mdiLogout } from '@mdi/js';
 	import Icon from 'mdi-svelte';
 	import { onMount } from 'svelte';
-	import { createHash } from '@better-auth/utils/hash';
 	import type { ApiKey } from '@better-auth/api-key/types';
-
-	let name = $state('');
-	let email = $state('');
-	let avatarSrc = $state('');
 
 	let apiKeys: Omit<ApiKey, 'key'>[] = $state([]);
 	let apiKeyModal: HTMLDialogElement;
 	let apiNewKey = $state('');
 
+	let { data } = $props();
+
 	onMount(async () => {
-		const session = await authClient.getSession();
-		if (!session.data) {
-			console.log('session not found?');
-			return;
-		}
-
-		name = session.data.user.name;
-		email = session.data.user.email;
-		const hashVal = await createHash('SHA-256', 'hex').digest(email);
-
-		avatarSrc = `https://gravatar.com/avatar/${hashVal}`;
-
 		const keys = await authClient.apiKey.list();
 		if (keys.data) {
 			apiKeys = keys.data.apiKeys;
@@ -69,41 +54,52 @@
 			<div class="flex flex-row gap-8">
 				<div class="avatar">
 					<div class="h-24 w-24 rounded-full">
-						<img src={avatarSrc} alt="avatar" class="my-0!" />
+						<img src={data.avatarSrc} alt="avatar" class="my-0!" />
 					</div>
 				</div>
 				<div>
-					<h2 class="mt-0">{name}</h2>
-					<p><a href={`mailto:${email}`}>{email}</a></p>
+					<h2 class="mt-0">{data.name}</h2>
+					<p><a href={`mailto:${data.email}`}>{data.email}</a></p>
 					<a class="btn btn-soft" href="/logout" data-sveltekit-preload-data="off">
 						<Icon path={mdiLogout} />Logout
 					</a>
 				</div>
 			</div>
 			<hr />
-
-			<h2>API Keys</h2>
-			<table>
-				<thead>
-					<tr>
-						<th>Key</th>
-						<th>Created At</th>
-						<th>Action</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each apiKeys as apiKey}
+			{#if data.role == 'admin'}
+				<h2>API Keys</h2>
+				<table>
+					<thead>
 						<tr>
-							<td>{apiKey.start}...</td>
-							<td>{apiKey.createdAt.toLocaleString()}</td>
+							<th>Key</th>
+							<th>Created At</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each apiKeys as apiKey}
+							<tr>
+								<td>{apiKey.start}...</td>
+								<td>{apiKey.createdAt.toLocaleString()}</td>
+								<td>
+									<button class="btn btn-sm" onclick={() => deleteApiKey(apiKey.id)}>
+										<Icon path={mdiKeyMinus} /> Delete
+									</button>
+								</td>
+							</tr>
+						{/each}
+						<tr>
+							<td></td>
+							<td></td>
 							<td>
-								<button class="btn btn-sm" onclick={() => deleteApiKey(apiKey.id)}> Delete </button>
+								<button class="btn btn-sm btn-primary" onclick={() => addNewApiKey()}>
+									<Icon path={mdiKeyPlus} /> Add
+								</button>
 							</td>
 						</tr>
-					{/each}
-				</tbody>
-			</table>
-			<button class="btn w-full btn-primary" onclick={() => addNewApiKey()}>Add new API key</button>
+					</tbody>
+				</table>
+			{/if}
 		</article>
 	</div>
 </div>
