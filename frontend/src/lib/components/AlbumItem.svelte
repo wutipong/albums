@@ -9,8 +9,8 @@
 	let { album, aspect = 'landscape' }: Props = $props();
 </script>
 
-<div class="block rounded-xl p-4 hover:bg-base-100 hover:shadow-xl" id={album.id}>
-	<div class="w-[300px] overflow-clip rounded-xl border-1 border-base-300">
+<div class="block rounded-xl p-4 hover:bg-base-content/20 hover:shadow-xl" id={album.id}>
+	<div class="w-[300px] overflow-clip rounded-xl border-1 border-base-content/20">
 		<figure
 			class="block w-[300px]"
 			class:h-[450px]={aspect === 'portrait'}

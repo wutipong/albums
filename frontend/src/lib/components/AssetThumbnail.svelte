@@ -17,7 +17,7 @@
 <button
 	tabindex="0"
 	class={`block cursor-pointer overflow-hidden rounded-xl p-4 
-		hover:bg-base-100 hover:shadow-xl`}
+		hover:bg-base-content/20 hover:shadow-xl`}
 	onmouseenter={() => (preview = true)}
 	onmouseleave={() => (preview = false)}
 	onclick={() => {
@@ -28,7 +28,7 @@
 	<div class="relative h-full w-full">
 		<div
 			class:hidden={preview}
-			class="box-border h-full w-full overflow-hidden rounded-xl border-1 border-base-300"
+			class="box-border h-full w-full overflow-hidden rounded-xl border-1 border-base-content/20"
 			style={`width: ${thumbnailWidth}px; height: ${thumbnailHeight}px;`}
 		>
 			{#if asset.thumbnail_url === ''}
@@ -49,7 +49,7 @@
 
 		<div
 			class:hidden={!preview}
-			class="box-border h-full w-full overflow-hidden rounded-xl border-1 border-base-300"
+			class="box-border h-full w-full overflow-hidden rounded-xl border-1 border-base-content/20"
 			style={`width: ${thumbnailWidth}px; height: ${thumbnailHeight}px;`}
 		>
 			{#if asset.preview_url == ''}
