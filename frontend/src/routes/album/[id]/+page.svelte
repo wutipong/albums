@@ -4,8 +4,10 @@
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
 	import {
+		mdiAlert,
 		mdiClipboardOutline,
 		mdiClose,
+		mdiDelete,
 		mdiDownload,
 		mdiImageAlbum,
 		mdiInformationOutline
@@ -14,6 +16,7 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import AssetInfoDialog from '$lib/components/AssetInfoDialog.svelte';
 	import { copyImageToClipboard } from '$lib/clipboard';
+	import { goto } from '$app/navigation';
 
 	let { data, params }: PageProps = $props();
 
@@ -34,6 +37,7 @@
 	let toast: Toast;
 
 	let infoModal: HTMLDialogElement;
+	let confirmDeleteModal: HTMLDialogElement;
 	let assetInfoDialog: AssetInfoDialog;
 
 	function findPrevious(assets: any[], index: number): number {
@@ -87,6 +91,11 @@
 		currentIndex = index;
 		asset = data.assets[index];
 	}
+
+	async function doDeleteAlbum(id: string) {
+		await fetch(`/api/album/${id}`, { method: 'DELETE' });
+		goto('/');
+	}
 </script>
 
 <svelte:head>
@@ -94,20 +103,20 @@
 </svelte:head>
 
 <div class="relative flex h-screen w-screen flex-col">
-	<NavBar album={data}></NavBar>
+	<NavBar album={data} user={data.user}></NavBar>
 	<div class="flex w-full items-center gap-2 border-1 border-base-300 bg-base-300 p-2 shadow">
 		<button class="btn btn-ghost" onclick={() => infoModal.showModal()}>
 			<Icon path={mdiInformationOutline} />
 		</button>
 
-		<span class="flex-1 overflow-hidden md:hidden">
+		<span class="flex flex-1 flex-row overflow-hidden md:hidden">
 			<div class="flex animate-marquee whitespace-nowrap">
 				{data.name}
 				{data.name}
 			</div>
 		</span>
 
-		<span class="hidden flex-1 overflow-ellipsis md:block">
+		<span class="flex hidden flex-1 flex-row overflow-ellipsis md:block">
 			<div class="flex whitespace-nowrap">
 				{data.name}
 			</div>
@@ -163,6 +172,36 @@
 		</table>
 		<div class="modal-action">
 			<form method="dialog">
+				{#if data.user.role == 'admin'}
+					<button class="btn btn-soft btn-error" onclick={() => confirmDeleteModal.showModal()}>
+						<Icon path={mdiDelete} />
+						Delete
+					</button>
+				{/if}
+				<!-- if there is a button in form, it will close the modal -->
+				<button class="btn btn-secondary">
+					<Icon path={mdiClose} />
+					Close
+				</button>
+			</form>
+		</div>
+	</div>
+</dialog>
+
+<dialog bind:this={confirmDeleteModal} class="modal">
+	<div class="modal-box">
+		<h3 class="text-lg font-bold">Delete</h3>
+		<div role="alert" class="alert alert-error">
+			<Icon path={mdiAlert} />
+			<span>Deleting album will also delete the associated assets.</span>
+		</div>
+		<p class="py-4">Delete the album {data.name}??</p>
+		<div class="modal-action">
+			<form method="dialog">
+				<button class="btn btn-soft btn-error" onclick={() => doDeleteAlbum(data.id)}>
+					<Icon path={mdiDelete} />
+					Delete
+				</button>
 				<!-- if there is a button in form, it will close the modal -->
 				<button class="btn btn-secondary">
 					<Icon path={mdiClose} />
@@ -201,13 +240,15 @@
 			<Icon path={mdiDownload} /> Download
 		</a>
 	</li>
-	<li>
-		<button
-			onclick={() => {
-				setAlbumCover(params.id, asset.id);
-			}}
-		>
-			<Icon path={mdiImageAlbum} /> Set as album cover
-		</button>
-	</li>
+	{#if data.user.role == 'admin'}
+		<li>
+			<button
+				onclick={() => {
+					setAlbumCover(params.id, asset.id);
+				}}
+			>
+				<Icon path={mdiImageAlbum} /> Set as album cover
+			</button>
+		</li>
+	{/if}
 {/snippet}

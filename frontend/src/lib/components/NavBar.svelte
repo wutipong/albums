@@ -1,7 +1,14 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { authClient } from '$lib/auth-client';
-	import { mdiImageSearch, mdiImageAlbum, mdiLogout, mdiAccount, mdiClose } from '@mdi/js';
+	import {
+		mdiImageSearch,
+		mdiImageAlbum,
+		mdiLogout,
+		mdiAccount,
+		mdiClose,
+		mdiShieldCrownOutline,
+		mdiMenu
+	} from '@mdi/js';
 	import Icon from 'mdi-svelte';
 	import { onMount } from 'svelte';
 	import { createHash } from '@better-auth/utils/hash';
@@ -10,7 +17,7 @@
 	let search = $state('');
 	let searchDialog: HTMLDialogElement;
 
-	let { album = null } = $props();
+	let { album = null, onMenuBtn = null, user } = $props();
 	let avatarSrc = $state('');
 
 	let albumsUrl = $derived.by(() => {
@@ -30,32 +37,41 @@
 	}
 
 	onMount(async () => {
-		const session = await authClient.getSession();
-		if (!session.data) {
-			console.log('session not found?');
-			return;
-		}
-
-		const email = session.data?.user.email;
-		const hashVal = await createHash('SHA-256', 'hex').digest(email);
+		const hashVal = await createHash('SHA-256', 'hex').digest(user.email);
 
 		avatarSrc = `https://gravatar.com/avatar/${hashVal} `;
 	});
 </script>
 
 <div class="navbar shadow-sm">
-	<div class="flex-1">
+	<div class="flex flex-1 flex-row">
+		<button
+			class="btn btn-square btn-ghost lg:hidden"
+			class:hidden={onMenuBtn == null}
+			onclick={() => onMenuBtn()}
+		>
+			<Icon path={mdiMenu} />
+		</button>
+
 		<div class="ms-2 w-32 text-base-content">
 			{@html logo}
 		</div>
 	</div>
 	<div class="flex-none">
+		<ul class="menu menu-horizontal px-1" class:hidden={user.role != 'admin'}>
+			<li>
+				<a href="/admin">
+					<Icon path={mdiShieldCrownOutline} />
+					<div class="hidden md:block">Administration</div>
+				</a>
+			</li>
+		</ul>
 		<ul class="menu menu-horizontal px-1">
 			<li>
 				<a href={albumsUrl}>
 					<Icon path={mdiImageAlbum} />
-					<div class="hidden md:block">Albums</div></a
-				>
+					<div class="hidden md:block">Albums</div>
+				</a>
 			</li>
 		</ul>
 		<ul class="menu menu-horizontal px-1 md:hidden">

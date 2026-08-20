@@ -2,10 +2,11 @@ import { db } from '$lib/server/db';
 import type { PageServerLoad } from './$types';
 
 import { createResponseAssetList } from '$lib/server/asset';
+import { auth } from '$lib/server/auth';
 
 export const ssr = false;
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 	const { id } = params;
 
 	const assets = await db
@@ -19,5 +20,5 @@ export const load: PageServerLoad = async ({ params }) => {
 	const outAssets = await createResponseAssetList(assets);
 	const album = await db.selectFrom('albums').selectAll().where('id', '=', id).executeTakeFirst();
 
-	return { ...album, assets: outAssets };
+	return { ...album, assets: outAssets, user: locals.user, session: locals.session };
 };

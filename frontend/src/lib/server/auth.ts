@@ -1,7 +1,7 @@
 import { getRequestEvent } from '$app/server';
 import { env } from '$env/dynamic/private';
 import { betterAuth } from 'better-auth';
-import { genericOAuth } from 'better-auth/plugins';
+import { admin, genericOAuth } from 'better-auth/plugins';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { apiKey } from '@better-auth/api-key';
 import { Pool } from 'pg';
@@ -11,6 +11,7 @@ export const auth = betterAuth({
 		connectionString: env.DATABASE_URL
 	}),
 	plugins: [
+		admin(),
 		sveltekitCookies(getRequestEvent),
 		apiKey({
 			rateLimit: { enabled: false }
@@ -25,9 +26,20 @@ export const auth = betterAuth({
 					tokenUrl: env.OIDC_TOKEN || 'https://placeholder-issuer.com',
 					authorizationUrl: env.OIDC_AUTHORIZE || 'https://placeholder-issuer.com',
 					requireIssuerValidation: false,
-					scopes: ['openid', 'email', 'profile']
+					scopes: ['openid', 'email', 'profile', 'groups'],
+					mapProfileToUser: async (profile) => {
+						const groups = profile.groups;
+						const isAdmin = groups?.includes('admin');
+						
+						console.log("mapProfileToUser")
+						return {
+							name: profile.name,
+							email: profile.email,
+							image: profile.picture,
+							role: isAdmin? 'admin' : 'user' // Maps directly to user.additionalFields.role
+						};
+					}
 				}
-				// Add more providers as needed
 			]
 		})
 	]

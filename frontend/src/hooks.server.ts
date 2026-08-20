@@ -1,30 +1,24 @@
 import { sequence } from '@sveltejs/kit/hooks';
-import { redirect, type Handle } from '@sveltejs/kit';
+import { error, redirect, type Handle, type ServerInit } from '@sveltejs/kit';
 import { auth } from '$lib/server/auth';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
-import { error } from 'node:console';
 import { dev, building } from '$app/environment';
 import { getMigrations } from 'better-auth/db/migration';
 
-const runMigrations = async () => {
-	// Skip if we are in development mode OR currently building the app
-	if (dev || building) return;
-
-	try {
-		const { runMigrations: execute } = await getMigrations(auth.options);
-		await execute();
-		console.log('Better Auth database migrations applied.');
-	} catch (e) {
-		console.error('Better Auth migration failed:', e);
-
-		process.exit(1);
+export const init: ServerInit = async () => {
+	if (!dev && !building) {
+		try {
+			const { runMigrations: execute } = await getMigrations(auth.options);
+			await execute();
+			console.log('Better Auth database migrations applied.');
+		} catch (e) {
+			console.error('Better Auth migration failed:', e);
+			process.exit(1);
+		}
 	}
 };
 
-await runMigrations();
-
 const handleBetterAuth: Handle = async ({ event, resolve }) => {
-	// path to your auth file
 	const session = await auth.api.getSession({ headers: event.request.headers });
 
 	if (session) {
@@ -42,18 +36,18 @@ const handleSession: Handle = async ({ event, resolve }) => {
 		return handleSessionApiKey({ event, resolve });
 	}
 
-	const session = event.locals.session;
-
-	if (event.url.pathname.startsWith('/login')) {
+	if (event.url.pathname == '/login') {
 		return resolve(event);
 	}
 
+	const session = event.locals.session;
+
 	if (session == null) {
-		redirect(307, '/login');
+		redirect(307, '/');
 	}
 
 	if (Date.now() > session.expiresAt) {
-		redirect(307, '/login');
+		redirect(307, '/');
 	}
 
 	return resolve(event);
@@ -62,7 +56,7 @@ const handleSession: Handle = async ({ event, resolve }) => {
 const handleSessionApiKey: Handle = async ({ event, resolve }) => {
 	const apiKey = event.request.headers.get('x-api-key');
 	if (!apiKey) {
-		throw error('apikey is missing.');
+		throw error(401, 'apikey is missing.');
 	}
 
 	const resp = await auth.api.verifyApiKey({
@@ -72,14 +66,31 @@ const handleSessionApiKey: Handle = async ({ event, resolve }) => {
 	});
 
 	if (resp.error) {
-		throw resp.error.message;
+		error(401, resp.error.message);
 	}
 
 	if (!resp.valid) {
-		throw error('API key is invalid');
+		error(401, 'API key is invalid');
+	}
+
+	if (event.url.pathname !== '/api' && !event.url.pathname.startsWith('/api/')) {
+		error(401, 'non-API access prohibited.');
 	}
 
 	return resolve(event);
 };
 
-export const handle = sequence(handleBetterAuth, handleSession);
+const handleAdminSession: Handle = async ({ event, resolve }) => {
+	if (!event.url.pathname.startsWith('/admin')) {
+		return resolve(event);
+	}
+
+	const session = await auth.api.getSession({ headers: event.request.headers });
+	if (session?.user.role !== 'admin') {
+		error(403, 'forbidden.');
+	}
+
+	return resolve(event);
+};
+
+export const handle = sequence(handleBetterAuth, handleAdminSession, handleSession);
