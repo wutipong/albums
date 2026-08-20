@@ -22,6 +22,5 @@
 		{@html pwaInfo.webManifest.linkTag}
 	{/if}
 </svelte:head>
-<div class="vh-full vw-full bg-base-200">
-	{@render children()}
-</div>
+
+{@render children()}
