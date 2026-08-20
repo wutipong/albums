@@ -4,11 +4,12 @@
 	import Icon from 'mdi-svelte';
 	import { page } from '$app/state';
 
-	let { children } = $props();
+	let { data, children } = $props();
 	let drawerToggle: HTMLInputElement;
 </script>
 
 <NavBar
+	user={data.user}
 	onMenuBtn={() => {
 		drawerToggle.checked = !drawerToggle.checked;
 	}}

@@ -20,7 +20,5 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const outAssets = await createResponseAssetList(assets);
 	const album = await db.selectFrom('albums').selectAll().where('id', '=', id).executeTakeFirst();
 
-	const user = locals?.user
-
-	return { ...album, assets: outAssets, user };
+	return { ...album, assets: outAssets, user: locals.user, session: locals.session };
 };

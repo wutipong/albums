@@ -5,7 +5,7 @@ import { db } from '$lib/server/db';
 import { cosineDistance } from 'pgvector/kysely';
 import { createResponseAssetList } from '$lib/server/asset';
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, locals }) => {
 	const search = url.searchParams.get('search');
 
 	if (!search) {
@@ -33,5 +33,5 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	const outAssets = await createResponseAssetList(assets);
 
-	return { search, assets: outAssets };
+	return { search, assets: outAssets, session: locals.session, user: locals.user };
 };

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { authClient } from '$lib/auth-client';
 	import {
 		mdiImageSearch,
 		mdiImageAlbum,
@@ -18,7 +17,7 @@
 	let search = $state('');
 	let searchDialog: HTMLDialogElement;
 
-	let { album = null, onMenuBtn = null } = $props();
+	let { album = null, onMenuBtn = null, user } = $props();
 	let avatarSrc = $state('');
 
 	let albumsUrl = $derived.by(() => {
@@ -29,8 +28,6 @@
 		}
 	});
 
-	let role = $state('user');
-
 	function doSearch() {
 		if (!search) return;
 		const url = new URL('/search', location.origin);
@@ -40,19 +37,7 @@
 	}
 
 	onMount(async () => {
-		const session = await authClient.getSession();
-		if (!session.data) {
-			console.log('session not found?');
-			return;
-		}
-
-		console.log(session);
-
-		const user = session.data.user;
-		role = user.role;
-
-		const email = session.data?.user.email;
-		const hashVal = await createHash('SHA-256', 'hex').digest(email);
+		const hashVal = await createHash('SHA-256', 'hex').digest(user.email);
 
 		avatarSrc = `https://gravatar.com/avatar/${hashVal} `;
 	});
@@ -73,7 +58,7 @@
 		</div>
 	</div>
 	<div class="flex-none">
-		<ul class="menu menu-horizontal px-1" class:hidden={role != 'admin'}>
+		<ul class="menu menu-horizontal px-1" class:hidden={user.role != 'admin'}>
 			<li>
 				<a href="/admin">
 					<Icon path={mdiShieldCrownOutline} />

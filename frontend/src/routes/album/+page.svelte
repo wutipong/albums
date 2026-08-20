@@ -39,7 +39,7 @@
 </svelte:head>
 
 <div class="relative flex h-screen w-screen flex-col">
-	<NavBar />
+	<NavBar user={data.user} />
 
 	<div class="flex w-full justify-end gap-2 border-1 border-base-300 bg-base-300 p-2 shadow">
 		<label class="select w-full max-w-xs">

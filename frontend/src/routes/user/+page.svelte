@@ -5,6 +5,7 @@
 	import Icon from 'mdi-svelte';
 	import { onMount } from 'svelte';
 	import type { ApiKey } from '@better-auth/api-key/types';
+	import { createHash } from '@better-auth/utils/hash';
 
 	let apiKeys: Omit<ApiKey, 'key'>[] = $state([]);
 	let apiKeyModal: HTMLDialogElement;
@@ -12,11 +13,17 @@
 
 	let { data } = $props();
 
+	let avatarSrc = $state('')
+
 	onMount(async () => {
 		const keys = await authClient.apiKey.list();
 		if (keys.data) {
 			apiKeys = keys.data.apiKeys;
 		}
+
+		const hashVal = await createHash('SHA-256', 'hex').digest(data.user.email);
+
+		avatarSrc = `https://gravatar.com/avatar/${hashVal} `;
 	});
 
 	async function addNewApiKey() {
@@ -47,26 +54,26 @@
 </svelte:head>
 
 <div class="flex h-screen w-screen flex-col">
-	<NavBar />
+	<NavBar user={data.user}/>
 
 	<div class="overflow-auto p-4 pt-8">
 		<article class="mx-auto prose h-full w-full md:w-200">
 			<div class="flex flex-row gap-8">
 				<div class="avatar">
 					<div class="h-24 w-24 rounded-full">
-						<img src={data.avatarSrc} alt="avatar" class="my-0!" />
+						<img src={avatarSrc} alt="avatar" class="my-0!" />
 					</div>
 				</div>
 				<div>
-					<h2 class="mt-0">{data.name}</h2>
-					<p><a href={`mailto:${data.email}`}>{data.email}</a></p>
+					<h2 class="mt-0">{data.user.name}</h2>
+					<p><a href={`mailto:${data.user.email}`}>{data.user.email}</a></p>
 					<a class="btn btn-soft" href="/logout" data-sveltekit-preload-data="off">
 						<Icon path={mdiLogout} />Logout
 					</a>
 				</div>
 			</div>
 			<hr />
-			{#if data.role == 'admin'}
+			{#if data.user.role == 'admin'}
 				<h2>API Keys</h2>
 				<table>
 					<thead>
@@ -109,7 +116,7 @@
 		<h3 class="text-lg font-bold">New key added</h3>
 		<div role="alert" class="alert py-4 alert-warning">
 			<Icon path={mdiAlert} />
-			<span>Warning: This API key will not be visible again! </span>
+			<span>This API key will not be visible again! </span>
 		</div>
 		<p class="py-4 font-mono text-wrap break-all">{apiNewKey}</p>
 		<div class="modal-action">
