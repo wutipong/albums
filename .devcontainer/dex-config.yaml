@@ -20,6 +20,12 @@ staticPasswords:
     hash: "$2a$12$7wNikYGmkFdMMCCfhKSZ1.gPKeOY1fnqY2XVZSH4ZT8nGPigwsmJS"
     groups: [admin]
 
+  - email: "user@example.com"
+    password: "password"
+    username: "user"
+    userID: "69ca6ea6-ac37-4543-a3b7-5923eada94bf"
+    hash: "$2a$12$7wNikYGmkFdMMCCfhKSZ1.gPKeOY1fnqY2XVZSH4ZT8nGPigwsmJS"
+
 # Configure your client credentials here
 staticClients:
   - id: albums
