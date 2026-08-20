@@ -18,6 +18,7 @@ staticPasswords:
     username: "admin"
     userID: "08a515a8-1200-400d-a34e-37966f3630f5"
     hash: "$2a$12$7wNikYGmkFdMMCCfhKSZ1.gPKeOY1fnqY2XVZSH4ZT8nGPigwsmJS"
+    groups: [admin]
 
 # Configure your client credentials here
 staticClients:

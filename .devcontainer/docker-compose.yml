@@ -76,7 +76,7 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
   dex:
-    image: ghcr.io/dexidp/dex:v2.41.0
+    image: ghcr.io/dexidp/dex:v2.45.1
     command: dex serve /etc/dex/cfg/config.yaml
     volumes:
       - ./dex-config.yaml:/etc/dex/cfg/config.yaml:ro

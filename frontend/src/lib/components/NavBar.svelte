@@ -1,7 +1,14 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { authClient } from '$lib/auth-client';
-	import { mdiImageSearch, mdiImageAlbum, mdiLogout, mdiAccount, mdiClose } from '@mdi/js';
+	import {
+		mdiImageSearch,
+		mdiImageAlbum,
+		mdiLogout,
+		mdiAccount,
+		mdiClose,
+		mdiShieldCrownOutline
+	} from '@mdi/js';
 	import Icon from 'mdi-svelte';
 	import { onMount } from 'svelte';
 	import { createHash } from '@better-auth/utils/hash';
@@ -21,6 +28,8 @@
 		}
 	});
 
+	let role = $state('user');
+
 	function doSearch() {
 		if (!search) return;
 		const url = new URL('/search', location.origin);
@@ -36,6 +45,11 @@
 			return;
 		}
 
+		console.log(session)
+
+		const user = session.data.user;
+		role = user.role;
+
 		const email = session.data?.user.email;
 		const hashVal = await createHash('SHA-256', 'hex').digest(email);
 
@@ -50,12 +64,20 @@
 		</div>
 	</div>
 	<div class="flex-none">
+		<ul class="menu menu-horizontal px-1" class:hidden={role != 'admin'}>
+			<li>
+				<a href="/admin">
+					<Icon path={mdiShieldCrownOutline} />
+					<div class="hidden md:block">Administration</div>
+				</a>
+			</li>
+		</ul>
 		<ul class="menu menu-horizontal px-1">
 			<li>
 				<a href={albumsUrl}>
 					<Icon path={mdiImageAlbum} />
-					<div class="hidden md:block">Albums</div></a
-				>
+					<div class="hidden md:block">Albums</div>
+				</a>
 			</li>
 		</ul>
 		<ul class="menu menu-horizontal px-1 md:hidden">
