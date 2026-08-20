@@ -50,7 +50,7 @@
 				<option value="name asc">Name Ascending</option>
 				<option value="name desc">Name Descending</option>
 				<option value="created_at asc">Creation Time Ascending</option>
-				<option value="created_at desc">Creation Time Ascending</option>
+				<option value="created_at desc">Creation Time Descending</option>
 			</select>
 		</label>
 
