@@ -1,14 +1,11 @@
 <script lang="ts">
 	import AlbumItem from '$lib/components/AlbumItem.svelte';
-	import type { PageData, PageProps } from './$types';
+	import type { PageProps } from './$types';
 	import NavBar from '$lib/components/NavBar.svelte';
 	import { mdiFilter, mdiOrderBoolAscending } from '@mdi/js';
 	import Icon from 'mdi-svelte';
-	import { authClient } from '$lib/auth-client';
 
 	let { data }: PageProps = $props();
-
-	const session = authClient.useSession();
 
 	let filter = $state('');
 	let order = $state('name asc');
