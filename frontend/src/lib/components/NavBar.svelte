@@ -7,7 +7,8 @@
 		mdiLogout,
 		mdiAccount,
 		mdiClose,
-		mdiShieldCrownOutline
+		mdiShieldCrownOutline,
+		mdiMenu
 	} from '@mdi/js';
 	import Icon from 'mdi-svelte';
 	import { onMount } from 'svelte';
@@ -17,7 +18,7 @@
 	let search = $state('');
 	let searchDialog: HTMLDialogElement;
 
-	let { album = null } = $props();
+	let { album = null, onMenuBtn = null } = $props();
 	let avatarSrc = $state('');
 
 	let albumsUrl = $derived.by(() => {
@@ -45,7 +46,7 @@
 			return;
 		}
 
-		console.log(session)
+		console.log(session);
 
 		const user = session.data.user;
 		role = user.role;
@@ -58,7 +59,15 @@
 </script>
 
 <div class="navbar shadow-sm">
-	<div class="flex-1">
+	<div class="flex flex-1 flex-row">
+		<button
+			class="btn btn-square btn-ghost lg:hidden"
+			class:hidden={onMenuBtn == null}
+			onclick={() => onMenuBtn()}
+		>
+			<Icon path={mdiMenu} />
+		</button>
+
 		<div class="ms-2 w-32 text-base-content">
 			{@html logo}
 		</div>
