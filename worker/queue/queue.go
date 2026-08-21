@@ -69,6 +69,13 @@ func Init(ctx context.Context) error {
 				j.Payload["albumId"].(string),
 				j.Payload["assetId"].(string),
 			)
+
+		case "populate-embedding":
+			err = PopulateImageEmbedding(
+				ctx,
+				minioClient,
+				j.Payload["assetId"].(string),
+			)
 		}
 
 		if err != nil {

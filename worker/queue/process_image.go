@@ -3,16 +3,12 @@ package queue
 import (
 	"bytes"
 	"context"
-	"encoding/binary"
 	"fmt"
 	"log/slog"
-	"math"
 	"os"
 	"path/filepath"
 
 	"github.com/minio/minio-go/v7"
-	"github.com/pgvector/pgvector-go"
-	"github.com/wutipong/albums/worker/clip"
 	"github.com/wutipong/albums/worker/db"
 	vips "github.com/wutipong/albums/worker/vips"
 )
@@ -81,10 +77,7 @@ func processImageAsset(ctx context.Context, minioClient *minio.Client, asset *db
 		return fmt.Errorf("unable to populate thumbnail: %e", err)
 	}
 
-	err = PopulateImageEmbedding(ctx, asset, original)
-	if err != nil {
-		return fmt.Errorf("unable to populate image embedding: %w", err)
-	}
+	/// TODO: add populate embedding to the queue.
 	return nil
 }
 
@@ -361,72 +354,4 @@ func createThumbnailForAnimationImage(original *vips.Image, err error) (*vips.Im
 		slog.Int("pages", thumbnail.Pages()),
 	)
 	return thumbnail, nil
-}
-
-func PopulateImageEmbedding(
-	ctx context.Context,
-	asset *db.Asset,
-	original *vips.Image,
-) error {
-	slog.Info("populating image embedding for asset", slog.String("id", asset.ID.String()))
-	spec, err := clip.GetImageSpec(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to get image spec: %w", err)
-	}
-	copyOptions := vips.DefaultCopyOptions()
-	img, _ := original.Copy(copyOptions)
-
-	defer img.Close()
-
-	err = img.Autorot(nil)
-	if err != nil {
-		return fmt.Errorf("unable to perform auto rotating: %w", err)
-	}
-
-	width := img.Width()
-	pageHeight := img.PageHeight()
-
-	img.ExtractArea(0, 0, width, pageHeight)
-	img.SetPages(1)
-
-	options := vips.DefaultThumbnailImageOptions()
-	options.Height = int(spec.Height)
-	options.Crop = vips.InterestingAttention
-	options.Size = vips.SizeBoth
-
-	err = img.ThumbnailImage(int(spec.Width), options)
-	if err != nil {
-		return fmt.Errorf("unable to resize image: %w", err)
-	}
-
-	buff, err := img.WebpsaveBuffer(vips.DefaultWebpsaveBufferOptions())
-	if err != nil {
-		return fmt.Errorf("unable to save image: %w", err)
-	}
-
-	resp, err := clip.EncodeImage(ctx, buff)
-	if err != nil {
-		return fmt.Errorf("unable to get image embedding: %w", err)
-	}
-
-	embedding, err := ParseNumpyBytes(resp.Embedding)
-	if err != nil {
-		return fmt.Errorf("unable to decode embedding: %w", err)
-	}
-	asset.ImageEmbedding = &embedding
-
-	return nil
-}
-
-func ParseNumpyBytes(b []byte) (pgvector.Vector, error) {
-	// 4 bytes per float32
-	length := len(b) / 4
-	vec := make([]float32, length)
-
-	for i := range length {
-		bits := binary.LittleEndian.Uint32(b[i*4 : (i+1)*4])
-		vec[i] = math.Float32frombits(bits)
-	}
-
-	return pgvector.NewVector(vec), nil
 }

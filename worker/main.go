@@ -174,8 +174,25 @@ func populateImageEmbeddings(ctx context.Context) error {
 		return fmt.Errorf("unable to retrieve assets with embedding missing :%w", err)
 	}
 
+	endpoint, secure, err := queue.GetMinioEndpoint(os.Getenv("AWS_ENDPOINT_URL"))
+	if err != nil {
+		return fmt.Errorf("unable to get endpoint: %w", err)
+	}
+
+	accessKeyId := os.Getenv("AWS_ACCESS_KEY_ID")
+	secret := os.Getenv("AWS_SECRET_ACCESS_KEY")
+
+	minioClient, err := minio.New(endpoint, &minio.Options{
+		Creds:        credentials.NewStaticV4(accessKeyId, secret, ""),
+		Secure:       secure,
+		BucketLookup: minio.BucketLookupPath,
+	})
+	if err != nil {
+		return fmt.Errorf("unable to create minio client: %w", err)
+	}
+
 	for _, asset := range assets {
-		err = queue.PopulateImageEmbedding(ctx, &asset, nil)
+		err = queue.DoPopulateEmbedding(ctx, minioClient, &asset)
 		if err != nil {
 			slog.Error("unable to populate embedding", slog.String("error", err.Error()))
 			continue
