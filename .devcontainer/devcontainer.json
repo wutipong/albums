@@ -53,7 +53,8 @@
     "vscode": {
       "extensions": [
         "svelte.svelte-vscode",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "DrBlury.protobuf-vsc"
       ],
       "settings": {
         "python.terminal.activateEnvironment": false

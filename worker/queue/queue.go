@@ -70,7 +70,7 @@ func Init(ctx context.Context) error {
 				j.Payload["assetId"].(string),
 			)
 
-		case "populate-embedding":
+		case "populate-image-embedding":
 			err = PopulateImageEmbedding(
 				ctx,
 				minioClient,
@@ -153,6 +153,33 @@ func EnqueuePopulateAlbumsCover(ctx context.Context, albumId string, assetId str
 		slog.String("albumId", albumId),
 		slog.String("assetId", assetId),
 		slog.String("command", "populate-album-cover"),
+	)
+
+	return nil
+}
+
+func EnqueuePopulateImageEmbedding(ctx context.Context, id string) error {
+	maxRetries := MAX_RETRIES
+	j := &jobs.Job{
+		Queue: "asset-processing",
+		Payload: map[string]any{
+			"command":    "populate-image-embedding",
+			"assetId":    id,
+			"created_at": time.Now().UTC(),
+		},
+		MaxRetries: &maxRetries,
+	}
+
+	jobId, err := queue.Enqueue(ctx, j)
+	if err != nil {
+		return fmt.Errorf("unable to add job: %w", err)
+	}
+
+	slog.Info(
+		"job added",
+		slog.String("job", jobId),
+		slog.String("assetId", id),
+		slog.String("command", "populate-image-embedding"),
 	)
 
 	return nil

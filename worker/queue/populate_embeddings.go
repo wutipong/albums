@@ -83,6 +83,8 @@ func DoPopulateEmbedding(ctx context.Context, minioClient *minio.Client, asset *
 	}
 	defer object.Close()
 
+	object.Stat()
+
 	source := vips.NewSource(object)
 	defer source.Close()
 
