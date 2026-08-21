@@ -49,6 +49,7 @@
 			<thead>
 				<tr>
 					<th>ID</th>
+					<th>Command</th>
 					<th>Asset ID</th>
 					<th>Type</th>
 					<th>Album</th>
@@ -64,6 +65,7 @@
 					{#each data.queueItems as asset, index}
 						<tr>
 							<th>{asset.id}</th>
+							<th>{asset.command}</th>
 							<td>{asset.asset_id}</td>
 							<td>{asset.type}</td>
 							<td
@@ -78,6 +80,7 @@
 			<tfoot>
 				<tr>
 					<th>ID</th>
+					<th>Command</th>
 					<th>Asset ID</th>
 					<th>Type</th>
 					<th>Album</th>

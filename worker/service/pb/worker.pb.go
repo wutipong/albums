@@ -427,6 +427,86 @@ func (*UpdateAllImageEmbeddingResponse) Descriptor() ([]byte, []int) {
 	return file_worker_proto_rawDescGZIP(), []int{7}
 }
 
+type UpdateAllAlbumThumbnailRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OnlyMissing   bool                   `protobuf:"varint,1,opt,name=only_missing,json=onlyMissing,proto3" json:"only_missing,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateAllAlbumThumbnailRequest) Reset() {
+	*x = UpdateAllAlbumThumbnailRequest{}
+	mi := &file_worker_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateAllAlbumThumbnailRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateAllAlbumThumbnailRequest) ProtoMessage() {}
+
+func (x *UpdateAllAlbumThumbnailRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_worker_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateAllAlbumThumbnailRequest.ProtoReflect.Descriptor instead.
+func (*UpdateAllAlbumThumbnailRequest) Descriptor() ([]byte, []int) {
+	return file_worker_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *UpdateAllAlbumThumbnailRequest) GetOnlyMissing() bool {
+	if x != nil {
+		return x.OnlyMissing
+	}
+	return false
+}
+
+type UpdateAllAlbumThumbnailResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateAllAlbumThumbnailResponse) Reset() {
+	*x = UpdateAllAlbumThumbnailResponse{}
+	mi := &file_worker_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateAllAlbumThumbnailResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateAllAlbumThumbnailResponse) ProtoMessage() {}
+
+func (x *UpdateAllAlbumThumbnailResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_worker_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateAllAlbumThumbnailResponse.ProtoReflect.Descriptor instead.
+func (*UpdateAllAlbumThumbnailResponse) Descriptor() ([]byte, []int) {
+	return file_worker_proto_rawDescGZIP(), []int{9}
+}
+
 var File_worker_proto protoreflect.FileDescriptor
 
 const file_worker_proto_rawDesc = "" +
@@ -447,17 +527,21 @@ const file_worker_proto_rawDesc = "" +
 	"\basset_id\x18\x02 \x01(\tR\aassetId\"C\n" +
 	"\x1eUpdateAllImageEmbeddingRequest\x12!\n" +
 	"\fonly_missing\x18\x01 \x01(\bR\vonlyMissing\"!\n" +
-	"\x1fUpdateAllImageEmbeddingResponse*9\n" +
+	"\x1fUpdateAllImageEmbeddingResponse\"C\n" +
+	"\x1eUpdateAllAlbumThumbnailRequest\x12!\n" +
+	"\fonly_missing\x18\x01 \x01(\bR\vonlyMissing\"!\n" +
+	"\x1fUpdateAllAlbumThumbnailResponse*9\n" +
 	"\vAssetStatus\x12\v\n" +
 	"\aPENDING\x10\x00\x12\x0e\n" +
 	"\n" +
 	"PROCESSING\x10\x01\x12\r\n" +
-	"\tPROCESSED\x10\x022\xd8\x02\n" +
+	"\tPROCESSED\x10\x022\xb6\x03\n" +
 	"\rWorkerService\x12N\n" +
 	"\x12NotifyProcessAsset\x12\x1b.NotifyProcessAssetResquest\x1a\x1b.NotifyProcessAssetResponse\x12D\n" +
 	"\x0fNotifyScanCache\x12\x17.NotifyScanCacheRequest\x1a\x18.NotifyScanCacheResponse\x12S\n" +
 	"\x14UpdateAlbumThumbnail\x12\x1c.UpdateAlbumThumbnailRequest\x1a\x1d.UpdateAlbumThumbnailResponse\x12\\\n" +
-	"\x17UpdateAllImageEmbedding\x12\x1f.UpdateAllImageEmbeddingRequest\x1a .UpdateAllImageEmbeddingResponseB\rZ\v/service/pbb\x06proto3"
+	"\x17UpdateAllImageEmbedding\x12\x1f.UpdateAllImageEmbeddingRequest\x1a .UpdateAllImageEmbeddingResponse\x12\\\n" +
+	"\x17UpdateAllAlbumThumbnail\x12\x1f.UpdateAllAlbumThumbnailRequest\x1a .UpdateAllAlbumThumbnailResponseB\rZ\v/service/pbb\x06proto3"
 
 var (
 	file_worker_proto_rawDescOnce sync.Once
@@ -472,7 +556,7 @@ func file_worker_proto_rawDescGZIP() []byte {
 }
 
 var file_worker_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_worker_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_worker_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_worker_proto_goTypes = []any{
 	(AssetStatus)(0),                        // 0: AssetStatus
 	(*NotifyProcessAssetResquest)(nil),      // 1: NotifyProcessAssetResquest
@@ -483,22 +567,26 @@ var file_worker_proto_goTypes = []any{
 	(*UpdateAlbumThumbnailResponse)(nil),    // 6: UpdateAlbumThumbnailResponse
 	(*UpdateAllImageEmbeddingRequest)(nil),  // 7: UpdateAllImageEmbeddingRequest
 	(*UpdateAllImageEmbeddingResponse)(nil), // 8: UpdateAllImageEmbeddingResponse
+	(*UpdateAllAlbumThumbnailRequest)(nil),  // 9: UpdateAllAlbumThumbnailRequest
+	(*UpdateAllAlbumThumbnailResponse)(nil), // 10: UpdateAllAlbumThumbnailResponse
 }
 var file_worker_proto_depIdxs = []int32{
-	0, // 0: NotifyProcessAssetResponse.status:type_name -> AssetStatus
-	1, // 1: WorkerService.NotifyProcessAsset:input_type -> NotifyProcessAssetResquest
-	3, // 2: WorkerService.NotifyScanCache:input_type -> NotifyScanCacheRequest
-	5, // 3: WorkerService.UpdateAlbumThumbnail:input_type -> UpdateAlbumThumbnailRequest
-	7, // 4: WorkerService.UpdateAllImageEmbedding:input_type -> UpdateAllImageEmbeddingRequest
-	2, // 5: WorkerService.NotifyProcessAsset:output_type -> NotifyProcessAssetResponse
-	4, // 6: WorkerService.NotifyScanCache:output_type -> NotifyScanCacheResponse
-	6, // 7: WorkerService.UpdateAlbumThumbnail:output_type -> UpdateAlbumThumbnailResponse
-	8, // 8: WorkerService.UpdateAllImageEmbedding:output_type -> UpdateAllImageEmbeddingResponse
-	5, // [5:9] is the sub-list for method output_type
-	1, // [1:5] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0,  // 0: NotifyProcessAssetResponse.status:type_name -> AssetStatus
+	1,  // 1: WorkerService.NotifyProcessAsset:input_type -> NotifyProcessAssetResquest
+	3,  // 2: WorkerService.NotifyScanCache:input_type -> NotifyScanCacheRequest
+	5,  // 3: WorkerService.UpdateAlbumThumbnail:input_type -> UpdateAlbumThumbnailRequest
+	7,  // 4: WorkerService.UpdateAllImageEmbedding:input_type -> UpdateAllImageEmbeddingRequest
+	9,  // 5: WorkerService.UpdateAllAlbumThumbnail:input_type -> UpdateAllAlbumThumbnailRequest
+	2,  // 6: WorkerService.NotifyProcessAsset:output_type -> NotifyProcessAssetResponse
+	4,  // 7: WorkerService.NotifyScanCache:output_type -> NotifyScanCacheResponse
+	6,  // 8: WorkerService.UpdateAlbumThumbnail:output_type -> UpdateAlbumThumbnailResponse
+	8,  // 9: WorkerService.UpdateAllImageEmbedding:output_type -> UpdateAllImageEmbeddingResponse
+	10, // 10: WorkerService.UpdateAllAlbumThumbnail:output_type -> UpdateAllAlbumThumbnailResponse
+	6,  // [6:11] is the sub-list for method output_type
+	1,  // [1:6] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_worker_proto_init() }
@@ -512,7 +600,7 @@ func file_worker_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_worker_proto_rawDesc), len(file_worker_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   8,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

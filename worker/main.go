@@ -80,7 +80,7 @@ func main() {
 						return fmt.Errorf("unable to connect to the database: %w", err)
 					}
 					defer db.Close(ctx)
-					return queue.PopulateAlbumsCover(ctx)
+					return queue.EnqueuePopulateAlbumsCover(ctx, false)
 				},
 			}, {
 				Name:  "populate-image-embedding",

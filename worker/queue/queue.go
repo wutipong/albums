@@ -2,6 +2,8 @@ package queue
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -129,7 +131,7 @@ func EnqueueAssetProcessing(ctx context.Context, id string) (status db.ProcessSt
 	return
 }
 
-func EnqueuePopulateAlbumsCover(ctx context.Context, albumId string, assetId string) error {
+func EnqueueUpdateAlbumCover(ctx context.Context, albumId string, assetId string) error {
 	maxRetries := MAX_RETRIES
 	j := &jobs.Job{
 		Queue: "asset-processing",
@@ -181,6 +183,63 @@ func EnqueuePopulateImageEmbedding(ctx context.Context, id string) error {
 		slog.String("assetId", id),
 		slog.String("command", "populate-image-embedding"),
 	)
+
+	return nil
+}
+
+func EnqueuePopulateAlbumsCover(ctx context.Context, missingOnly bool) error {
+	queries, _ := db.Get()
+
+	var albums []db.Album
+	var err error
+
+	if missingOnly {
+		albums, err = queries.GetAlbumsWithoutCover(ctx)
+	} else {
+		albums, err = queries.GetAllAlbum(ctx)
+	}
+
+	if err != nil {
+		return fmt.Errorf("unable to populate albums without cover image: %w", err)
+	}
+
+	for _, album := range albums {
+		portrait := os.Getenv("COVER_ASPECT") == "portrait"
+
+		var asset db.Asset
+
+		if portrait {
+			asset, err = queries.GetAlbumPortraitAssetForCover(ctx, album.ID)
+		} else {
+			asset, err = queries.GetAlbumLandscapeAssetForCover(ctx, album.ID)
+		}
+
+		if errors.Is(err, sql.ErrNoRows) {
+			asset, err = queries.GetAlbumAssetForCover(ctx, album.ID)
+		}
+
+		if err != nil {
+			slog.Warn(
+				"unable to find image asset for cover",
+				slog.String("album_id", album.ID.String()),
+				slog.String("name", album.Name),
+			)
+
+			continue
+		}
+
+		err = EnqueueUpdateAlbumCover(ctx, album.ID.String(), asset.ID.String())
+
+		if err != nil {
+			slog.Error(
+				"unable add update album cover job",
+				slog.Any("id", album.ID),
+				slog.String("error", err.Error()),
+			)
+			return err
+		}
+
+	}
 
 	return nil
 }

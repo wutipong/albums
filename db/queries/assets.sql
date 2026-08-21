@@ -87,6 +87,9 @@ WHERE
 -- name: GetAlbum :one
 SELECT * FROM albums WHERE id = $1 and deleted_at IS NULL;
 
+-- name: GetAllAlbum :many
+SELECT * FROM albums WHERE deleted_at IS NULL;
+
 -- name: UpdateAlbumThumbnail :one
 UPDATE albums
 SET
@@ -112,7 +115,30 @@ WHERE
 ORDER BY RANDOM()
 LIMIT 1;
 
--- name: GetRandomAlbumAssetForCover :one
+-- name: GetAlbumAssetForCover :one
+SELECT *
+FROM assets
+WHERE
+    type <> 'audio'
+    AND album_id = $1
+    AND process_status = 'processed'
+    AND deleted_at IS NULL
+ORDER BY filename ASC
+LIMIT 1;
+
+-- name: GetAlbumPortraitAssetForCover :one
+SELECT *
+FROM assets
+WHERE
+    type <> 'audio'
+    AND album_id = $1
+    AND process_status = 'processed'
+    AND view_width < view_height
+    AND deleted_at IS NULL
+ORDER BY filename ASC
+LIMIT 1;
+
+-- name: GetAlbumLandscapeAssetForCover :one
 SELECT *
 FROM assets
 WHERE
@@ -121,5 +147,5 @@ WHERE
     AND process_status = 'processed'
     AND view_width > view_height
     AND deleted_at IS NULL
-ORDER BY RANDOM()
+ORDER BY filename ASC
 LIMIT 1;
