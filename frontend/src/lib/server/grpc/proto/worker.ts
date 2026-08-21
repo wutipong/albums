@@ -87,6 +87,14 @@ export interface UpdateAllImageEmbeddingRequest {
 export interface UpdateAllImageEmbeddingResponse {
 }
 
+export interface UpdateAllAlbumThumbnailRequest {
+  onlyMissing: boolean;
+}
+
+/** empty */
+export interface UpdateAllAlbumThumbnailResponse {
+}
+
 function createBaseNotifyProcessAssetResquest(): NotifyProcessAssetResquest {
   return { id: "" };
 }
@@ -574,6 +582,113 @@ export const UpdateAllImageEmbeddingResponse: MessageFns<UpdateAllImageEmbedding
   },
 };
 
+function createBaseUpdateAllAlbumThumbnailRequest(): UpdateAllAlbumThumbnailRequest {
+  return { onlyMissing: false };
+}
+
+export const UpdateAllAlbumThumbnailRequest: MessageFns<UpdateAllAlbumThumbnailRequest> = {
+  encode(message: UpdateAllAlbumThumbnailRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.onlyMissing !== false) {
+      writer.uint32(8).bool(message.onlyMissing);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAllAlbumThumbnailRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAllAlbumThumbnailRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.onlyMissing = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateAllAlbumThumbnailRequest {
+    return {
+      onlyMissing: isSet(object.onlyMissing)
+        ? globalThis.Boolean(object.onlyMissing)
+        : isSet(object.only_missing)
+        ? globalThis.Boolean(object.only_missing)
+        : false,
+    };
+  },
+
+  toJSON(message: UpdateAllAlbumThumbnailRequest): unknown {
+    const obj: any = {};
+    if (message.onlyMissing !== false) {
+      obj.onlyMissing = message.onlyMissing;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateAllAlbumThumbnailRequest>): UpdateAllAlbumThumbnailRequest {
+    return UpdateAllAlbumThumbnailRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateAllAlbumThumbnailRequest>): UpdateAllAlbumThumbnailRequest {
+    const message = createBaseUpdateAllAlbumThumbnailRequest();
+    message.onlyMissing = object.onlyMissing ?? false;
+    return message;
+  },
+};
+
+function createBaseUpdateAllAlbumThumbnailResponse(): UpdateAllAlbumThumbnailResponse {
+  return {};
+}
+
+export const UpdateAllAlbumThumbnailResponse: MessageFns<UpdateAllAlbumThumbnailResponse> = {
+  encode(_: UpdateAllAlbumThumbnailResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAllAlbumThumbnailResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAllAlbumThumbnailResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): UpdateAllAlbumThumbnailResponse {
+    return {};
+  },
+
+  toJSON(_: UpdateAllAlbumThumbnailResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateAllAlbumThumbnailResponse>): UpdateAllAlbumThumbnailResponse {
+    return UpdateAllAlbumThumbnailResponse.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<UpdateAllAlbumThumbnailResponse>): UpdateAllAlbumThumbnailResponse {
+    const message = createBaseUpdateAllAlbumThumbnailResponse();
+    return message;
+  },
+};
+
 /** Worker service definition. */
 export type WorkerServiceDefinition = typeof WorkerServiceDefinition;
 export const WorkerServiceDefinition = {
@@ -616,6 +731,15 @@ export const WorkerServiceDefinition = {
       responseStream: false,
       options: {},
     },
+    /** Update all album thumbnail */
+    updateAllAlbumThumbnail: {
+      name: "UpdateAllAlbumThumbnail",
+      requestType: UpdateAllAlbumThumbnailRequest as typeof UpdateAllAlbumThumbnailRequest,
+      requestStream: false,
+      responseType: UpdateAllAlbumThumbnailResponse as typeof UpdateAllAlbumThumbnailResponse,
+      responseStream: false,
+      options: {},
+    },
   },
 } as const;
 
@@ -640,6 +764,11 @@ export interface WorkerServiceImplementation<CallContextExt = {}> {
     request: UpdateAllImageEmbeddingRequest,
     context: CallContext & CallContextExt,
   ): Promise<DeepPartial<UpdateAllImageEmbeddingResponse>>;
+  /** Update all album thumbnail */
+  updateAllAlbumThumbnail(
+    request: UpdateAllAlbumThumbnailRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<UpdateAllAlbumThumbnailResponse>>;
 }
 
 export interface WorkerServiceClient<CallOptionsExt = {}> {
@@ -663,6 +792,11 @@ export interface WorkerServiceClient<CallOptionsExt = {}> {
     request: DeepPartial<UpdateAllImageEmbeddingRequest>,
     options?: CallOptions & CallOptionsExt,
   ): Promise<UpdateAllImageEmbeddingResponse>;
+  /** Update all album thumbnail */
+  updateAllAlbumThumbnail(
+    request: DeepPartial<UpdateAllAlbumThumbnailRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<UpdateAllAlbumThumbnailResponse>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;

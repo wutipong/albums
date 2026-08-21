@@ -136,5 +136,6 @@ func (s *WorkerServiceServer) UpdateAllAlbumThumbnail(
 	req *pb.UpdateAllAlbumThumbnailRequest,
 ) (resp *pb.UpdateAllAlbumThumbnailResponse, err error) {
 
+	err = queue.EnqueuePopulateAlbumsCover(ctx, req.OnlyMissing)
 	return
 }
