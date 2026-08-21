@@ -77,7 +77,12 @@ func processImageAsset(ctx context.Context, minioClient *minio.Client, asset *db
 		return fmt.Errorf("unable to populate thumbnail: %e", err)
 	}
 
-	/// TODO: add populate embedding to the queue.
+	embedding, err := GetImageEmbedding(ctx, original)
+	if err == nil {
+		asset.ImageEmbedding = &embedding
+	} else {
+		slog.Warn("Unable to populate embedding. Skip.")
+	}
 	return nil
 }
 
