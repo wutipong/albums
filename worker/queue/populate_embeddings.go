@@ -96,9 +96,18 @@ func DoPopulateEmbedding(ctx context.Context, minioClient *minio.Client, asset *
 	}
 	defer original.Close()
 
+	embedding, err := GetImageEmbedding(ctx, original)
+	if err != nil {
+		return err
+	}
+	asset.ImageEmbedding = &embedding
+	return nil
+}
+
+func GetImageEmbedding(ctx context.Context, original *vips.Image) (pgvector.Vector, error) {
 	spec, err := clip.GetImageSpec(ctx)
 	if err != nil {
-		return fmt.Errorf("unable to get image spec: %w", err)
+		return pgvector.Vector{}, fmt.Errorf("unable to get image spec: %w", err)
 	}
 	copyOptions := vips.DefaultCopyOptions()
 	img, _ := original.Copy(copyOptions)
@@ -107,7 +116,7 @@ func DoPopulateEmbedding(ctx context.Context, minioClient *minio.Client, asset *
 
 	err = img.Autorot(nil)
 	if err != nil {
-		return fmt.Errorf("unable to perform auto rotating: %w", err)
+		return pgvector.Vector{}, fmt.Errorf("unable to perform auto rotating: %w", err)
 	}
 
 	width := img.Width()
@@ -123,25 +132,24 @@ func DoPopulateEmbedding(ctx context.Context, minioClient *minio.Client, asset *
 
 	err = img.ThumbnailImage(int(spec.Width), options)
 	if err != nil {
-		return fmt.Errorf("unable to resize image: %w", err)
+		return pgvector.Vector{}, fmt.Errorf("unable to resize image: %w", err)
 	}
 
 	buff, err := img.WebpsaveBuffer(vips.DefaultWebpsaveBufferOptions())
 	if err != nil {
-		return fmt.Errorf("unable to save image: %w", err)
+		return pgvector.Vector{}, fmt.Errorf("unable to save image: %w", err)
 	}
 
 	resp, err := clip.EncodeImage(ctx, buff)
 	if err != nil {
-		return fmt.Errorf("unable to get image embedding: %w", err)
+		return pgvector.Vector{}, fmt.Errorf("unable to get image embedding: %w", err)
 	}
 
 	embedding, err := ParseNumpyBytes(resp.Embedding)
 	if err != nil {
-		return fmt.Errorf("unable to decode embedding: %w", err)
+		return pgvector.Vector{}, fmt.Errorf("unable to decode embedding: %w", err)
 	}
-	asset.ImageEmbedding = &embedding
-	return nil
+	return embedding, nil
 }
 
 func ParseNumpyBytes(b []byte) (pgvector.Vector, error) {
