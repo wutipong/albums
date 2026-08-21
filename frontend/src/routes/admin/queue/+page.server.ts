@@ -1,6 +1,7 @@
 import { db } from '$lib/server/db';
 import { sql } from 'kysely';
 import type { PageServerLoad } from './$types';
+import { command } from '$app/server';
 
 export const load: PageServerLoad = async () => {
 	const queue = await db
@@ -54,7 +55,11 @@ export const load: PageServerLoad = async () => {
 			.where('assets.id', '=', asset_id)
 			.executeTakeFirst();
 		if (asset) {
-			queueItems.push({ id: job.id, ...asset });
+			queueItems.push({ 
+				id: job.id, 
+				command: payload.command, 
+				...asset 
+			});
 		}
 	}
 	return {
