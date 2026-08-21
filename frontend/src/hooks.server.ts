@@ -31,7 +31,7 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 };
 
 const handleSession: Handle = async ({ event, resolve }) => {
-	if (event.url.pathname == '/login') {
+	if (event.url.pathname == '/login' || event.url.pathname == '/') {
 		return resolve(event);
 	}
 
