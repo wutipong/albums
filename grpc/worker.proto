@@ -13,6 +13,9 @@ service WorkerService {
 
   // Update album thumbnail.
   rpc UpdateAlbumThumbnail(UpdateAlbumThumbnailRequest) returns (UpdateAlbumThumbnailResponse);
+
+  // Update image embedding.
+  rpc UpdateAllImageEmbedding(UpdateAllImageEmbeddingRequest) returns (UpdateAllImageEmbeddingResponse);
 }
 
 //Status of the asset.
@@ -51,4 +54,12 @@ message UpdateAlbumThumbnailRequest {
 message UpdateAlbumThumbnailResponse {
   string id       = 1;
   string asset_id = 2;
+}
+
+message UpdateAllImageEmbeddingRequest {
+  bool only_missing = 1;
+}
+
+message UpdateAllImageEmbeddingResponse {
+  // empty
 }

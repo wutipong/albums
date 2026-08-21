@@ -1,6 +1,13 @@
 -- name: GetAsset :one
 SELECT * FROM assets WHERE id = $1 AND deleted_at IS NULL LIMIT 1;
 
+-- name: GetAssetsByType :many
+SELECT *
+FROM assets
+WHERE
+    type = $1
+    AND deleted_at IS NULL;
+
 -- name: CreateAsset :one
 INSERT INTO
     assets (
@@ -96,7 +103,7 @@ SELECT * FROM albums WHERE cover = '' and deleted_at IS NULL;
 
 -- name: GetRandomAlbumAsset :one
 SELECT *
-from assets
+FROM assets
 WHERE
     type <> 'audio'
     AND album_id = $1
@@ -107,7 +114,7 @@ LIMIT 1;
 
 -- name: GetRandomAlbumAssetForCover :one
 SELECT *
-from assets
+FROM assets
 WHERE
     type <> 'audio'
     AND album_id = $1

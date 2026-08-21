@@ -175,33 +175,9 @@ func populateImageEmbeddings(ctx context.Context) error {
 	}
 
 	for _, asset := range assets {
-		err = queue.PopulateImageEmbedding(ctx, &asset, nil)
-		if err != nil {
-			slog.Error("unable to populate embedding", slog.String("error", err.Error()))
-			continue
-		}
-
-		_, err = queries.UpdateAsset(ctx, db.UpdateAssetParams{
-			ID:              asset.ID,
-			Filename:        asset.Filename,
-			Type:            asset.Type,
-			Original:        asset.Original,
-			Preview:         asset.Preview,
-			Thumbnail:       asset.Thumbnail,
-			View:            asset.View,
-			ProcessStatus:   db.ProcessStatusTProcessed,
-			ThumbnailWidth:  asset.ThumbnailWidth,
-			ThumbnailHeight: asset.ThumbnailHeight,
-			ViewWidth:       asset.ViewWidth,
-			ViewHeight:      asset.ViewHeight,
-			ImageFrames:     asset.ImageFrames,
-			VideoDuration:   asset.VideoDuration,
-			ImageEmbedding:  asset.ImageEmbedding,
-		})
-
-		if err != nil {
-			slog.Error("update asset fails.", slog.String("error", err.Error()))
-			return fmt.Errorf("unable to save image metadata: %w", err)
+		e := queue.EnqueuePopulateImageEmbedding(ctx, asset.ID.String())
+		if e != nil {
+			return fmt.Errorf("unable to add new populate image embedding job: %w", err)
 		}
 	}
 

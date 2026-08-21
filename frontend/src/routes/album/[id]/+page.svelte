@@ -157,6 +157,10 @@
 		<table class="table w-full">
 			<tbody>
 				<tr>
+					<td>ID</td>
+					<td>{data.id ?? ''}</td>
+				</tr>
+				<tr>
 					<td>Created at</td>
 					<td>{new Date(data.created_at ?? new Date()).toLocaleString()}</td>
 				</tr>

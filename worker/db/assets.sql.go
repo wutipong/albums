@@ -187,6 +187,54 @@ func (q *Queries) GetAssetProcessStatus(ctx context.Context, id pgtype.UUID) (Pr
 	return process_status, err
 }
 
+const getAssetsByType = `-- name: GetAssetsByType :many
+SELECT id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
+FROM assets
+WHERE
+    type = $1
+    AND deleted_at IS NULL
+`
+
+func (q *Queries) GetAssetsByType(ctx context.Context, type_ AssetTypeT) ([]Asset, error) {
+	rows, err := q.db.Query(ctx, getAssetsByType, type_)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Asset
+	for rows.Next() {
+		var i Asset
+		if err := rows.Scan(
+			&i.ID,
+			&i.AlbumID,
+			&i.Filename,
+			&i.CreatedAt,
+			&i.ModifiedAt,
+			&i.DeletedAt,
+			&i.Type,
+			&i.Original,
+			&i.Preview,
+			&i.Thumbnail,
+			&i.View,
+			&i.ProcessStatus,
+			&i.ThumbnailWidth,
+			&i.ThumbnailHeight,
+			&i.ViewWidth,
+			&i.ViewHeight,
+			&i.ImageFrames,
+			&i.VideoDuration,
+			&i.ImageEmbedding,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getImageAssetsWithoutEmbedding = `-- name: GetImageAssetsWithoutEmbedding :many
 SELECT id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 FROM assets
@@ -286,7 +334,7 @@ func (q *Queries) GetPendingAssets(ctx context.Context) ([]Asset, error) {
 
 const getRandomAlbumAsset = `-- name: GetRandomAlbumAsset :one
 SELECT id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
-from assets
+FROM assets
 WHERE
     type <> 'audio'
     AND album_id = $1
@@ -325,7 +373,7 @@ func (q *Queries) GetRandomAlbumAsset(ctx context.Context, albumID pgtype.UUID) 
 
 const getRandomAlbumAssetForCover = `-- name: GetRandomAlbumAssetForCover :one
 SELECT id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
-from assets
+FROM assets
 WHERE
     type <> 'audio'
     AND album_id = $1

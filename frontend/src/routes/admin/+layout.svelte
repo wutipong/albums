@@ -1,6 +1,6 @@
 <script lang="ts">
 	import NavBar from '$lib/components/NavBar.svelte';
-	import { mdiImageAlbum, mdiTrayFull } from '@mdi/js';
+	import { mdiImage, mdiImageAlbum, mdiTrayFull } from '@mdi/js';
 	import Icon from 'mdi-svelte';
 	import { page } from '$app/state';
 
@@ -29,11 +29,18 @@
 				</a>
 			</li>
 
+			<li class:menu-active={page.url.pathname === '/admin/asset'}>
+				<a href="/admin/asset">
+					<Icon path={mdiImage} /> Assets
+				</a>
+			</li>
+
 			<li class:menu-active={page.url.pathname === '/admin/queue'}>
 				<a href="/admin/queue">
 					<Icon path={mdiTrayFull} /> Processing Queue
 				</a>
 			</li>
+
 		</ul>
 	</div>
 </div>

@@ -105,3 +105,28 @@ func (s *WorkerServiceServer) UpdateAlbumThumbnail(
 
 	return
 }
+
+func (s *WorkerServiceServer) UpdateAllImageEmbedding(
+	ctx context.Context,
+	req *pb.UpdateAllImageEmbeddingRequest,
+) (resp *pb.UpdateAllImageEmbeddingResponse, err error) {
+	queries, _ := db.Get()
+	var assets []db.Asset
+
+	slog.Info("update all image embedding.")
+
+	if req.OnlyMissing {
+		assets, err = queries.GetImageAssetsWithoutEmbedding(ctx)
+	} else {
+		assets, err = queries.GetAssetsByType(ctx, db.AssetTypeTImage)
+	}
+
+	for _, asset := range assets {
+		e := queue.EnqueuePopulateImageEmbedding(ctx, asset.ID.String())
+		if e != nil {
+			err = fmt.Errorf("unable to add new populate image embedding job: %w", err)
+			return
+		}
+	}
+	return
+}

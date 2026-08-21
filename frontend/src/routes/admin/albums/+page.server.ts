@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import { sql } from 'kysely';
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad } from '../asset/$types';
 
 export const load: PageServerLoad = async () => {
 	const count = await db

@@ -1,10 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import Icon from 'mdi-svelte';
-	import { mdiInformationOutline } from '@mdi/js';
-	import { authClient } from '$lib/auth-client';
-
-
+	
 	let { data }: PageProps = $props();
 	const formatter = new Intl.NumberFormat('en-US', {
 		notation: 'compact',

@@ -20,3 +20,9 @@ export async function notifyUpdateAlbumCover(albumId: string, assetId?: string) 
 		assetId: assetId
 	});
 }
+
+export async function updateAllImageEmbedding(onlyMissing: boolean = true) {
+	return await client.updateAllImageEmbedding({
+		onlyMissing: onlyMissing
+	});
+}
