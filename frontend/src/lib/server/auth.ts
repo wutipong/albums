@@ -14,7 +14,8 @@ export const auth = betterAuth({
 		admin(),
 		sveltekitCookies(getRequestEvent),
 		apiKey({
-			rateLimit: { enabled: false }
+			rateLimit: { enabled: false },
+			enableSessionForAPIKeys: true, 
 		}),
 		genericOAuth({
 			config: [

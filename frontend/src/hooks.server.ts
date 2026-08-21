@@ -31,66 +31,29 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 };
 
 const handleSession: Handle = async ({ event, resolve }) => {
-	const apiKey = event.request.headers.get('x-api-key');
-	if (apiKey != null) {
-		return handleSessionApiKey({ event, resolve });
-	}
-
 	if (event.url.pathname == '/login') {
 		return resolve(event);
 	}
 
 	const session = event.locals.session;
-
-	if (session == null) {
-		redirect(307, '/');
-	}
-
-	if (Date.now() > session.expiresAt) {
-		redirect(307, '/');
-	}
-
-	return resolve(event);
-};
-
-const handleSessionApiKey: Handle = async ({ event, resolve }) => {
-	const apiKey = event.request.headers.get('x-api-key');
-	if (!apiKey) {
-		throw error(401, 'apikey is missing.');
-	}
-
-	const resp = await auth.api.verifyApiKey({
-		body: {
-			key: apiKey
-		}
-	});
-
-	if (resp.error) {
-		error(401, resp.error.message);
-	}
-
-	if (!resp.valid) {
-		error(401, 'API key is invalid');
-	}
-
-	if (event.url.pathname !== '/api' && !event.url.pathname.startsWith('/api/')) {
-		error(401, 'non-API access prohibited.');
-	}
-
-	return resolve(event);
-};
-
-const handleAdminSession: Handle = async ({ event, resolve }) => {
-	if (!event.url.pathname.startsWith('/admin')) {
-		return resolve(event);
-	}
-
-	const session = await auth.api.getSession({ headers: event.request.headers });
-	if (session?.user.role !== 'admin') {
+	if (!session) {
 		error(403, 'forbidden.');
 	}
 
 	return resolve(event);
 };
 
-export const handle = sequence(handleBetterAuth, handleAdminSession, handleSession);
+const handleAdmin: Handle = async ({ event, resolve }) => {
+	if (!event.url.pathname.startsWith('/admin')) {
+		return resolve(event);
+	}
+
+	const user = event.locals.user;
+	if (user.role !== 'admin') {
+		error(403, 'forbidden.');
+	}
+
+	return resolve(event);
+};
+
+export const handle = sequence(handleBetterAuth, handleAdmin, handleSession);
