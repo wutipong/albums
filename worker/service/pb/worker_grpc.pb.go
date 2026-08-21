@@ -23,6 +23,7 @@ const (
 	WorkerService_NotifyScanCache_FullMethodName         = "/WorkerService/NotifyScanCache"
 	WorkerService_UpdateAlbumThumbnail_FullMethodName    = "/WorkerService/UpdateAlbumThumbnail"
 	WorkerService_UpdateAllImageEmbedding_FullMethodName = "/WorkerService/UpdateAllImageEmbedding"
+	WorkerService_UpdateAllAlbumThumbnail_FullMethodName = "/WorkerService/UpdateAllAlbumThumbnail"
 )
 
 // WorkerServiceClient is the client API for WorkerService service.
@@ -39,6 +40,8 @@ type WorkerServiceClient interface {
 	UpdateAlbumThumbnail(ctx context.Context, in *UpdateAlbumThumbnailRequest, opts ...grpc.CallOption) (*UpdateAlbumThumbnailResponse, error)
 	// Update image embedding.
 	UpdateAllImageEmbedding(ctx context.Context, in *UpdateAllImageEmbeddingRequest, opts ...grpc.CallOption) (*UpdateAllImageEmbeddingResponse, error)
+	// Update all album thumbnail
+	UpdateAllAlbumThumbnail(ctx context.Context, in *UpdateAllAlbumThumbnailRequest, opts ...grpc.CallOption) (*UpdateAllAlbumThumbnailResponse, error)
 }
 
 type workerServiceClient struct {
@@ -89,6 +92,16 @@ func (c *workerServiceClient) UpdateAllImageEmbedding(ctx context.Context, in *U
 	return out, nil
 }
 
+func (c *workerServiceClient) UpdateAllAlbumThumbnail(ctx context.Context, in *UpdateAllAlbumThumbnailRequest, opts ...grpc.CallOption) (*UpdateAllAlbumThumbnailResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateAllAlbumThumbnailResponse)
+	err := c.cc.Invoke(ctx, WorkerService_UpdateAllAlbumThumbnail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkerServiceServer is the server API for WorkerService service.
 // All implementations must embed UnimplementedWorkerServiceServer
 // for forward compatibility.
@@ -103,6 +116,8 @@ type WorkerServiceServer interface {
 	UpdateAlbumThumbnail(context.Context, *UpdateAlbumThumbnailRequest) (*UpdateAlbumThumbnailResponse, error)
 	// Update image embedding.
 	UpdateAllImageEmbedding(context.Context, *UpdateAllImageEmbeddingRequest) (*UpdateAllImageEmbeddingResponse, error)
+	// Update all album thumbnail
+	UpdateAllAlbumThumbnail(context.Context, *UpdateAllAlbumThumbnailRequest) (*UpdateAllAlbumThumbnailResponse, error)
 	mustEmbedUnimplementedWorkerServiceServer()
 }
 
@@ -124,6 +139,9 @@ func (UnimplementedWorkerServiceServer) UpdateAlbumThumbnail(context.Context, *U
 }
 func (UnimplementedWorkerServiceServer) UpdateAllImageEmbedding(context.Context, *UpdateAllImageEmbeddingRequest) (*UpdateAllImageEmbeddingResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateAllImageEmbedding not implemented")
+}
+func (UnimplementedWorkerServiceServer) UpdateAllAlbumThumbnail(context.Context, *UpdateAllAlbumThumbnailRequest) (*UpdateAllAlbumThumbnailResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateAllAlbumThumbnail not implemented")
 }
 func (UnimplementedWorkerServiceServer) mustEmbedUnimplementedWorkerServiceServer() {}
 func (UnimplementedWorkerServiceServer) testEmbeddedByValue()                       {}
@@ -218,6 +236,24 @@ func _WorkerService_UpdateAllImageEmbedding_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkerService_UpdateAllAlbumThumbnail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAllAlbumThumbnailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkerServiceServer).UpdateAllAlbumThumbnail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkerService_UpdateAllAlbumThumbnail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkerServiceServer).UpdateAllAlbumThumbnail(ctx, req.(*UpdateAllAlbumThumbnailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkerService_ServiceDesc is the grpc.ServiceDesc for WorkerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -240,6 +276,10 @@ var WorkerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateAllImageEmbedding",
 			Handler:    _WorkerService_UpdateAllImageEmbedding_Handler,
+		},
+		{
+			MethodName: "UpdateAllAlbumThumbnail",
+			Handler:    _WorkerService_UpdateAllAlbumThumbnail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

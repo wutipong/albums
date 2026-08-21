@@ -97,9 +97,9 @@ func (s *WorkerServiceServer) UpdateAlbumThumbnail(
 		AssetId: req.AssetId,
 	}
 
-	err = queue.EnqueuePopulateAlbumsCover(ctx, req.Id, req.AssetId)
+	err = queue.EnqueueUpdateAlbumCover(ctx, req.Id, req.AssetId)
 	if err != nil {
-		err = fmt.Errorf("unable to unque popluate album cover.")
+		err = fmt.Errorf("unable to unque populate album cover.")
 		return
 	}
 
@@ -128,5 +128,13 @@ func (s *WorkerServiceServer) UpdateAllImageEmbedding(
 			return
 		}
 	}
+	return
+}
+
+func (s *WorkerServiceServer) UpdateAllAlbumThumbnail(
+	ctx context.Context,
+	req *pb.UpdateAllAlbumThumbnailRequest,
+) (resp *pb.UpdateAllAlbumThumbnailResponse, err error) {
+
 	return
 }
