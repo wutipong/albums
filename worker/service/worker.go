@@ -122,7 +122,11 @@ func (s *WorkerServiceServer) UpdateAllImageEmbedding(
 	}
 
 	for _, asset := range assets {
-		queue.EnqueuePopulateImageEmbedding(ctx, asset.ID.String())
+		e := queue.EnqueuePopulateImageEmbedding(ctx, asset.ID.String())
+		if e != nil {
+			err = fmt.Errorf("unable to add new populate image embedding job: %w", err)
+			return
+		}
 	}
 	return
 }
