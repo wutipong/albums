@@ -12,6 +12,13 @@ func Command(profile *string) *cli.Command {
 		Usage: "Manage profiles for albums importer",
 		Commands: []*cli.Command{
 			{
+				Name:  "me",
+				Usage: "Show the user information associated to the profile.",
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					return profileDetail(ctx, *profile, false)
+				},
+			},
+			{
 				Name: "setup",
 				Usage: "Setup profile file interactively. " +
 					"Existing configuration file will be overwritten.",

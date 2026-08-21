@@ -1,6 +1,10 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
-	redirect(308, '/album');
+export const load: PageServerLoad = async ({ locals }) => {
+	if (locals.session) {
+		redirect(302, '/album');
+	}
+
+	redirect(302, '/login');
 };
