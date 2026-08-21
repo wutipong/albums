@@ -7,6 +7,7 @@ import { apiKey } from '@better-auth/api-key';
 import { Pool } from 'pg';
 
 export const auth = betterAuth({
+	secret: env.BETTER_AUTH_SECRET || 'placeholder-secret',
 	database: new Pool({
 		connectionString: env.DATABASE_URL
 	}),
