@@ -17,6 +17,21 @@ export const POST: RequestHandler = async ({ request }) => {
 	const checksum = req.checksum;
 	const network = req.network ?? 'private';
 
+	const contentType = mime.contentType(path.basename(filename));
+
+	if (!contentType) {
+		return json({ success: false, error: 'Failed to recognize filetype' }, { status: 400 });
+	}
+
+	const extension = mime.extension(mime.lookup(filename) || '');
+	const key = `pending/${randomUUID()}.${extension}`;
+
+	const type = contentType.substring(0, contentType.indexOf('/'));
+
+	if (type != 'image' && type != 'video') {
+		return json({ success: false, error: 'Unsupported asset type.' }, { status: 400 });
+	}
+
 	const album = await db
 		.selectFrom('albums')
 		.selectAll()
@@ -40,25 +55,13 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ success: false, error: 'duplicate asset' }, { status: 409 });
 	}
 
-	const contentType = mime.contentType(path.basename(filename));
-
-	if (!contentType) {
-		return json({ success: false, error: 'Failed to recognize filetype' }, { status: 400 });
-	}
-
 	let asset = null;
-
 	if (existed) {
 		asset = existed;
+		asset.original = key;
+		asset.type = type;
+		asset.process_status = 'uploading';
 	} else {
-		const extension = mime.extension(mime.lookup(filename) || '');
-		const key = `pending/${randomUUID()}.${extension}`;
-
-		const type = contentType.substring(0, contentType.indexOf('/'));
-
-		if (type != 'image' && type != 'video') {
-			return json({ success: false, error: 'Unsupported asset type.' }, { status: 400 });
-		}
 		asset = await db
 			.insertInto('assets')
 			.values({
