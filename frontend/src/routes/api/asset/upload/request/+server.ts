@@ -50,11 +50,11 @@ export const POST: RequestHandler = async ({ request }) => {
 		.selectAll()
 		.limit(1)
 		.executeTakeFirst();
-	if (existed) {
+	if (existed && existed.process_status != 'uploading') {
 		return json({ success: false, error: 'duplicate asset' }, { status: 409 });
 	}
 
-	const asset = await db
+	const asset = existed ?? await db
 		.insertInto('assets')
 		.values({
 			album_id: albumId,
