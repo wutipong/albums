@@ -29,20 +29,6 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ success: false, error: 'Album not found' }, { status: 404 });
 	}
 
-	const extension = mime.extension(mime.lookup(filename) || '');
-	const key = `pending/${randomUUID()}.${extension}`;
-
-	const contentType = mime.contentType(path.basename(filename));
-
-	if (!contentType) {
-		return json({ success: false, error: 'Failed to recognize filetype' }, { status: 400 });
-	}
-	const type = contentType.substring(0, contentType.indexOf('/'));
-
-	if (type != 'image' && type != 'video') {
-		return json({ success: false, error: 'Unsupported asset type.' }, { status: 400 });
-	}
-
 	const existed = await db
 		.selectFrom('assets')
 		.where('album_id', '=', albumId)
@@ -50,21 +36,41 @@ export const POST: RequestHandler = async ({ request }) => {
 		.selectAll()
 		.limit(1)
 		.executeTakeFirst();
-	if (existed && existed.process_status != 'uploading') {
+	if (existed && existed.process_status != 'uploading' && existed.process_status != 'failed') {
 		return json({ success: false, error: 'duplicate asset' }, { status: 409 });
 	}
 
-	const asset = existed ?? await db
-		.insertInto('assets')
-		.values({
-			album_id: albumId,
-			filename: filename,
-			type: type,
-			process_status: 'uploading',
-			original: key
-		})
-		.returningAll()
-		.executeTakeFirstOrThrow();
+	const contentType = mime.contentType(path.basename(filename));
+
+	if (!contentType) {
+		return json({ success: false, error: 'Failed to recognize filetype' }, { status: 400 });
+	}
+
+	let asset = null;
+
+	if (existed) {
+		asset = existed;
+	} else {
+		const extension = mime.extension(mime.lookup(filename) || '');
+		const key = `pending/${randomUUID()}.${extension}`;
+
+		const type = contentType.substring(0, contentType.indexOf('/'));
+
+		if (type != 'image' && type != 'video') {
+			return json({ success: false, error: 'Unsupported asset type.' }, { status: 400 });
+		}
+		asset = await db
+			.insertInto('assets')
+			.values({
+				album_id: albumId,
+				filename: filename,
+				type: type,
+				process_status: 'uploading',
+				original: key
+			})
+			.returningAll()
+			.executeTakeFirstOrThrow();
+	}
 
 	if (!asset) {
 		return json({ success: false, error: 'Failed to create asset' }, { status: 500 });
@@ -72,7 +78,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	const command = new PutObjectCommand({
 		Bucket: env.S3_BUCKET,
-		Key: key,
+		Key: asset.original,
 		ChecksumCRC32: checksum,
 		ContentType: contentType
 	});
