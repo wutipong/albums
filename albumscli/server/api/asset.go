@@ -92,10 +92,37 @@ func PostAsset(
 		return
 	}
 
-	req, err := http.NewRequest(http.MethodPut, postAssetRequest.URL, bytes.NewBuffer(data))
+	success := true
+	err = doPutObject(ctx, postAssetRequest.URL, data, size)
+	if err != nil {
+		slog.Error("put object fails", slog.String("error", err.Error()))
+		success = false
+	}
+
+	postAssetCommit, err := Post[PostAssetCommitResponse](
+		ctx, server, "/api/asset/upload/commit",
+		PostAssetCommitRequest{
+			ID:      postAssetRequest.ID,
+			Success: success,
+		})
+
+	if err != nil {
+		err = fmt.Errorf("unable to commit asset upload %s: %w", postAssetRequest.ID, err)
+	}
+
+	result = PostAssetResposnse{
+		Asset:   postAssetCommit.Asset,
+		Success: postAssetCommit.Success,
+	}
+
+	return
+}
+
+func doPutObject(ctx context.Context, url string, data []byte, size int64) error {
+	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(data))
 	if err != nil {
 		err = fmt.Errorf("failed to create request for put object: %w", err)
-		return
+		return err
 	}
 	req.ContentLength = size
 	for i := range 10 {
@@ -112,32 +139,17 @@ func PostAsset(
 		select {
 		case <-ctx.Done():
 			err = fmt.Errorf("context error during put object: %w", ctx.Err())
-			return
+			return err
 		case <-time.After(time.Duration(i+1) * 10 * time.Second):
 		}
 	}
 
 	if err != nil {
 		err = fmt.Errorf("failed to put object: %w", err)
-		return
+		return err
 	}
 
-	postAssetCommit, err := Post[PostAssetCommitResponse](
-		ctx, server, "/api/asset/upload/commit",
-		PostAssetCommitRequest{
-			ID: postAssetRequest.ID,
-		})
-
-	if err != nil {
-		err = fmt.Errorf("unable to commit asset upload %s: %w", postAssetRequest.ID, err)
-	}
-
-	result = PostAssetResposnse{
-		Asset:   postAssetCommit.Asset,
-		Success: postAssetCommit.Success,
-	}
-
-	return
+	return nil
 }
 
 type PostAssetRequestRequest struct {
@@ -154,7 +166,8 @@ type PostAssetRequestResponse struct {
 }
 
 type PostAssetCommitRequest struct {
-	ID string `json:"id"`
+	ID      string `json:"id"`
+	Success bool   `json:"success"`
 }
 
 type PostAssetCommitResponse struct {
