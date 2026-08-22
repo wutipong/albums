@@ -13,7 +13,7 @@ interface AlbumItem {
 	cover_url: String;
 }
 
-export const load: PageServerLoad = async ({locals}) => {
+export const load: PageServerLoad = async ({ locals }) => {
 	let aspect: 'portrait' | 'landscape' = env.COVER_ASPECT == 'portrait' ? 'portrait' : 'landscape';
 
 	const albums = await db

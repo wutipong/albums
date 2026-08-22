@@ -13,7 +13,7 @@
 
 	let { data } = $props();
 
-	let avatarSrc = $state('')
+	let avatarSrc = $state('');
 
 	onMount(async () => {
 		const keys = await authClient.apiKey.list();
@@ -54,7 +54,7 @@
 </svelte:head>
 
 <div class="flex h-screen w-screen flex-col">
-	<NavBar user={data.user}/>
+	<NavBar user={data.user} />
 
 	<div class="overflow-auto p-4 pt-8">
 		<article class="mx-auto prose h-full w-full md:w-200">
@@ -99,7 +99,7 @@
 							<td></td>
 							<td></td>
 							<td>
-								<button class="btn btn-sm btn-primary" onclick={() => addNewApiKey()}>
+								<button class="btn btn-primary btn-sm" onclick={() => addNewApiKey()}>
 									<Icon path={mdiKeyPlus} /> Add
 								</button>
 							</td>

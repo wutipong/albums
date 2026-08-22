@@ -40,7 +40,6 @@
 					<Icon path={mdiTrayFull} /> Processing Queue
 				</a>
 			</li>
-
 		</ul>
 	</div>
 </div>

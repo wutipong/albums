@@ -36,8 +36,8 @@
 		</div>
 	</div>
 
-    <hr />
-    <h3 class="p-4 text-xl font-semibold">Queue Details</h3>
+	<hr />
+	<h3 class="p-4 text-xl font-semibold">Queue Details</h3>
 
 	<div role="alert" class="alert alert-info">
 		<Icon path={mdiInformationOutline} />

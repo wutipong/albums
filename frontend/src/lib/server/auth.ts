@@ -16,7 +16,7 @@ export const auth = betterAuth({
 		sveltekitCookies(getRequestEvent),
 		apiKey({
 			rateLimit: { enabled: false },
-			enableSessionForAPIKeys: true, 
+			enableSessionForAPIKeys: true
 		}),
 		genericOAuth({
 			config: [
@@ -32,13 +32,13 @@ export const auth = betterAuth({
 					mapProfileToUser: async (profile) => {
 						const groups = profile.groups;
 						const isAdmin = groups?.includes('admin');
-						
-						console.log("mapProfileToUser")
+
+						console.log('mapProfileToUser');
 						return {
 							name: profile.name,
 							email: profile.email,
 							image: profile.picture,
-							role: isAdmin? 'admin' : 'user' // Maps directly to user.additionalFields.role
+							role: isAdmin ? 'admin' : 'user' // Maps directly to user.additionalFields.role
 						};
 					}
 				}

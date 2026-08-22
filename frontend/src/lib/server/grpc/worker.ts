@@ -30,5 +30,5 @@ export async function updateAllImageEmbedding(onlyMissing: boolean = true) {
 export async function updateAllAlbumThumbnail(onlyMissing: boolean = true) {
 	return await client.updateAllAlbumThumbnail({
 		onlyMissing: onlyMissing
-	})
+	});
 }

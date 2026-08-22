@@ -51,6 +51,6 @@ export const load: PageServerLoad = async () => {
 
 		images: imageCount ? BigInt(imageCount.count) : 0n,
 		embeddings: embeddingCount ? BigInt(embeddingCount.count) : 0n,
-		video: videoCount ? BigInt(videoCount.count) : 0n,
+		video: videoCount ? BigInt(videoCount.count) : 0n
 	};
 };
