@@ -112,7 +112,7 @@ func performWork(ctx context.Context, processPending bool) error {
 	defer queue.Shutdown(ctx)
 
 	if processPending {
-		err = processExistingItems(ctx)
+		err = queue.EnqueueProcessAllAssets(ctx, true)
 		if err != nil {
 			return fmt.Errorf("unable to processing pending items :%w", err)
 		}
@@ -134,30 +134,6 @@ func performWork(ctx context.Context, processPending bool) error {
 	if err := grpcServer.Serve(lis); err != nil {
 		return fmt.Errorf("error running grpc server: %w", err)
 	}
-	return nil
-}
-
-func processExistingItems(ctx context.Context) error {
-	quries, _ := db.Get()
-
-	assets, err := quries.GetPendingAssets(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to query pending items: %w", err)
-	}
-
-	slog.Info("scan library for unprocessed asset.")
-
-	slog.Info("pending tasks found", slog.Int("count", len(assets)))
-	if len(assets) == 0 {
-		return nil
-	}
-
-	for _, asset := range assets {
-		slog.Info("adding asset", slog.String("id", asset.ID.String()))
-
-		queue.EnqueueAssetProcessing(ctx, asset.ID.String())
-	}
-
 	return nil
 }
 

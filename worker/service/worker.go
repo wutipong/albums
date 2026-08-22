@@ -34,9 +34,9 @@ func (s *WorkerServiceServer) NotifyProcessAsset(
 		return
 	}
 
-	quries, _ := db.Get()
+	queries, _ := db.Get()
 
-	processStatus, err := quries.GetAssetProcessStatus(ctx, uuid)
+	processStatus, err := queries.GetAssetProcessStatus(ctx, uuid)
 	if err != nil {
 		err = fmt.Errorf("unable to find asset: %w", err)
 		return
@@ -67,9 +67,9 @@ func (s *WorkerServiceServer) NotifyScanCache(
 	ctx context.Context,
 	req *pb.NotifyScanCacheRequest,
 ) (resp *pb.NotifyScanCacheResponse, err error) {
-	quries, _ := db.Get()
+	queries, _ := db.Get()
 
-	assets, err := quries.GetPendingAssets(ctx)
+	assets, err := queries.GetPendingAssets(ctx)
 
 	slog.Info("scan library for unprocessed asset.")
 
@@ -137,5 +137,13 @@ func (s *WorkerServiceServer) UpdateAllAlbumThumbnail(
 ) (resp *pb.UpdateAllAlbumThumbnailResponse, err error) {
 
 	err = queue.EnqueuePopulateAlbumsCover(ctx, req.OnlyMissing)
+	return
+}
+
+func (s *WorkerServiceServer) NotifyProcessAllAssets(
+	ctx context.Context,
+	req *pb.NotifyProcessAllAssetsRequest,
+) (resp *pb.NotifyProcessAllAssetsResponse, err error) {
+	err = queue.EnqueueProcessAllAssets(ctx, req.OnlyMissing)
 	return
 }

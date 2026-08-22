@@ -29,7 +29,7 @@
 
 	async function notifyProcessAllAssets(missingOnly: boolean) {
 		try {
-			const resp = await fetch('/api/asset/process');
+			const resp = await fetch(`/api/asset/process?missingOnly=${missingOnly}`);
 			if (resp.ok) {
 				toast.add('Asset processing request has been made.', 'info');
 			} else {
@@ -119,7 +119,7 @@
 			<tr>
 				<td>Re-process all items</td>
 				<td>
-					<button class="btn-small btn btn-primary" onclick={() => notifyProcessAllAssets(true)}>
+					<button class="btn-small btn btn-primary" onclick={() => notifyProcessAllAssets(false)}>
 						<Icon path={mdiPlayCircle} />
 						Start
 					</button>
@@ -134,7 +134,7 @@
 			<tr>
 				<td>Re-process failed and pending Items</td>
 				<td>
-					<button class="btn-small btn btn-primary" onclick={() => notifyProcessAllAssets(false)}>
+					<button class="btn-small btn btn-primary" onclick={() => notifyProcessAllAssets(true)}>
 						<Icon path={mdiPlayCircle} />
 						Start
 					</button>
