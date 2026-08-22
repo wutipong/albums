@@ -16,7 +16,7 @@
 
 	async function notifyUpdateAllImageEmbedding() {
 		try {
-			const resp = await fetch('/api/album/embedding');
+			const resp = await fetch('/api/asset/embedding');
 			if (resp.ok) {
 				toast.add('Embedding update request has been made.', 'info');
 			} else {
@@ -24,6 +24,19 @@
 			}
 		} catch (e) {
 			toast.add('Embedding update request fails.', 'error');
+		}
+	}
+
+	async function notifyProcessAllAssets(missingOnly: boolean) {
+		try {
+			const resp = await fetch('/api/asset/process');
+			if (resp.ok) {
+				toast.add('Asset processing request has been made.', 'info');
+			} else {
+				toast.add('Asset processing  request fails.', 'error');
+			}
+		} catch (e) {
+			toast.add('Asset processing  request fails.', 'error');
 		}
 	}
 </script>
@@ -89,12 +102,48 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td>Populate Missing Image Embedding</td>
+				<td>Populate missing image embedding</td>
 				<td>
 					<button class="btn-small btn btn-primary" onclick={() => notifyUpdateAllImageEmbedding()}>
 						<Icon path={mdiPlayCircle} />
 						Start
 					</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="italic">
+					This generates embedding for items that doesn't have it generated during processing, so
+					the items are searchable.
+				</td>
+			</tr>
+			<tr>
+				<td>Re-process all items</td>
+				<td>
+					<button class="btn-small btn btn-primary" onclick={() => notifyProcessAllAssets(true)}>
+						<Icon path={mdiPlayCircle} />
+						Start
+					</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="italic">
+					Reprocess all items to update the assets information. Avoid repettively triggering this
+					action as it can causes massive jobs being queued.
+				</td>
+			</tr>
+			<tr>
+				<td>Re-process failed and pending Items</td>
+				<td>
+					<button class="btn-small btn btn-primary" onclick={() => notifyProcessAllAssets(false)}>
+						<Icon path={mdiPlayCircle} />
+						Start
+					</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="italic">
+					Reprocess items that marked as 'failed' and 'new' items to update the assets information.
+					Avoid repettively triggering this action as it can causes massive jobs being queued.
 				</td>
 			</tr>
 		</tbody>
