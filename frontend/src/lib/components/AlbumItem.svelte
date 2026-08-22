@@ -35,9 +35,9 @@
 						/>
 					{/if}
 					<div
-						class={`absolute bottom-0 left-0 h-[100px] w-full 
-                            bg-gradient-to-b from-base-100/0 via-base-100/70 via-30% to-base-100/100 
-                            p-4 break-all`}
+						class={`absolute bottom-0 left-0 h-[150px] w-full 
+                            bg-gradient-to-b from-neutral/0 to-neutral/80 
+                            p-4 pt-12 break-all text-neutral-content`}
 						class:hidden={aspect != 'portrait'}
 					>
 						{album.name}
