@@ -93,13 +93,6 @@ func populateView(
 	original *vips.Image,
 ) (view *vips.Image, err error) {
 	slog.Info("populating view media for asset", slog.String("id", asset.ID.String()))
-	slog.Debug("original image",
-		slog.Int("width", original.Width()),
-		slog.Int("height", original.Height()),
-		slog.Int("page_height", original.PageHeight()),
-		slog.Int("loop", original.Loop()),
-		slog.Int("pages", original.Pages()),
-	)
 
 	err = ctx.Err()
 	if err != nil {
@@ -112,20 +105,14 @@ func populateView(
 		return
 	}
 
-	asset.ImageFrames = int32(original.Pages())
-
+	asset.ViewWidth = int32(original.Width())
+	asset.ViewHeight = int32(original.Height())
 	if original.Pages() > 1 {
-		asset.View = asset.Original
-		asset.ViewWidth = int32(original.Width())
 		asset.ViewHeight = int32(original.PageHeight())
-
-		return
 	}
 
-	if (original.Width() * original.Height()) < MAX_VIEW_PIXEL {
+	if original.Width()*original.Height() < MAX_VIEW_PIXEL || original.Pages() == 1 {
 		asset.View = asset.Original
-		asset.ViewWidth = int32(original.Width())
-		asset.ViewHeight = int32(original.Height())
 
 		return
 	}
@@ -136,19 +123,21 @@ func populateView(
 		return
 	}
 
-	factor := float64(view.Height()) / float64(VIEW_HEIGHT)
+	if view.Width()*view.Height() > MAX_VIEW_PIXEL {
+		factor := float64(view.Height()) / float64(VIEW_HEIGHT)
 
-	err = view.Resize(factor, &vips.ResizeOptions{
-		Kernel: vips.KernelLanczos3,
-		Gap:    2,
-	})
-	if err != nil {
-		err = fmt.Errorf("unable to resize view image: %w", err)
-		return
+		err = view.Resize(factor, &vips.ResizeOptions{
+			Kernel: vips.KernelLanczos3,
+			Gap:    2,
+		})
+		if err != nil {
+			err = fmt.Errorf("unable to resize view image: %w", err)
+			return
+		}
+
+		asset.ViewWidth = int32(view.Width())
+		asset.ViewHeight = int32(view.Height())
 	}
-
-	asset.ViewWidth = int32(view.Width())
-	asset.ViewHeight = int32(view.Height())
 
 	buf, err := view.WebpsaveBuffer(nil)
 	if err != nil {
@@ -193,6 +182,8 @@ func populatePreview(
 	if err != nil {
 		return fmt.Errorf("context cancelled: %w", err)
 	}
+
+	asset.ImageFrames = int32(view.Pages())
 
 	if asset.ImageFrames == 1 {
 		asset.Preview = asset.View

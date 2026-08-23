@@ -40,12 +40,6 @@ func ProcessAsset(ctx context.Context, minioClient *minio.Client, id string) err
 		return fmt.Errorf("unable to read asset data: %w", err)
 	}
 
-	slog.Info("asset",
-		slog.String("id", asset.ID.String()),
-		slog.String("album_id", asset.AlbumID.String()),
-		slog.String("type", string(asset.Type)),
-	)
-
 	switch asset.Type {
 	case "image":
 		err = processImageAsset(ctx, minioClient, &asset)
