@@ -68,7 +68,6 @@ func Init(ctx context.Context) error {
 		case "populate-album-cover":
 			err = PopulateAlbumCover(
 				ctx,
-				minioClient,
 				j.Payload["albumId"].(string),
 				j.Payload["assetId"].(string),
 			)
