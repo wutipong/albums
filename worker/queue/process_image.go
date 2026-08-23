@@ -27,11 +27,7 @@ func processImageAsset(ctx context.Context, minioClient *minio.Client, asset *db
 	}
 
 	slog.Info("getting object from S3.", slog.String("id", asset.Original))
-	object, err := minioClient.GetObject(
-		ctx, os.Getenv("S3_BUCKET"),
-		asset.Original,
-		minio.GetObjectOptions{},
-	)
+	object, err := getObjectFromS3(ctx, minioClient, asset.Original)
 
 	if err != nil {
 		return fmt.Errorf("unable to get object from s3: %w", err)
@@ -200,12 +196,16 @@ func populatePreview(
 		return nil
 	}
 
-	preview, err := createPreviewForAnimationImage(view)
+	preview, err := view.Copy(nil)
+	if err != nil {
+		return fmt.Errorf("unable to create a preview copy from original image: %w", err)
+	}
+	defer preview.Close()
+
+	err = processAnimatedPreview(preview)
 	if err != nil {
 		return err
 	}
-
-	defer preview.Close()
 
 	params := vips.DefaultWebpsaveBufferOptions()
 	params.Q = THUMBNAIL_QUALITY
@@ -237,21 +237,16 @@ func populatePreview(
 	return nil
 }
 
-func createPreviewForAnimationImage(original *vips.Image) (*vips.Image, error) {
+func processAnimatedPreview(preview *vips.Image) error {
 	slog.Debug("original image",
-		slog.Int("width", original.Width()),
-		slog.Int("height", original.Height()),
-		slog.Int("page_height", original.PageHeight()),
-		slog.Int("loop", original.Loop()),
-		slog.Int("pages", original.Pages()),
+		slog.Int("width", preview.Width()),
+		slog.Int("height", preview.Height()),
+		slog.Int("page_height", preview.PageHeight()),
+		slog.Int("loop", preview.Loop()),
+		slog.Int("pages", preview.Pages()),
 	)
 
-	preview, err := original.Copy(nil)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create a preview copy from original image: %w", err)
-	}
-
-	factor := float64(THUMBNAIL_HEIGHT) / float64(original.PageHeight())
+	factor := float64(THUMBNAIL_HEIGHT) / float64(preview.PageHeight())
 
 	preview.Resize(factor, &vips.ResizeOptions{
 		Kernel: vips.KernelLanczos3,
@@ -267,7 +262,7 @@ func createPreviewForAnimationImage(original *vips.Image) (*vips.Image, error) {
 		slog.Int("loop", preview.Loop()),
 		slog.Int("pages", preview.Pages()),
 	)
-	return preview, nil
+	return nil
 }
 
 func populateThumbnail(
@@ -276,7 +271,10 @@ func populateThumbnail(
 	asset *db.Asset,
 	view *vips.Image,
 ) error {
-	slog.Info("populating thumbnail media for asset", slog.String("id", asset.ID.String()))
+	slog.Info(
+		"populating thumbnail media for asset",
+		slog.String("id", asset.ID.String()),
+	)
 
 	err := ctx.Err()
 	if err != nil {
@@ -286,12 +284,19 @@ func populateThumbnail(
 	asset.ThumbnailWidth = int32((view.Width() * THUMBNAIL_HEIGHT) / view.Height())
 	asset.ThumbnailHeight = THUMBNAIL_HEIGHT
 
-	thumbnail, err := createImageThumbnail(view)
+	copyOptions := vips.DefaultCopyOptions()
+	thumbnail, err := view.Copy(copyOptions)
+	if err != nil {
+		return fmt.Errorf("unable to copy from original image: %w", err)
+	}
+
+	defer thumbnail.Close()
+
+	err = processThumbnail(thumbnail)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to process thumbnail image: %w", err)
 	}
-	defer thumbnail.Close()
 
 	asset.ThumbnailWidth = int32((view.Width() * THUMBNAIL_HEIGHT) / view.PageHeight())
 
@@ -324,29 +329,21 @@ func populateThumbnail(
 	return nil
 }
 
-func createImageThumbnail(original *vips.Image) (thumbnail *vips.Image, err error) {
+func processThumbnail(thumbnail *vips.Image) error {
 	slog.Debug("original image",
-		slog.Int("width", original.Width()),
-		slog.Int("height", original.Height()),
-		slog.Int("page_height", original.PageHeight()),
-		slog.Int("loop", original.Loop()),
-		slog.Int("pages", original.Pages()),
+		slog.Int("width", thumbnail.Width()),
+		slog.Int("height", thumbnail.Height()),
+		slog.Int("page_height", thumbnail.PageHeight()),
+		slog.Int("loop", thumbnail.Loop()),
+		slog.Int("pages", thumbnail.Pages()),
 	)
 
-	copyOptions := vips.DefaultCopyOptions()
-	thumbnail, err = original.Copy(copyOptions)
+	err := thumbnail.Autorot(nil)
 	if err != nil {
-		err = fmt.Errorf("unable to copy from original image: %w", err)
-		return
+		return fmt.Errorf("unable to perform auto rotating: %w", err)
 	}
 
-	err = thumbnail.Autorot(nil)
-	if err != nil {
-		err = fmt.Errorf("unable to perform auto rotating: %w", err)
-		return
-	}
-
-	factor := float64(THUMBNAIL_HEIGHT) / float64(original.PageHeight())
+	factor := float64(THUMBNAIL_HEIGHT) / float64(thumbnail.PageHeight())
 	thumbnail.Resize(factor, &vips.ResizeOptions{
 		Kernel: vips.KernelLanczos3,
 		Gap:    2,
@@ -354,11 +351,10 @@ func createImageThumbnail(original *vips.Image) (thumbnail *vips.Image, err erro
 
 	err = thumbnail.ExtractArea(0, 0, thumbnail.Width(), THUMBNAIL_HEIGHT)
 	if err != nil {
-		err = fmt.Errorf("unable to extract area: %w", err)
-		return
+		return fmt.Errorf("unable to extract area: %w", err)
 	}
 
-	if original.Pages() > 1 {
+	if thumbnail.Pages() > 1 {
 		thumbnail.SetPages(1)
 		thumbnail.SetPageHeight(THUMBNAIL_HEIGHT)
 	}
@@ -369,5 +365,5 @@ func createImageThumbnail(original *vips.Image) (thumbnail *vips.Image, err erro
 		slog.Int("loop", thumbnail.Loop()),
 		slog.Int("pages", thumbnail.Pages()),
 	)
-	return
+	return nil
 }

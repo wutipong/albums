@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -30,12 +31,7 @@ func processVideoAsset(ctx context.Context, minioClient *minio.Client, asset *db
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	s3Obj, err := minioClient.GetObject(
-		ctx,
-		os.Getenv("S3_BUCKET"),
-		asset.Original,
-		minio.GetObjectOptions{},
-	)
+	s3Obj, err := getObjectFromS3(ctx, minioClient, asset.Original)
 
 	if err != nil {
 		return fmt.Errorf("unable to get object from s3: %w", err)
@@ -150,7 +146,11 @@ func processVideoView(
 }
 
 func processVideoThumbnail(
-	ctx context.Context, minioClient *minio.Client, asset *db.Asset, originalFile *os.File, info Probe,
+	ctx context.Context,
+	minioClient *minio.Client,
+	asset *db.Asset,
+	originalFile *os.File,
+	info Probe,
 ) error {
 	slog.Info("process video asset thumbnail", slog.Any("id", asset.ID))
 	err := ctx.Err()
@@ -158,14 +158,56 @@ func processVideoThumbnail(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
+	image, err := extractVideoThumbnail(info, originalFile, asset, "vframes", "1")
+
+	if err != nil {
+		return fmt.Errorf("unable to extract image from video: %w", err)
+	}
+
+	err = processThumbnail(image)
+	if err != nil {
+		return fmt.Errorf("Unable to process thumbnail image: %w", err)
+	}
+
+	saveParams := vips.DefaultWebpsaveBufferOptions()
+	saveParams.Q = THUMBNAIL_QUALITY
+
+	buf, err := image.WebpsaveBuffer(saveParams)
+	if err != nil {
+		return fmt.Errorf("unable to write preview image: %w", err)
+	}
+
+	asset.ThumbnailHeight = int32(image.Height())
+	asset.ThumbnailWidth = int32(image.Width())
+
+	if asset.Thumbnail == "" {
+		asset.Thumbnail = createAssetKey("webp")
+	}
+
+	err = putObjectToS3(ctx, minioClient, asset.Thumbnail, bytes.NewReader(buf), "image/webp")
+	if err != nil {
+		return fmt.Errorf("unable to put object to S3: %w", err)
+	}
+	return nil
+}
+
+func extractVideoThumbnail(
+	info Probe,
+	originalFile *os.File,
+	asset *db.Asset,
+	paramKey string,
+	paramValue string,
+) (image *vips.Image, error error) {
 	duration, err := strconv.ParseFloat(info.Format.Duration, 10)
 	if err != nil {
-		return fmt.Errorf("unable to parse duration: %w", err)
+		err = fmt.Errorf("unable to parse duration: %w", err)
+		return
 	}
 
 	outputFile, err := os.CreateTemp("", "*view.webp")
 	if err != nil {
-		return fmt.Errorf("unable to create temp file to transcode: %w", err)
+		err = fmt.Errorf("unable to create temp file to transcode: %w", err)
+		return
 	}
 	defer os.Remove(outputFile.Name())
 
@@ -175,14 +217,16 @@ func processVideoThumbnail(
 			"ss": fmt.Sprintf("%f", duration/3),
 		}).
 		Output(outputFile.Name(), ffmpeg.KwArgs{
-			"c:v":     "libwebp",
-			"vframes": "1",
-			"quality": fmt.Sprintf("%d", THUMBNAIL_QUALITY),
-			"vf":      fmt.Sprintf("scale=-2:%d", THUMBNAIL_HEIGHT),
+			"c:v":    "libwebp",
+			paramKey: paramValue,
+			"loop":   "0",
+			// "quality": fmt.Sprintf("%d", THUMBNAIL_QUALITY),
+			// "vf":      fmt.Sprintf("scale=-2:%d", THUMBNAIL_HEIGHT),
 		}).OverWriteOutput().ErrorToStdOut().Run()
 
 	if err != nil {
-		return fmt.Errorf("unable to create thumbnail asset for video asset: %w", err)
+		err = fmt.Errorf("unable to create thumbnail asset for video asset: %w", err)
+		return
 	}
 
 	videoDuration := time.Duration(duration) * time.Second
@@ -191,29 +235,13 @@ func processVideoThumbnail(
 		Valid:        true,
 	}
 
-	image, err := vips.NewImageFromFile(outputFile.Name(), nil)
+	image, err = vips.NewImageFromFile(outputFile.Name(), nil)
 	if err != nil {
-		return fmt.Errorf("unable to read image file with vips: %w", err)
+		err = fmt.Errorf("unable to read extracted file: %w", err)
+		return
 	}
 
-	asset.ThumbnailHeight = THUMBNAIL_HEIGHT
-	asset.ThumbnailWidth = int32((THUMBNAIL_HEIGHT * image.Width()) / image.Height())
-
-	if asset.Thumbnail == "" || asset.Thumbnail == asset.Original {
-		asset.Thumbnail = createAssetKey("webp")
-	}
-
-	_, err = minioClient.PutObject(
-		ctx, os.Getenv("S3_BUCKET"),
-		asset.Thumbnail,
-		outputFile,
-		-1,
-		minio.PutObjectOptions{
-			ContentType: "image/webp",
-		},
-	)
-
-	return nil
+	return
 }
 
 func processVideoPreview(
@@ -225,45 +253,31 @@ func processVideoPreview(
 	if err != nil {
 		return fmt.Errorf("context cancelled: %w", err)
 	}
-	outputFile, err := os.CreateTemp("", "*view.webp")
-	if err != nil {
-		return fmt.Errorf("unable to create temp file to transcode: %w", err)
-	}
-	defer os.Remove(outputFile.Name())
 
-	duration, err := strconv.ParseFloat(info.Format.Duration, 10)
+	slog.Info("process video asset thumbnail", slog.Any("id", asset.ID))
+
+	image, err := extractVideoThumbnail(info, originalFile, asset, "t", "5")
 	if err != nil {
-		return fmt.Errorf("unable to parse duration: %w", err)
+		return fmt.Errorf("unable to extract preview image: %w", err)
 	}
 
-	// save preview at 1/3 duration, 5 seconds-long in 5 fps.
-	err = ffmpeg.
-		Input(originalFile.Name(), ffmpeg.KwArgs{
-			"ss": fmt.Sprintf("%f", duration/3),
-		}).
-		Output(outputFile.Name(), ffmpeg.KwArgs{
-			"c:v":     "libwebp",
-			"t":       "5",
-			"loop":    "0",
-			"quality": fmt.Sprintf("%d", THUMBNAIL_QUALITY),
-			"vf":      fmt.Sprintf("fps=5,scale=-2:%d", THUMBNAIL_HEIGHT),
-		}).OverWriteOutput().ErrorToStdOut().Run()
-
+	err = processAnimatedPreview(image)
 	if err != nil {
-		return fmt.Errorf("unable to create thumbnail asset for video asset: %w", err)
+		return fmt.Errorf("unable to process preview image: %w", err)
 	}
 
-	if asset.Preview == "" || asset.Preview == asset.Original {
+	saveParams := vips.DefaultWebpsaveBufferOptions()
+	saveParams.Q = THUMBNAIL_QUALITY
+
+	if asset.Preview == "" {
 		asset.Preview = createAssetKey("webp")
 	}
-	_, err = minioClient.PutObject(
-		ctx, os.Getenv("S3_BUCKET"),
-		asset.Preview,
-		outputFile,
-		-1,
-		minio.PutObjectOptions{
-			ContentType: "image/webp",
-		},
-	)
+
+	buf, err := image.WebpsaveBuffer(saveParams)
+
+	err = putObjectToS3(ctx, minioClient, asset.Preview, bytes.NewReader(buf), "image/webp")
+	if err != nil {
+		return fmt.Errorf("unable to put object to S3: %w", err)
+	}
 	return nil
 }
