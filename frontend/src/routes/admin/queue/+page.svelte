@@ -68,10 +68,11 @@
 							<th>{asset.command}</th>
 							<td>{asset.asset_id}</td>
 							<td>{asset.type}</td>
-							<td
-								><a href={`album/${asset.album_id}`} class="link link-primary">{asset.album_name}</a
-								></td
-							>
+							<td>
+								<a href={`/album/${asset.album_id}`} class="link link-primary">
+									{asset.album_name}
+								</a>
+							</td>
 							<td>{asset.created_at.toLocaleString()}</td>
 						</tr>
 					{/each}

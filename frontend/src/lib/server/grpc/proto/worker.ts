@@ -5,841 +5,951 @@
 // source: worker.proto
 
 /* eslint-disable */
-import { BinaryReader, BinaryWriter } from '@bufbuild/protobuf/wire';
-import type { CallContext, CallOptions } from 'nice-grpc-common';
+import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import type { CallContext, CallOptions } from "nice-grpc-common";
 
-export const protobufPackage = '';
+export const protobufPackage = "";
 
 /** Status of the asset. */
 export enum AssetStatus {
-	PENDING = 0,
-	PROCESSING = 1,
-	PROCESSED = 2,
-	UNRECOGNIZED = -1
+  PENDING = 0,
+  PROCESSING = 1,
+  PROCESSED = 2,
+  UNRECOGNIZED = -1,
 }
 
 export function assetStatusFromJSON(object: any): AssetStatus {
-	switch (object) {
-		case 0:
-		case 'PENDING':
-			return AssetStatus.PENDING;
-		case 1:
-		case 'PROCESSING':
-			return AssetStatus.PROCESSING;
-		case 2:
-		case 'PROCESSED':
-			return AssetStatus.PROCESSED;
-		case -1:
-		case 'UNRECOGNIZED':
-		default:
-			return AssetStatus.UNRECOGNIZED;
-	}
+  switch (object) {
+    case 0:
+    case "PENDING":
+      return AssetStatus.PENDING;
+    case 1:
+    case "PROCESSING":
+      return AssetStatus.PROCESSING;
+    case 2:
+    case "PROCESSED":
+      return AssetStatus.PROCESSED;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return AssetStatus.UNRECOGNIZED;
+  }
 }
 
 export function assetStatusToJSON(object: AssetStatus): string {
-	switch (object) {
-		case AssetStatus.PENDING:
-			return 'PENDING';
-		case AssetStatus.PROCESSING:
-			return 'PROCESSING';
-		case AssetStatus.PROCESSED:
-			return 'PROCESSED';
-		case AssetStatus.UNRECOGNIZED:
-		default:
-			return 'UNRECOGNIZED';
-	}
+  switch (object) {
+    case AssetStatus.PENDING:
+      return "PENDING";
+    case AssetStatus.PROCESSING:
+      return "PROCESSING";
+    case AssetStatus.PROCESSED:
+      return "PROCESSED";
+    case AssetStatus.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
 }
 
 /** NotifyProcessAssetRequest */
 export interface NotifyProcessAssetResquest {
-	id: string;
+  id: string;
 }
 
 /** NotifyProcessAssetResponse */
 export interface NotifyProcessAssetResponse {
-	id: string;
-	status: AssetStatus;
+  id: string;
+  status: AssetStatus;
 }
 
 /** NotifyScanCacheRequest */
-export interface NotifyScanCacheRequest {}
+export interface NotifyScanCacheRequest {
+}
 
 /** NotifyScanCacheResponse */
-export interface NotifyScanCacheResponse {}
+export interface NotifyScanCacheResponse {
+}
 
 export interface UpdateAlbumThumbnailRequest {
-	id: string;
-	assetId: string;
+  id: string;
+  assetId: string;
 }
 
 export interface UpdateAlbumThumbnailResponse {
-	id: string;
-	assetId: string;
+  id: string;
+  assetId: string;
 }
 
 export interface UpdateAllImageEmbeddingRequest {
-	onlyMissing: boolean;
+  onlyMissing: boolean;
 }
 
 /** empty */
-export interface UpdateAllImageEmbeddingResponse {}
+export interface UpdateAllImageEmbeddingResponse {
+}
 
 export interface UpdateAllAlbumThumbnailRequest {
-	onlyMissing: boolean;
+  onlyMissing: boolean;
 }
 
 /** empty */
-export interface UpdateAllAlbumThumbnailResponse {}
+export interface UpdateAllAlbumThumbnailResponse {
+}
+
+export interface NotifyProcessAllAssetsRequest {
+  onlyMissing: boolean;
+}
+
+/** empty */
+export interface NotifyProcessAllAssetsResponse {
+}
 
 function createBaseNotifyProcessAssetResquest(): NotifyProcessAssetResquest {
-	return { id: '' };
+  return { id: "" };
 }
 
 export const NotifyProcessAssetResquest: MessageFns<NotifyProcessAssetResquest> = {
-	encode(
-		message: NotifyProcessAssetResquest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.id !== '') {
-			writer.uint32(10).string(message.id);
-		}
-		return writer;
-	},
+  encode(message: NotifyProcessAssetResquest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): NotifyProcessAssetResquest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseNotifyProcessAssetResquest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): NotifyProcessAssetResquest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseNotifyProcessAssetResquest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.id = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): NotifyProcessAssetResquest {
-		return { id: isSet(object.id) ? globalThis.String(object.id) : '' };
-	},
+  fromJSON(object: any): NotifyProcessAssetResquest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
 
-	toJSON(message: NotifyProcessAssetResquest): unknown {
-		const obj: any = {};
-		if (message.id !== '') {
-			obj.id = message.id;
-		}
-		return obj;
-	},
+  toJSON(message: NotifyProcessAssetResquest): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<NotifyProcessAssetResquest>): NotifyProcessAssetResquest {
-		return NotifyProcessAssetResquest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<NotifyProcessAssetResquest>): NotifyProcessAssetResquest {
-		const message = createBaseNotifyProcessAssetResquest();
-		message.id = object.id ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<NotifyProcessAssetResquest>): NotifyProcessAssetResquest {
+    return NotifyProcessAssetResquest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<NotifyProcessAssetResquest>): NotifyProcessAssetResquest {
+    const message = createBaseNotifyProcessAssetResquest();
+    message.id = object.id ?? "";
+    return message;
+  },
 };
 
 function createBaseNotifyProcessAssetResponse(): NotifyProcessAssetResponse {
-	return { id: '', status: 0 };
+  return { id: "", status: 0 };
 }
 
 export const NotifyProcessAssetResponse: MessageFns<NotifyProcessAssetResponse> = {
-	encode(
-		message: NotifyProcessAssetResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.id !== '') {
-			writer.uint32(10).string(message.id);
-		}
-		if (message.status !== 0) {
-			writer.uint32(16).int32(message.status);
-		}
-		return writer;
-	},
+  encode(message: NotifyProcessAssetResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.status !== 0) {
+      writer.uint32(16).int32(message.status);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): NotifyProcessAssetResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseNotifyProcessAssetResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): NotifyProcessAssetResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseNotifyProcessAssetResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.id = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 16) {
-						break;
-					}
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
 
-					message.status = reader.int32() as any;
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.status = reader.int32() as any;
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): NotifyProcessAssetResponse {
-		return {
-			id: isSet(object.id) ? globalThis.String(object.id) : '',
-			status: isSet(object.status) ? assetStatusFromJSON(object.status) : 0
-		};
-	},
+  fromJSON(object: any): NotifyProcessAssetResponse {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      status: isSet(object.status) ? assetStatusFromJSON(object.status) : 0,
+    };
+  },
 
-	toJSON(message: NotifyProcessAssetResponse): unknown {
-		const obj: any = {};
-		if (message.id !== '') {
-			obj.id = message.id;
-		}
-		if (message.status !== 0) {
-			obj.status = assetStatusToJSON(message.status);
-		}
-		return obj;
-	},
+  toJSON(message: NotifyProcessAssetResponse): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.status !== 0) {
+      obj.status = assetStatusToJSON(message.status);
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<NotifyProcessAssetResponse>): NotifyProcessAssetResponse {
-		return NotifyProcessAssetResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<NotifyProcessAssetResponse>): NotifyProcessAssetResponse {
-		const message = createBaseNotifyProcessAssetResponse();
-		message.id = object.id ?? '';
-		message.status = object.status ?? 0;
-		return message;
-	}
+  create(base?: DeepPartial<NotifyProcessAssetResponse>): NotifyProcessAssetResponse {
+    return NotifyProcessAssetResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<NotifyProcessAssetResponse>): NotifyProcessAssetResponse {
+    const message = createBaseNotifyProcessAssetResponse();
+    message.id = object.id ?? "";
+    message.status = object.status ?? 0;
+    return message;
+  },
 };
 
 function createBaseNotifyScanCacheRequest(): NotifyScanCacheRequest {
-	return {};
+  return {};
 }
 
 export const NotifyScanCacheRequest: MessageFns<NotifyScanCacheRequest> = {
-	encode(_: NotifyScanCacheRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		return writer;
-	},
+  encode(_: NotifyScanCacheRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): NotifyScanCacheRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseNotifyScanCacheRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+  decode(input: BinaryReader | Uint8Array, length?: number): NotifyScanCacheRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseNotifyScanCacheRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(_: any): NotifyScanCacheRequest {
-		return {};
-	},
+  fromJSON(_: any): NotifyScanCacheRequest {
+    return {};
+  },
 
-	toJSON(_: NotifyScanCacheRequest): unknown {
-		const obj: any = {};
-		return obj;
-	},
+  toJSON(_: NotifyScanCacheRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
 
-	create(base?: DeepPartial<NotifyScanCacheRequest>): NotifyScanCacheRequest {
-		return NotifyScanCacheRequest.fromPartial(base ?? {});
-	},
-	fromPartial(_: DeepPartial<NotifyScanCacheRequest>): NotifyScanCacheRequest {
-		const message = createBaseNotifyScanCacheRequest();
-		return message;
-	}
+  create(base?: DeepPartial<NotifyScanCacheRequest>): NotifyScanCacheRequest {
+    return NotifyScanCacheRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<NotifyScanCacheRequest>): NotifyScanCacheRequest {
+    const message = createBaseNotifyScanCacheRequest();
+    return message;
+  },
 };
 
 function createBaseNotifyScanCacheResponse(): NotifyScanCacheResponse {
-	return {};
+  return {};
 }
 
 export const NotifyScanCacheResponse: MessageFns<NotifyScanCacheResponse> = {
-	encode(_: NotifyScanCacheResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-		return writer;
-	},
+  encode(_: NotifyScanCacheResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): NotifyScanCacheResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseNotifyScanCacheResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+  decode(input: BinaryReader | Uint8Array, length?: number): NotifyScanCacheResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseNotifyScanCacheResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(_: any): NotifyScanCacheResponse {
-		return {};
-	},
+  fromJSON(_: any): NotifyScanCacheResponse {
+    return {};
+  },
 
-	toJSON(_: NotifyScanCacheResponse): unknown {
-		const obj: any = {};
-		return obj;
-	},
+  toJSON(_: NotifyScanCacheResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
 
-	create(base?: DeepPartial<NotifyScanCacheResponse>): NotifyScanCacheResponse {
-		return NotifyScanCacheResponse.fromPartial(base ?? {});
-	},
-	fromPartial(_: DeepPartial<NotifyScanCacheResponse>): NotifyScanCacheResponse {
-		const message = createBaseNotifyScanCacheResponse();
-		return message;
-	}
+  create(base?: DeepPartial<NotifyScanCacheResponse>): NotifyScanCacheResponse {
+    return NotifyScanCacheResponse.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<NotifyScanCacheResponse>): NotifyScanCacheResponse {
+    const message = createBaseNotifyScanCacheResponse();
+    return message;
+  },
 };
 
 function createBaseUpdateAlbumThumbnailRequest(): UpdateAlbumThumbnailRequest {
-	return { id: '', assetId: '' };
+  return { id: "", assetId: "" };
 }
 
 export const UpdateAlbumThumbnailRequest: MessageFns<UpdateAlbumThumbnailRequest> = {
-	encode(
-		message: UpdateAlbumThumbnailRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.id !== '') {
-			writer.uint32(10).string(message.id);
-		}
-		if (message.assetId !== '') {
-			writer.uint32(18).string(message.assetId);
-		}
-		return writer;
-	},
+  encode(message: UpdateAlbumThumbnailRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.assetId !== "") {
+      writer.uint32(18).string(message.assetId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): UpdateAlbumThumbnailRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseUpdateAlbumThumbnailRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAlbumThumbnailRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAlbumThumbnailRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.id = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.assetId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.assetId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): UpdateAlbumThumbnailRequest {
-		return {
-			id: isSet(object.id) ? globalThis.String(object.id) : '',
-			assetId: isSet(object.assetId)
-				? globalThis.String(object.assetId)
-				: isSet(object.asset_id)
-					? globalThis.String(object.asset_id)
-					: ''
-		};
-	},
+  fromJSON(object: any): UpdateAlbumThumbnailRequest {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      assetId: isSet(object.assetId)
+        ? globalThis.String(object.assetId)
+        : isSet(object.asset_id)
+        ? globalThis.String(object.asset_id)
+        : "",
+    };
+  },
 
-	toJSON(message: UpdateAlbumThumbnailRequest): unknown {
-		const obj: any = {};
-		if (message.id !== '') {
-			obj.id = message.id;
-		}
-		if (message.assetId !== '') {
-			obj.assetId = message.assetId;
-		}
-		return obj;
-	},
+  toJSON(message: UpdateAlbumThumbnailRequest): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.assetId !== "") {
+      obj.assetId = message.assetId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<UpdateAlbumThumbnailRequest>): UpdateAlbumThumbnailRequest {
-		return UpdateAlbumThumbnailRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<UpdateAlbumThumbnailRequest>): UpdateAlbumThumbnailRequest {
-		const message = createBaseUpdateAlbumThumbnailRequest();
-		message.id = object.id ?? '';
-		message.assetId = object.assetId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<UpdateAlbumThumbnailRequest>): UpdateAlbumThumbnailRequest {
+    return UpdateAlbumThumbnailRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateAlbumThumbnailRequest>): UpdateAlbumThumbnailRequest {
+    const message = createBaseUpdateAlbumThumbnailRequest();
+    message.id = object.id ?? "";
+    message.assetId = object.assetId ?? "";
+    return message;
+  },
 };
 
 function createBaseUpdateAlbumThumbnailResponse(): UpdateAlbumThumbnailResponse {
-	return { id: '', assetId: '' };
+  return { id: "", assetId: "" };
 }
 
 export const UpdateAlbumThumbnailResponse: MessageFns<UpdateAlbumThumbnailResponse> = {
-	encode(
-		message: UpdateAlbumThumbnailResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.id !== '') {
-			writer.uint32(10).string(message.id);
-		}
-		if (message.assetId !== '') {
-			writer.uint32(18).string(message.assetId);
-		}
-		return writer;
-	},
+  encode(message: UpdateAlbumThumbnailResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    if (message.assetId !== "") {
+      writer.uint32(18).string(message.assetId);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): UpdateAlbumThumbnailResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseUpdateAlbumThumbnailResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 10) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAlbumThumbnailResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAlbumThumbnailResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
 
-					message.id = reader.string();
-					continue;
-				}
-				case 2: {
-					if (tag !== 18) {
-						break;
-					}
+          message.id = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
 
-					message.assetId = reader.string();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.assetId = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): UpdateAlbumThumbnailResponse {
-		return {
-			id: isSet(object.id) ? globalThis.String(object.id) : '',
-			assetId: isSet(object.assetId)
-				? globalThis.String(object.assetId)
-				: isSet(object.asset_id)
-					? globalThis.String(object.asset_id)
-					: ''
-		};
-	},
+  fromJSON(object: any): UpdateAlbumThumbnailResponse {
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      assetId: isSet(object.assetId)
+        ? globalThis.String(object.assetId)
+        : isSet(object.asset_id)
+        ? globalThis.String(object.asset_id)
+        : "",
+    };
+  },
 
-	toJSON(message: UpdateAlbumThumbnailResponse): unknown {
-		const obj: any = {};
-		if (message.id !== '') {
-			obj.id = message.id;
-		}
-		if (message.assetId !== '') {
-			obj.assetId = message.assetId;
-		}
-		return obj;
-	},
+  toJSON(message: UpdateAlbumThumbnailResponse): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    if (message.assetId !== "") {
+      obj.assetId = message.assetId;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<UpdateAlbumThumbnailResponse>): UpdateAlbumThumbnailResponse {
-		return UpdateAlbumThumbnailResponse.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<UpdateAlbumThumbnailResponse>): UpdateAlbumThumbnailResponse {
-		const message = createBaseUpdateAlbumThumbnailResponse();
-		message.id = object.id ?? '';
-		message.assetId = object.assetId ?? '';
-		return message;
-	}
+  create(base?: DeepPartial<UpdateAlbumThumbnailResponse>): UpdateAlbumThumbnailResponse {
+    return UpdateAlbumThumbnailResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateAlbumThumbnailResponse>): UpdateAlbumThumbnailResponse {
+    const message = createBaseUpdateAlbumThumbnailResponse();
+    message.id = object.id ?? "";
+    message.assetId = object.assetId ?? "";
+    return message;
+  },
 };
 
 function createBaseUpdateAllImageEmbeddingRequest(): UpdateAllImageEmbeddingRequest {
-	return { onlyMissing: false };
+  return { onlyMissing: false };
 }
 
 export const UpdateAllImageEmbeddingRequest: MessageFns<UpdateAllImageEmbeddingRequest> = {
-	encode(
-		message: UpdateAllImageEmbeddingRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.onlyMissing !== false) {
-			writer.uint32(8).bool(message.onlyMissing);
-		}
-		return writer;
-	},
+  encode(message: UpdateAllImageEmbeddingRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.onlyMissing !== false) {
+      writer.uint32(8).bool(message.onlyMissing);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): UpdateAllImageEmbeddingRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseUpdateAllImageEmbeddingRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAllImageEmbeddingRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAllImageEmbeddingRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.onlyMissing = reader.bool();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.onlyMissing = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): UpdateAllImageEmbeddingRequest {
-		return {
-			onlyMissing: isSet(object.onlyMissing)
-				? globalThis.Boolean(object.onlyMissing)
-				: isSet(object.only_missing)
-					? globalThis.Boolean(object.only_missing)
-					: false
-		};
-	},
+  fromJSON(object: any): UpdateAllImageEmbeddingRequest {
+    return {
+      onlyMissing: isSet(object.onlyMissing)
+        ? globalThis.Boolean(object.onlyMissing)
+        : isSet(object.only_missing)
+        ? globalThis.Boolean(object.only_missing)
+        : false,
+    };
+  },
 
-	toJSON(message: UpdateAllImageEmbeddingRequest): unknown {
-		const obj: any = {};
-		if (message.onlyMissing !== false) {
-			obj.onlyMissing = message.onlyMissing;
-		}
-		return obj;
-	},
+  toJSON(message: UpdateAllImageEmbeddingRequest): unknown {
+    const obj: any = {};
+    if (message.onlyMissing !== false) {
+      obj.onlyMissing = message.onlyMissing;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<UpdateAllImageEmbeddingRequest>): UpdateAllImageEmbeddingRequest {
-		return UpdateAllImageEmbeddingRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<UpdateAllImageEmbeddingRequest>): UpdateAllImageEmbeddingRequest {
-		const message = createBaseUpdateAllImageEmbeddingRequest();
-		message.onlyMissing = object.onlyMissing ?? false;
-		return message;
-	}
+  create(base?: DeepPartial<UpdateAllImageEmbeddingRequest>): UpdateAllImageEmbeddingRequest {
+    return UpdateAllImageEmbeddingRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateAllImageEmbeddingRequest>): UpdateAllImageEmbeddingRequest {
+    const message = createBaseUpdateAllImageEmbeddingRequest();
+    message.onlyMissing = object.onlyMissing ?? false;
+    return message;
+  },
 };
 
 function createBaseUpdateAllImageEmbeddingResponse(): UpdateAllImageEmbeddingResponse {
-	return {};
+  return {};
 }
 
 export const UpdateAllImageEmbeddingResponse: MessageFns<UpdateAllImageEmbeddingResponse> = {
-	encode(
-		_: UpdateAllImageEmbeddingResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		return writer;
-	},
+  encode(_: UpdateAllImageEmbeddingResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): UpdateAllImageEmbeddingResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseUpdateAllImageEmbeddingResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAllImageEmbeddingResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAllImageEmbeddingResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(_: any): UpdateAllImageEmbeddingResponse {
-		return {};
-	},
+  fromJSON(_: any): UpdateAllImageEmbeddingResponse {
+    return {};
+  },
 
-	toJSON(_: UpdateAllImageEmbeddingResponse): unknown {
-		const obj: any = {};
-		return obj;
-	},
+  toJSON(_: UpdateAllImageEmbeddingResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
 
-	create(base?: DeepPartial<UpdateAllImageEmbeddingResponse>): UpdateAllImageEmbeddingResponse {
-		return UpdateAllImageEmbeddingResponse.fromPartial(base ?? {});
-	},
-	fromPartial(_: DeepPartial<UpdateAllImageEmbeddingResponse>): UpdateAllImageEmbeddingResponse {
-		const message = createBaseUpdateAllImageEmbeddingResponse();
-		return message;
-	}
+  create(base?: DeepPartial<UpdateAllImageEmbeddingResponse>): UpdateAllImageEmbeddingResponse {
+    return UpdateAllImageEmbeddingResponse.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<UpdateAllImageEmbeddingResponse>): UpdateAllImageEmbeddingResponse {
+    const message = createBaseUpdateAllImageEmbeddingResponse();
+    return message;
+  },
 };
 
 function createBaseUpdateAllAlbumThumbnailRequest(): UpdateAllAlbumThumbnailRequest {
-	return { onlyMissing: false };
+  return { onlyMissing: false };
 }
 
 export const UpdateAllAlbumThumbnailRequest: MessageFns<UpdateAllAlbumThumbnailRequest> = {
-	encode(
-		message: UpdateAllAlbumThumbnailRequest,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		if (message.onlyMissing !== false) {
-			writer.uint32(8).bool(message.onlyMissing);
-		}
-		return writer;
-	},
+  encode(message: UpdateAllAlbumThumbnailRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.onlyMissing !== false) {
+      writer.uint32(8).bool(message.onlyMissing);
+    }
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): UpdateAllAlbumThumbnailRequest {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseUpdateAllAlbumThumbnailRequest();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-				case 1: {
-					if (tag !== 8) {
-						break;
-					}
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAllAlbumThumbnailRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAllAlbumThumbnailRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
 
-					message.onlyMissing = reader.bool();
-					continue;
-				}
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+          message.onlyMissing = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(object: any): UpdateAllAlbumThumbnailRequest {
-		return {
-			onlyMissing: isSet(object.onlyMissing)
-				? globalThis.Boolean(object.onlyMissing)
-				: isSet(object.only_missing)
-					? globalThis.Boolean(object.only_missing)
-					: false
-		};
-	},
+  fromJSON(object: any): UpdateAllAlbumThumbnailRequest {
+    return {
+      onlyMissing: isSet(object.onlyMissing)
+        ? globalThis.Boolean(object.onlyMissing)
+        : isSet(object.only_missing)
+        ? globalThis.Boolean(object.only_missing)
+        : false,
+    };
+  },
 
-	toJSON(message: UpdateAllAlbumThumbnailRequest): unknown {
-		const obj: any = {};
-		if (message.onlyMissing !== false) {
-			obj.onlyMissing = message.onlyMissing;
-		}
-		return obj;
-	},
+  toJSON(message: UpdateAllAlbumThumbnailRequest): unknown {
+    const obj: any = {};
+    if (message.onlyMissing !== false) {
+      obj.onlyMissing = message.onlyMissing;
+    }
+    return obj;
+  },
 
-	create(base?: DeepPartial<UpdateAllAlbumThumbnailRequest>): UpdateAllAlbumThumbnailRequest {
-		return UpdateAllAlbumThumbnailRequest.fromPartial(base ?? {});
-	},
-	fromPartial(object: DeepPartial<UpdateAllAlbumThumbnailRequest>): UpdateAllAlbumThumbnailRequest {
-		const message = createBaseUpdateAllAlbumThumbnailRequest();
-		message.onlyMissing = object.onlyMissing ?? false;
-		return message;
-	}
+  create(base?: DeepPartial<UpdateAllAlbumThumbnailRequest>): UpdateAllAlbumThumbnailRequest {
+    return UpdateAllAlbumThumbnailRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateAllAlbumThumbnailRequest>): UpdateAllAlbumThumbnailRequest {
+    const message = createBaseUpdateAllAlbumThumbnailRequest();
+    message.onlyMissing = object.onlyMissing ?? false;
+    return message;
+  },
 };
 
 function createBaseUpdateAllAlbumThumbnailResponse(): UpdateAllAlbumThumbnailResponse {
-	return {};
+  return {};
 }
 
 export const UpdateAllAlbumThumbnailResponse: MessageFns<UpdateAllAlbumThumbnailResponse> = {
-	encode(
-		_: UpdateAllAlbumThumbnailResponse,
-		writer: BinaryWriter = new BinaryWriter()
-	): BinaryWriter {
-		return writer;
-	},
+  encode(_: UpdateAllAlbumThumbnailResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
 
-	decode(input: BinaryReader | Uint8Array, length?: number): UpdateAllAlbumThumbnailResponse {
-		const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-		const end = length === undefined ? reader.len : reader.pos + length;
-		const message = createBaseUpdateAllAlbumThumbnailResponse();
-		while (reader.pos < end) {
-			const tag = reader.uint32();
-			switch (tag >>> 3) {
-			}
-			if ((tag & 7) === 4 || tag === 0) {
-				break;
-			}
-			reader.skip(tag & 7);
-		}
-		return message;
-	},
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAllAlbumThumbnailResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateAllAlbumThumbnailResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
 
-	fromJSON(_: any): UpdateAllAlbumThumbnailResponse {
-		return {};
-	},
+  fromJSON(_: any): UpdateAllAlbumThumbnailResponse {
+    return {};
+  },
 
-	toJSON(_: UpdateAllAlbumThumbnailResponse): unknown {
-		const obj: any = {};
-		return obj;
-	},
+  toJSON(_: UpdateAllAlbumThumbnailResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
 
-	create(base?: DeepPartial<UpdateAllAlbumThumbnailResponse>): UpdateAllAlbumThumbnailResponse {
-		return UpdateAllAlbumThumbnailResponse.fromPartial(base ?? {});
-	},
-	fromPartial(_: DeepPartial<UpdateAllAlbumThumbnailResponse>): UpdateAllAlbumThumbnailResponse {
-		const message = createBaseUpdateAllAlbumThumbnailResponse();
-		return message;
-	}
+  create(base?: DeepPartial<UpdateAllAlbumThumbnailResponse>): UpdateAllAlbumThumbnailResponse {
+    return UpdateAllAlbumThumbnailResponse.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<UpdateAllAlbumThumbnailResponse>): UpdateAllAlbumThumbnailResponse {
+    const message = createBaseUpdateAllAlbumThumbnailResponse();
+    return message;
+  },
+};
+
+function createBaseNotifyProcessAllAssetsRequest(): NotifyProcessAllAssetsRequest {
+  return { onlyMissing: false };
+}
+
+export const NotifyProcessAllAssetsRequest: MessageFns<NotifyProcessAllAssetsRequest> = {
+  encode(message: NotifyProcessAllAssetsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.onlyMissing !== false) {
+      writer.uint32(8).bool(message.onlyMissing);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): NotifyProcessAllAssetsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseNotifyProcessAllAssetsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.onlyMissing = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): NotifyProcessAllAssetsRequest {
+    return {
+      onlyMissing: isSet(object.onlyMissing)
+        ? globalThis.Boolean(object.onlyMissing)
+        : isSet(object.only_missing)
+        ? globalThis.Boolean(object.only_missing)
+        : false,
+    };
+  },
+
+  toJSON(message: NotifyProcessAllAssetsRequest): unknown {
+    const obj: any = {};
+    if (message.onlyMissing !== false) {
+      obj.onlyMissing = message.onlyMissing;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<NotifyProcessAllAssetsRequest>): NotifyProcessAllAssetsRequest {
+    return NotifyProcessAllAssetsRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<NotifyProcessAllAssetsRequest>): NotifyProcessAllAssetsRequest {
+    const message = createBaseNotifyProcessAllAssetsRequest();
+    message.onlyMissing = object.onlyMissing ?? false;
+    return message;
+  },
+};
+
+function createBaseNotifyProcessAllAssetsResponse(): NotifyProcessAllAssetsResponse {
+  return {};
+}
+
+export const NotifyProcessAllAssetsResponse: MessageFns<NotifyProcessAllAssetsResponse> = {
+  encode(_: NotifyProcessAllAssetsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): NotifyProcessAllAssetsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseNotifyProcessAllAssetsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): NotifyProcessAllAssetsResponse {
+    return {};
+  },
+
+  toJSON(_: NotifyProcessAllAssetsResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<NotifyProcessAllAssetsResponse>): NotifyProcessAllAssetsResponse {
+    return NotifyProcessAllAssetsResponse.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<NotifyProcessAllAssetsResponse>): NotifyProcessAllAssetsResponse {
+    const message = createBaseNotifyProcessAllAssetsResponse();
+    return message;
+  },
 };
 
 /** Worker service definition. */
 export type WorkerServiceDefinition = typeof WorkerServiceDefinition;
 export const WorkerServiceDefinition = {
-	name: 'WorkerService',
-	fullName: 'WorkerService',
-	methods: {
-		/** Notify worker to process specific asset. */
-		notifyProcessAsset: {
-			name: 'NotifyProcessAsset',
-			requestType: NotifyProcessAssetResquest as typeof NotifyProcessAssetResquest,
-			requestStream: false,
-			responseType: NotifyProcessAssetResponse as typeof NotifyProcessAssetResponse,
-			responseStream: false,
-			options: {}
-		},
-		/** Notify worker to queue unprocessed asset to processing queue. */
-		notifyScanCache: {
-			name: 'NotifyScanCache',
-			requestType: NotifyScanCacheRequest as typeof NotifyScanCacheRequest,
-			requestStream: false,
-			responseType: NotifyScanCacheResponse as typeof NotifyScanCacheResponse,
-			responseStream: false,
-			options: {}
-		},
-		/** Update album thumbnail. */
-		updateAlbumThumbnail: {
-			name: 'UpdateAlbumThumbnail',
-			requestType: UpdateAlbumThumbnailRequest as typeof UpdateAlbumThumbnailRequest,
-			requestStream: false,
-			responseType: UpdateAlbumThumbnailResponse as typeof UpdateAlbumThumbnailResponse,
-			responseStream: false,
-			options: {}
-		},
-		/** Update image embedding. */
-		updateAllImageEmbedding: {
-			name: 'UpdateAllImageEmbedding',
-			requestType: UpdateAllImageEmbeddingRequest as typeof UpdateAllImageEmbeddingRequest,
-			requestStream: false,
-			responseType: UpdateAllImageEmbeddingResponse as typeof UpdateAllImageEmbeddingResponse,
-			responseStream: false,
-			options: {}
-		},
-		/** Update all album thumbnail */
-		updateAllAlbumThumbnail: {
-			name: 'UpdateAllAlbumThumbnail',
-			requestType: UpdateAllAlbumThumbnailRequest as typeof UpdateAllAlbumThumbnailRequest,
-			requestStream: false,
-			responseType: UpdateAllAlbumThumbnailResponse as typeof UpdateAllAlbumThumbnailResponse,
-			responseStream: false,
-			options: {}
-		}
-	}
+  name: "WorkerService",
+  fullName: "WorkerService",
+  methods: {
+    /** Notify worker to process specific asset. */
+    notifyProcessAsset: {
+      name: "NotifyProcessAsset",
+      requestType: NotifyProcessAssetResquest as typeof NotifyProcessAssetResquest,
+      requestStream: false,
+      responseType: NotifyProcessAssetResponse as typeof NotifyProcessAssetResponse,
+      responseStream: false,
+      options: {},
+    },
+    /** Notify worker to process all assets */
+    notifyProcessAllAssets: {
+      name: "NotifyProcessAllAssets",
+      requestType: NotifyProcessAllAssetsRequest as typeof NotifyProcessAllAssetsRequest,
+      requestStream: false,
+      responseType: NotifyProcessAllAssetsResponse as typeof NotifyProcessAllAssetsResponse,
+      responseStream: false,
+      options: {},
+    },
+    /** Notify worker to queue unprocessed asset to processing queue. */
+    notifyScanCache: {
+      name: "NotifyScanCache",
+      requestType: NotifyScanCacheRequest as typeof NotifyScanCacheRequest,
+      requestStream: false,
+      responseType: NotifyScanCacheResponse as typeof NotifyScanCacheResponse,
+      responseStream: false,
+      options: {},
+    },
+    /** Update album thumbnail. */
+    updateAlbumThumbnail: {
+      name: "UpdateAlbumThumbnail",
+      requestType: UpdateAlbumThumbnailRequest as typeof UpdateAlbumThumbnailRequest,
+      requestStream: false,
+      responseType: UpdateAlbumThumbnailResponse as typeof UpdateAlbumThumbnailResponse,
+      responseStream: false,
+      options: {},
+    },
+    /** Update image embedding. */
+    updateAllImageEmbedding: {
+      name: "UpdateAllImageEmbedding",
+      requestType: UpdateAllImageEmbeddingRequest as typeof UpdateAllImageEmbeddingRequest,
+      requestStream: false,
+      responseType: UpdateAllImageEmbeddingResponse as typeof UpdateAllImageEmbeddingResponse,
+      responseStream: false,
+      options: {},
+    },
+    /** Update all album thumbnail */
+    updateAllAlbumThumbnail: {
+      name: "UpdateAllAlbumThumbnail",
+      requestType: UpdateAllAlbumThumbnailRequest as typeof UpdateAllAlbumThumbnailRequest,
+      requestStream: false,
+      responseType: UpdateAllAlbumThumbnailResponse as typeof UpdateAllAlbumThumbnailResponse,
+      responseStream: false,
+      options: {},
+    },
+  },
 } as const;
 
 export interface WorkerServiceImplementation<CallContextExt = {}> {
-	/** Notify worker to process specific asset. */
-	notifyProcessAsset(
-		request: NotifyProcessAssetResquest,
-		context: CallContext & CallContextExt
-	): Promise<DeepPartial<NotifyProcessAssetResponse>>;
-	/** Notify worker to queue unprocessed asset to processing queue. */
-	notifyScanCache(
-		request: NotifyScanCacheRequest,
-		context: CallContext & CallContextExt
-	): Promise<DeepPartial<NotifyScanCacheResponse>>;
-	/** Update album thumbnail. */
-	updateAlbumThumbnail(
-		request: UpdateAlbumThumbnailRequest,
-		context: CallContext & CallContextExt
-	): Promise<DeepPartial<UpdateAlbumThumbnailResponse>>;
-	/** Update image embedding. */
-	updateAllImageEmbedding(
-		request: UpdateAllImageEmbeddingRequest,
-		context: CallContext & CallContextExt
-	): Promise<DeepPartial<UpdateAllImageEmbeddingResponse>>;
-	/** Update all album thumbnail */
-	updateAllAlbumThumbnail(
-		request: UpdateAllAlbumThumbnailRequest,
-		context: CallContext & CallContextExt
-	): Promise<DeepPartial<UpdateAllAlbumThumbnailResponse>>;
+  /** Notify worker to process specific asset. */
+  notifyProcessAsset(
+    request: NotifyProcessAssetResquest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<NotifyProcessAssetResponse>>;
+  /** Notify worker to process all assets */
+  notifyProcessAllAssets(
+    request: NotifyProcessAllAssetsRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<NotifyProcessAllAssetsResponse>>;
+  /** Notify worker to queue unprocessed asset to processing queue. */
+  notifyScanCache(
+    request: NotifyScanCacheRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<NotifyScanCacheResponse>>;
+  /** Update album thumbnail. */
+  updateAlbumThumbnail(
+    request: UpdateAlbumThumbnailRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<UpdateAlbumThumbnailResponse>>;
+  /** Update image embedding. */
+  updateAllImageEmbedding(
+    request: UpdateAllImageEmbeddingRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<UpdateAllImageEmbeddingResponse>>;
+  /** Update all album thumbnail */
+  updateAllAlbumThumbnail(
+    request: UpdateAllAlbumThumbnailRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<UpdateAllAlbumThumbnailResponse>>;
 }
 
 export interface WorkerServiceClient<CallOptionsExt = {}> {
-	/** Notify worker to process specific asset. */
-	notifyProcessAsset(
-		request: DeepPartial<NotifyProcessAssetResquest>,
-		options?: CallOptions & CallOptionsExt
-	): Promise<NotifyProcessAssetResponse>;
-	/** Notify worker to queue unprocessed asset to processing queue. */
-	notifyScanCache(
-		request: DeepPartial<NotifyScanCacheRequest>,
-		options?: CallOptions & CallOptionsExt
-	): Promise<NotifyScanCacheResponse>;
-	/** Update album thumbnail. */
-	updateAlbumThumbnail(
-		request: DeepPartial<UpdateAlbumThumbnailRequest>,
-		options?: CallOptions & CallOptionsExt
-	): Promise<UpdateAlbumThumbnailResponse>;
-	/** Update image embedding. */
-	updateAllImageEmbedding(
-		request: DeepPartial<UpdateAllImageEmbeddingRequest>,
-		options?: CallOptions & CallOptionsExt
-	): Promise<UpdateAllImageEmbeddingResponse>;
-	/** Update all album thumbnail */
-	updateAllAlbumThumbnail(
-		request: DeepPartial<UpdateAllAlbumThumbnailRequest>,
-		options?: CallOptions & CallOptionsExt
-	): Promise<UpdateAllAlbumThumbnailResponse>;
+  /** Notify worker to process specific asset. */
+  notifyProcessAsset(
+    request: DeepPartial<NotifyProcessAssetResquest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<NotifyProcessAssetResponse>;
+  /** Notify worker to process all assets */
+  notifyProcessAllAssets(
+    request: DeepPartial<NotifyProcessAllAssetsRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<NotifyProcessAllAssetsResponse>;
+  /** Notify worker to queue unprocessed asset to processing queue. */
+  notifyScanCache(
+    request: DeepPartial<NotifyScanCacheRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<NotifyScanCacheResponse>;
+  /** Update album thumbnail. */
+  updateAlbumThumbnail(
+    request: DeepPartial<UpdateAlbumThumbnailRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<UpdateAlbumThumbnailResponse>;
+  /** Update image embedding. */
+  updateAllImageEmbedding(
+    request: DeepPartial<UpdateAllImageEmbeddingRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<UpdateAllImageEmbeddingResponse>;
+  /** Update all album thumbnail */
+  updateAllAlbumThumbnail(
+    request: DeepPartial<UpdateAllAlbumThumbnailRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<UpdateAllAlbumThumbnailResponse>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin
-	? T
-	: T extends globalThis.Array<infer U>
-		? globalThis.Array<DeepPartial<U>>
-		: T extends ReadonlyArray<infer U>
-			? ReadonlyArray<DeepPartial<U>>
-			: T extends {}
-				? { [K in keyof T]?: DeepPartial<T[K]> }
-				: Partial<T>;
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : Partial<T>;
 
 function isSet(value: any): boolean {
-	return value !== null && value !== undefined;
+  return value !== null && value !== undefined;
 }
 
 export interface MessageFns<T> {
-	encode(message: T, writer?: BinaryWriter): BinaryWriter;
-	decode(input: BinaryReader | Uint8Array, length?: number): T;
-	fromJSON(object: any): T;
-	toJSON(message: T): unknown;
-	create(base?: DeepPartial<T>): T;
-	fromPartial(object: DeepPartial<T>): T;
+  encode(message: T, writer?: BinaryWriter): BinaryWriter;
+  decode(input: BinaryReader | Uint8Array, length?: number): T;
+  fromJSON(object: any): T;
+  toJSON(message: T): unknown;
+  create(base?: DeepPartial<T>): T;
+  fromPartial(object: DeepPartial<T>): T;
 }

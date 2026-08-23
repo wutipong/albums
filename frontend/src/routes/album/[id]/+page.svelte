@@ -5,6 +5,7 @@
 	import type { PageProps } from './$types';
 	import {
 		mdiAlert,
+		mdiBlender,
 		mdiClipboardOutline,
 		mdiClose,
 		mdiDelete,
@@ -63,6 +64,15 @@
 
 		toast.add(
 			'Album cover change has been queued. It will take some time before the change is applied.',
+			'info'
+		);
+	}
+
+	async function reprocessAsset(assetId: string) {
+		await fetch(`/api/asset/${assetId}/process`);
+
+		toast.add(
+			'Asset processing has been requested. It will take some time before the change is applied.',
 			'info'
 		);
 	}
@@ -252,6 +262,16 @@
 				}}
 			>
 				<Icon path={mdiImageAlbum} /> Set as album cover
+			</button>
+		</li>
+
+		<li>
+			<button
+				onclick={() => {
+					reprocessAsset(asset.id);
+				}}
+			>
+				<Icon path={mdiBlender} /> Re-process this asset.
 			</button>
 		</li>
 	{/if}

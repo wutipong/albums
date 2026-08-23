@@ -32,3 +32,7 @@ export async function updateAllAlbumThumbnail(onlyMissing: boolean = true) {
 		onlyMissing: onlyMissing
 	});
 }
+
+export async function notifyProcessAllAssets(onlyMissing: boolean = true) {
+	return await client.notifyProcessAllAssets({ onlyMissing: onlyMissing });
+}

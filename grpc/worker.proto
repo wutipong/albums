@@ -8,6 +8,9 @@ service WorkerService {
   // Notify worker to process specific asset.
   rpc NotifyProcessAsset(NotifyProcessAssetResquest) returns (NotifyProcessAssetResponse);
 
+  // Notify worker to process all assets
+  rpc NotifyProcessAllAssets(NotifyProcessAllAssetsRequest) returns (NotifyProcessAllAssetsResponse);
+
   // Notify worker to queue unprocessed asset to processing queue.
   rpc NotifyScanCache(NotifyScanCacheRequest) returns (NotifyScanCacheResponse);
 
@@ -73,4 +76,12 @@ message UpdateAllAlbumThumbnailRequest {
 
 message UpdateAllAlbumThumbnailResponse {
   // empty
+}
+
+message NotifyProcessAllAssetsRequest {
+  bool only_missing = 1;
+}
+
+message NotifyProcessAllAssetsResponse {
+  //empty
 }

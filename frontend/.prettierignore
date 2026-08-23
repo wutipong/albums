@@ -7,3 +7,6 @@ bun.lockb
 
 # Miscellaneous
 /static/
+
+#protoc generated.
+/src/lib/server/grpc/proto

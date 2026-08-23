@@ -15,9 +15,9 @@
 
 	let toast: Toast;
 
-	async function notifyPopulateMissingCover() {
+	async function notifyPopulateMissingCover(missingOnly: boolean) {
 		try {
-			const resp = await fetch('/api/album/cover');
+			const resp = await fetch(`/api/album/cover?missingOnly=${missingOnly}`);
 			if (resp.ok) {
 				toast.add('Album cover update request has been made.', 'info');
 			} else {
@@ -57,12 +57,34 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td>Populate Missing Album Cover</td>
+				<td>Populate missing album cover</td>
 				<td>
 					<button class="btn-small btn btn-primary" onclick={() => notifyPopulateMissingCover()}>
 						<Icon path={mdiPlayCircle} />
 						Start
 					</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="italic">
+					For album that has no cover, select an image that match the criteria to be the cover.
+				</td>
+			</tr>
+			<tr>
+				<td>Repopulate cover of all album.</td>
+				<td>
+					<button
+						class="btn-small btn btn-primary"
+						onclick={() => notifyPopulateMissingCover(false)}
+					>
+						<Icon path={mdiPlayCircle} />
+						Start
+					</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="italic">
+					Repopulate album cover, even album that already have one.
 				</td>
 			</tr>
 		</tbody>

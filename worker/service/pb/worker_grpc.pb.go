@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	WorkerService_NotifyProcessAsset_FullMethodName      = "/WorkerService/NotifyProcessAsset"
+	WorkerService_NotifyProcessAllAssets_FullMethodName  = "/WorkerService/NotifyProcessAllAssets"
 	WorkerService_NotifyScanCache_FullMethodName         = "/WorkerService/NotifyScanCache"
 	WorkerService_UpdateAlbumThumbnail_FullMethodName    = "/WorkerService/UpdateAlbumThumbnail"
 	WorkerService_UpdateAllImageEmbedding_FullMethodName = "/WorkerService/UpdateAllImageEmbedding"
@@ -34,6 +35,8 @@ const (
 type WorkerServiceClient interface {
 	// Notify worker to process specific asset.
 	NotifyProcessAsset(ctx context.Context, in *NotifyProcessAssetResquest, opts ...grpc.CallOption) (*NotifyProcessAssetResponse, error)
+	// Notify worker to process all assets
+	NotifyProcessAllAssets(ctx context.Context, in *NotifyProcessAllAssetsRequest, opts ...grpc.CallOption) (*NotifyProcessAllAssetsResponse, error)
 	// Notify worker to queue unprocessed asset to processing queue.
 	NotifyScanCache(ctx context.Context, in *NotifyScanCacheRequest, opts ...grpc.CallOption) (*NotifyScanCacheResponse, error)
 	// Update album thumbnail.
@@ -56,6 +59,16 @@ func (c *workerServiceClient) NotifyProcessAsset(ctx context.Context, in *Notify
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(NotifyProcessAssetResponse)
 	err := c.cc.Invoke(ctx, WorkerService_NotifyProcessAsset_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workerServiceClient) NotifyProcessAllAssets(ctx context.Context, in *NotifyProcessAllAssetsRequest, opts ...grpc.CallOption) (*NotifyProcessAllAssetsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NotifyProcessAllAssetsResponse)
+	err := c.cc.Invoke(ctx, WorkerService_NotifyProcessAllAssets_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -110,6 +123,8 @@ func (c *workerServiceClient) UpdateAllAlbumThumbnail(ctx context.Context, in *U
 type WorkerServiceServer interface {
 	// Notify worker to process specific asset.
 	NotifyProcessAsset(context.Context, *NotifyProcessAssetResquest) (*NotifyProcessAssetResponse, error)
+	// Notify worker to process all assets
+	NotifyProcessAllAssets(context.Context, *NotifyProcessAllAssetsRequest) (*NotifyProcessAllAssetsResponse, error)
 	// Notify worker to queue unprocessed asset to processing queue.
 	NotifyScanCache(context.Context, *NotifyScanCacheRequest) (*NotifyScanCacheResponse, error)
 	// Update album thumbnail.
@@ -130,6 +145,9 @@ type UnimplementedWorkerServiceServer struct{}
 
 func (UnimplementedWorkerServiceServer) NotifyProcessAsset(context.Context, *NotifyProcessAssetResquest) (*NotifyProcessAssetResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method NotifyProcessAsset not implemented")
+}
+func (UnimplementedWorkerServiceServer) NotifyProcessAllAssets(context.Context, *NotifyProcessAllAssetsRequest) (*NotifyProcessAllAssetsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method NotifyProcessAllAssets not implemented")
 }
 func (UnimplementedWorkerServiceServer) NotifyScanCache(context.Context, *NotifyScanCacheRequest) (*NotifyScanCacheResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method NotifyScanCache not implemented")
@@ -178,6 +196,24 @@ func _WorkerService_NotifyProcessAsset_Handler(srv interface{}, ctx context.Cont
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WorkerServiceServer).NotifyProcessAsset(ctx, req.(*NotifyProcessAssetResquest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkerService_NotifyProcessAllAssets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NotifyProcessAllAssetsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkerServiceServer).NotifyProcessAllAssets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkerService_NotifyProcessAllAssets_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkerServiceServer).NotifyProcessAllAssets(ctx, req.(*NotifyProcessAllAssetsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -264,6 +300,10 @@ var WorkerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NotifyProcessAsset",
 			Handler:    _WorkerService_NotifyProcessAsset_Handler,
+		},
+		{
+			MethodName: "NotifyProcessAllAssets",
+			Handler:    _WorkerService_NotifyProcessAllAssets_Handler,
 		},
 		{
 			MethodName: "NotifyScanCache",

@@ -27,6 +27,20 @@ WHERE
     process_status = 'pending'
     AND deleted_at IS NULL;
 
+-- name: GetPendingOrFailedAssets :many
+SELECT *
+FROM assets
+WHERE
+    (process_status = 'pending' OR process_status = 'failed')
+    AND deleted_at IS NULL;
+
+-- name: GetAssetsWithoutUploading :many
+SELECT *
+FROM assets
+WHERE
+    process_status <> 'uploading'
+    AND deleted_at IS NULL;
+
 -- name: GetImageAssetsWithoutEmbedding :many
 SELECT *
 FROM assets
