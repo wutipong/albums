@@ -73,7 +73,10 @@
 			<tr>
 				<td>Repopulate cover of all album.</td>
 				<td>
-					<button class="btn-small btn btn-primary" onclick={() => notifyPopulateMissingCover(false)}>
+					<button
+						class="btn-small btn btn-primary"
+						onclick={() => notifyPopulateMissingCover(false)}
+					>
 						<Icon path={mdiPlayCircle} />
 						Start
 					</button>

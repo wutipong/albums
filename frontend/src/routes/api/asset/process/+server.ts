@@ -3,7 +3,7 @@ import { notifyProcessAllAssets, updateAllImageEmbedding } from '$lib/server/grp
 import { error, json } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ url }) => {
-	let missingOnly = url.searchParams.get("missingOnly") === "true"
+	let missingOnly = url.searchParams.get('missingOnly') === 'true';
 	try {
 		await notifyProcessAllAssets(missingOnly);
 	} catch {
