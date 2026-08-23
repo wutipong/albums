@@ -7,6 +7,7 @@ export const load: PageServerLoad = async () => {
 	const queue = await db
 		.selectFrom('neoq_jobs')
 		.where('status', '=', 'new')
+		.where(sql<string>`payload->>'command'`, '=', 'process-asset')
 		.orderBy('id', 'asc')
 		.limit(20)
 		.selectAll()
