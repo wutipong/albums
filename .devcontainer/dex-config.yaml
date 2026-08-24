@@ -1,6 +1,6 @@
 # config.yaml
 # Force the issuer URL to remain uniform across all networks
-issuer: http://localhost:5556
+issuer: http://dex.localhost:5556
 
 storage:
   type: memory
