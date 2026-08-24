@@ -26,8 +26,6 @@ export const auth = betterAuth({
 					clientId: env.OIDC_CLIENT_ID || 'placeholder-client',
 					clientSecret: env.OIDC_SECRET || 'placeholder-secret',
 					discoveryUrl: env.OIDC_DISCOVERY_URL || 'placeholder-discovery',
-					tokenUrl: env.OIDC_TOKEN || 'https://placeholder-issuer.com',
-					authorizationUrl: env.OIDC_AUTHORIZE || 'https://placeholder-issuer.com',
 					scopes: ['openid', 'email', 'profile', 'groups'],
 					mapProfileToUser: async (profile) => {
 						const groups = profile.groups;
@@ -36,7 +34,6 @@ export const auth = betterAuth({
 						return {
 							name: profile.name,
 							email: profile.email,
-							image: profile.picture?.tostring(),
 							
 							role: isAdmin ? 'admin' : 'user' // Maps directly to user.additionalFields.role
 						};
