@@ -26,10 +26,9 @@ func deleteAlbum(ctx context.Context, profileName string, dryRun bool, id string
 		return fmt.Errorf("Unable to parse server URL: %w", err)
 	}
 	server := api.ServerConfig{
-		URL:     serverUrl,
-		DryRun:  dryRun,
-		APIKey:  config.APIKey,
-		Network: string(config.Network),
+		URL:    serverUrl,
+		DryRun: dryRun,
+		APIKey: config.APIKey,
 	}
 
 	resp, err := api.DeleteAlbum(ctx, server, id)

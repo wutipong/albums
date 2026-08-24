@@ -56,10 +56,9 @@ func Command(profileStr *string) *cli.Command {
 					}
 
 					server := api.ServerConfig{
-						URL:     url,
-						DryRun:  dryRun,
-						APIKey:  c.APIKey,
-						Network: string(c.Network),
+						URL:    url,
+						DryRun: dryRun,
+						APIKey: c.APIKey,
 					}
 
 					return processSingle(ctx, server, dryRun, id)
@@ -94,10 +93,9 @@ func Command(profileStr *string) *cli.Command {
 					}
 
 					server := api.ServerConfig{
-						URL:     url,
-						DryRun:  dryRun,
-						APIKey:  c.APIKey,
-						Network: string(c.Network),
+						URL:    url,
+						DryRun: dryRun,
+						APIKey: c.APIKey,
 					}
 
 					return processPending(ctx, server, dryRun)

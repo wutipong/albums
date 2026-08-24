@@ -14,15 +14,9 @@ import (
 
 type Network string
 
-const (
-	NetworkPublic  Network = "public"
-	NetworkPrivate Network = "private"
-)
-
 type Profile struct {
-	URL     string  `yaml:"url"`
-	APIKey  string  `yaml:"api_key"`
-	Network Network `yaml:"network"`
+	URL    string `yaml:"url"`
+	APIKey string `yaml:"api_key"`
 }
 
 func createConfigPath() (path string, err error) {
