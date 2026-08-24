@@ -11,7 +11,7 @@ export const auth = betterAuth({
 	database: new Pool({
 		connectionString: env.DATABASE_URL
 	}),
-	
+
 	plugins: [
 		admin(),
 		sveltekitCookies(getRequestEvent),
@@ -34,7 +34,7 @@ export const auth = betterAuth({
 						return {
 							name: profile.name,
 							email: profile.email,
-							
+
 							role: isAdmin ? 'admin' : 'user' // Maps directly to user.additionalFields.role
 						};
 					}
