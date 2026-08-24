@@ -1,6 +1,6 @@
 # config.yaml
 # Force the issuer URL to remain uniform across all networks
-issuer: http://localhost:5556
+issuer: http://dex.localhost:5556
 
 storage:
   type: memory
@@ -32,4 +32,4 @@ staticClients:
     secret: albums-secret
     name: "Albums"
     redirectURIs:
-      - 'http://localhost:5173/api/auth/oauth2/callback/dex'
+      - 'http://localhost:5173/api/auth/callback/dex'

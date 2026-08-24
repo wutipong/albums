@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { s3, s3Public } from '$lib/server/s3';
+import { s3 } from '$lib/server/s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import * as mime from 'mime-types';
@@ -86,7 +86,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		ContentType: contentType
 	});
 
-	const url = await getSignedUrl(network === 'public' ? s3Public : s3, command, {
+	const url = await getSignedUrl(s3, command, {
 		expiresIn: 3600
 	});
 

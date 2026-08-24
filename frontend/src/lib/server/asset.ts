@@ -3,7 +3,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { generateImageUrl } from '@imgproxy/imgproxy-node';
 import type { IPostgresInterval } from 'postgres-interval';
 import { env } from '$env/dynamic/private';
-import { s3Public } from './s3';
+import { s3 } from './s3';
 import { Temporal } from 'temporal-polyfill';
 
 export async function createResponseAssetList(
@@ -81,7 +81,7 @@ export async function createResponseAssetList(
 
 				case 'video':
 					view_url = await getSignedUrl(
-						s3Public,
+						s3,
 						new GetObjectCommand({
 							Bucket: env.S3_BUCKET,
 							Key: asset.view
@@ -93,7 +93,7 @@ export async function createResponseAssetList(
 			const copy_url = asset.type === 'video' ? '' : `/api/asset/${asset.id}/original/`;
 
 			const original_url = await getSignedUrl(
-				s3Public,
+				s3,
 				new GetObjectCommand({
 					Bucket: env.S3_BUCKET,
 					Key: asset.original

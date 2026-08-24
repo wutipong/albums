@@ -3,7 +3,7 @@ import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { env } from '$env/dynamic/private';
-import { s3, s3Public } from '$lib/server/s3';
+import { s3 } from '$lib/server/s3';
 import mime from 'mime-types';
 
 export const GET: RequestHandler = async ({ params }) => {

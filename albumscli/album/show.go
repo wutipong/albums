@@ -26,10 +26,9 @@ func showAlbum(ctx context.Context, profileName string, dryRun bool, albumID str
 		return fmt.Errorf("Unable to parse server URL: %w", err)
 	}
 	server := api.ServerConfig{
-		URL:     serverUrl,
-		DryRun:  dryRun,
-		APIKey:  config.APIKey,
-		Network: string(config.Network),
+		URL:    serverUrl,
+		DryRun: dryRun,
+		APIKey: config.APIKey,
 	}
 
 	albumDetail, err := api.GetAlbumDetail(ctx, server, albumID)

@@ -11,6 +11,7 @@ export const auth = betterAuth({
 	database: new Pool({
 		connectionString: env.DATABASE_URL
 	}),
+
 	plugins: [
 		admin(),
 		sveltekitCookies(getRequestEvent),
@@ -24,20 +25,16 @@ export const auth = betterAuth({
 					providerId: env.OIDC_PROVIDER_ID || 'placeholder-provider',
 					clientId: env.OIDC_CLIENT_ID || 'placeholder-client',
 					clientSecret: env.OIDC_SECRET || 'placeholder-secret',
-					issuer: env.OIDC_ISSUER || 'https://placeholder-issuer.com',
-					tokenUrl: env.OIDC_TOKEN || 'https://placeholder-issuer.com',
-					authorizationUrl: env.OIDC_AUTHORIZE || 'https://placeholder-issuer.com',
-					requireIssuerValidation: false,
+					discoveryUrl: env.OIDC_DISCOVERY_URL || 'placeholder-discovery',
 					scopes: ['openid', 'email', 'profile', 'groups'],
 					mapProfileToUser: async (profile) => {
 						const groups = profile.groups;
 						const isAdmin = groups?.includes('admin');
 
-						console.log('mapProfileToUser');
 						return {
 							name: profile.name,
 							email: profile.email,
-							image: profile.picture,
+
 							role: isAdmin ? 'admin' : 'user' // Maps directly to user.additionalFields.role
 						};
 					}

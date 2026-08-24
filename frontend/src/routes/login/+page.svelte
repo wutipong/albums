@@ -6,7 +6,7 @@
 	const { data } = $props();
 
 	async function performLogin() {
-		await authClient.signIn.oauth2(data);
+		await authClient.signIn.social({ provider: data.providerId });
 	}
 </script>
 
