@@ -10,13 +10,3 @@ export const s3 = new S3Client({
 	},
 	forcePathStyle: true
 });
-
-export const s3Public = new S3Client({
-	region: env.AWS_DEFAULT_REGION ?? 'dummy-region',
-	endpoint: env.S3_PUBLIC_URL ?? 'http://example.com',
-	credentials: {
-		accessKeyId: env.AWS_ACCESS_KEY_ID ?? 'dummy-key',
-		secretAccessKey: env.AWS_SECRET_ACCESS_KEY ?? 'dummy-secret'
-	},
-	forcePathStyle: true
-});
