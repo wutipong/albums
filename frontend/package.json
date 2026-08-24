@@ -62,7 +62,6 @@
 		"@types/hammerjs": "^2.0.46",
 		"@types/mime-types": "^3.0.1",
 		"@types/pg": "^8.20.0",
-		"@typescript/typescript6": "^6.0.2",
 		"better-auth": "^1.7.1",
 		"hammerjs": "^2.0.8",
 		"kysely": "^0.28.17",
