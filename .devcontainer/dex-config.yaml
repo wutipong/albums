@@ -32,4 +32,4 @@ staticClients:
     secret: albums-secret
     name: "Albums"
     redirectURIs:
-      - 'http://localhost:5173/api/auth/oauth2/callback/dex'
+      - 'http://localhost:5173/api/auth/callback/dex'
