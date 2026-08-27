@@ -37,6 +37,8 @@
 
 	let toast: Toast;
 
+	let thumbnails: Record<string, AssetThumbnail> = $state({});
+
 	let infoModal: HTMLDialogElement;
 	let confirmDeleteModal: HTMLDialogElement;
 	let assetInfoDialog: AssetInfoDialog;
@@ -100,6 +102,12 @@
 
 		currentIndex = index;
 		asset = data.assets[index];
+
+		thumbnails[asset.id].scrollIntoView({
+			behavior: 'smooth', // Options: 'smooth', 'auto'
+			block: 'center', // Vertically centers the element
+			inline: 'center' // Horizontally centers the element
+		});
 	}
 
 	async function doDeleteAlbum(id: string) {
@@ -136,9 +144,11 @@
 		<div class="flex flex-wrap justify-evenly gap-1">
 			{#each data.assets as asset, index (asset)}
 				<AssetThumbnail
+					bind:this={thumbnails[asset.id]}
 					{asset}
 					onclick={(asset: any) => {
 						onIndexUpdated(index);
+						thumbnails[asset.id].scrollIntoView(true);
 						showViewer = true;
 					}}
 				/>
