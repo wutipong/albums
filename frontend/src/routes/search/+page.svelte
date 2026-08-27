@@ -15,7 +15,7 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import { copyImageToClipboard } from '$lib/clipboard';
 
-	let { data, params }: PageProps = $props();
+	let { data }: PageProps = $props();
 	let asset: any = $state({ id: '<placeholder>', album_id: '' });
 	let showViewer = $state(false);
 	let currentIndex = $state(0);
@@ -24,6 +24,7 @@
 	let assetInfoDialog: AssetInfoDialog;
 	let toast: Toast;
 
+	let thumbnails: Record<string, AssetThumbnail> = {};
 	function next() {
 		if (hasNext) {
 			currentIndex++;
@@ -52,6 +53,12 @@
 
 		currentIndex = index;
 		asset = data.assets[index];
+
+		thumbnails[asset.id].scrollIntoView({
+			behavior: 'smooth', // Options: 'smooth', 'auto'
+			block: 'center', // Vertically centers the element
+			inline: 'center' // Horizontally centers the element
+		});
 	}
 </script>
 
@@ -71,6 +78,7 @@
 		<div class="flex flex-wrap justify-evenly">
 			{#each data.assets as asset, index (asset)}
 				<AssetThumbnail
+					bind:this={thumbnails[asset.id]}
 					{asset}
 					onclick={(asset: any) => {
 						onIndexUpdated(index);
@@ -91,6 +99,20 @@
 		{hasPrevious}
 		menu={viewMenu}
 	/>
+
+	<nav aria-label="Move to top navigation" class="fixed inset-e-5 bottom-10">
+		<button
+			class="btn shadow-xl"
+			onclick={() => {
+				if (data.assets.length > 0) {
+					thumbnails[data.assets[0].id].scrollIntoView();
+				}
+			}}
+		>
+			<Icon path={mdiArrowUpBox} />
+			<span class="hidden md:block">Top</span>
+		</button>
+	</nav>
 </div>
 
 <Toast bind:this={toast} />
