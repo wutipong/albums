@@ -1,5 +1,7 @@
 <script lang="ts">
 	import notAvailableSvg from '$lib/assets/not-available-small.svg?raw';
+	import { mdiAlertCircle, mdiClock, mdiFilmstrip, mdiMovie } from '@mdi/js';
+	import Icon from 'mdi-svelte';
 	let { asset, onclick = (id: string) => {} } = $props();
 
 	const TARGET_HEIGHT = 200;
@@ -71,13 +73,19 @@
 			{/if}
 		</div>
 
-		<div class="absolute top-1 right-2 place-items-end">
+		<div class="absolute top-1 right-2 grid grid-cols-1 place-items-end gap-2">
 			{#if assetType === 'video'}
-				<div class="badge">Video</div>
+				<div class="badge text-xs badge-info"><Icon path={mdiMovie} /> Video</div>
 			{/if}
 
 			{#if imageFrames > 1}
-				<div class="badge">Animation</div>
+				<div class="badge-s badge badge-info"><Icon path={mdiFilmstrip} /> Animation</div>
+			{/if}
+			{#if asset.processStatus == 'error'}
+				<div class="badge badge-error"><Icon path={mdiAlertCircle} /> Failed</div>
+			{/if}
+			{#if asset.processStatus == 'processing'}
+				<div class="badge badge-warning"><Icon path={mdiClock} /> Processing</div>
 			{/if}
 		</div>
 	</div>
