@@ -75,17 +75,19 @@
 
 		<div class="absolute top-1 right-2 grid grid-cols-1 place-items-end gap-2">
 			{#if assetType === 'video'}
-				<div class="badge text-xs badge-info"><Icon path={mdiMovie} /> Video</div>
+				<div class="badge badge-soft badge-info"><Icon path={mdiMovie} /> Video</div>
 			{/if}
 
 			{#if imageFrames > 1}
-				<div class="badge-s badge badge-info"><Icon path={mdiFilmstrip} /> Animation</div>
+				<div class="badge badge-soft badge-info"><Icon path={mdiFilmstrip} /> Animation</div>
 			{/if}
+
 			{#if asset.processStatus == 'error'}
-				<div class="badge badge-error"><Icon path={mdiAlertCircle} /> Failed</div>
+				<div class="badge badge-soft badge-error"><Icon path={mdiAlertCircle} /> Failed</div>
 			{/if}
+
 			{#if asset.processStatus == 'processing'}
-				<div class="badge badge-warning"><Icon path={mdiClock} /> Processing</div>
+				<div class="badge badge-soft badge-warning"><Icon path={mdiClock} /> Processing</div>
 			{/if}
 		</div>
 	</div>
