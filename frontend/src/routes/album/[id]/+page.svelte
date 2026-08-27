@@ -5,6 +5,7 @@
 	import type { PageProps } from './$types';
 	import {
 		mdiAlert,
+		mdiArrowUpBox,
 		mdiBlender,
 		mdiClipboardOutline,
 		mdiClose,
@@ -37,7 +38,7 @@
 
 	let toast: Toast;
 
-	let thumbnails: Record<string, AssetThumbnail> = $state({});
+	let thumbnails: Record<string, AssetThumbnail> = {};
 
 	let infoModal: HTMLDialogElement;
 	let confirmDeleteModal: HTMLDialogElement;
@@ -166,6 +167,23 @@
 		hasPrevious={prevIndex != -1}
 		menu={viewMenu}
 	/>
+
+	<nav
+		aria-label="Move to top navigation"
+		class="fixed inset-e-5 bottom-10"
+	>
+		<button
+			class="btn shadow-xl"
+			onclick={() => {
+				if (data.assets.length > 0) {
+					thumbnails[data.assets[0].id].scrollIntoView();
+				}
+			}}
+		>
+			<Icon path={mdiArrowUpBox} />
+			<span class="hidden md:block">Top</span>
+		</button>
+	</nav>
 </div>
 
 <Toast bind:this={toast} />
