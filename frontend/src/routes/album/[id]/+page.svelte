@@ -168,10 +168,7 @@
 		menu={viewMenu}
 	/>
 
-	<nav
-		aria-label="Move to top navigation"
-		class="fixed inset-e-5 bottom-10"
-	>
+	<nav aria-label="Move to top navigation" class="fixed inset-e-5 bottom-10">
 		<button
 			class="btn shadow-xl"
 			onclick={() => {

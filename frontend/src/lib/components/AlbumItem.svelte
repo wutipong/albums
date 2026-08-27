@@ -7,9 +7,17 @@
 	}
 
 	let { album, aspect = 'landscape' }: Props = $props();
+	let container: HTMLElement;
+	export function scrollIntoView(arg?: boolean | ScrollIntoViewOptions) {
+		container?.scrollIntoView(arg);
+	}
 </script>
 
-<div class="block rounded-xl p-4 hover:bg-base-content/20 hover:shadow-xl" id={album.id}>
+<div
+	bind:this={container}
+	class="block rounded-xl p-4 hover:bg-base-content/20 hover:shadow-xl"
+	id={album.id}
+>
 	<div class="w-[300px] overflow-clip rounded-xl border-1 border-base-content/20">
 		<figure
 			class="block w-[300px]"

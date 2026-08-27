@@ -2,7 +2,7 @@
 	import AlbumItem from '$lib/components/AlbumItem.svelte';
 	import type { PageProps } from './$types';
 	import NavBar from '$lib/components/NavBar.svelte';
-	import { mdiFilter, mdiOrderBoolAscending } from '@mdi/js';
+	import { mdiArrowUpBox, mdiFilter, mdiOrderBoolAscending } from '@mdi/js';
 	import Icon from 'mdi-svelte';
 
 	let { data }: PageProps = $props();
@@ -32,6 +32,8 @@
 				}
 			})
 	);
+
+	let thumbnails: Record<string, AlbumItem> = {};
 </script>
 
 <svelte:head>
@@ -65,8 +67,22 @@
 	<div class="mx-4 overflow-auto pt-4 pb-20">
 		<div class="flex flex-wrap justify-evenly gap-2">
 			{#each albums as album (album.id)}
-				<AlbumItem {album} aspect={data.aspect} />
+				<AlbumItem {album} aspect={data.aspect} bind:this={thumbnails[album.id]} />
 			{/each}
 		</div>
 	</div>
+
+	<nav aria-label="Move to top navigation" class="fixed inset-e-5 bottom-10">
+		<button
+			class="btn shadow-xl"
+			onclick={() => {
+				if (albums.length > 0) {
+					thumbnails[albums[0].id].scrollIntoView();
+				}
+			}}
+		>
+			<Icon path={mdiArrowUpBox} />
+			<span class="hidden md:block">Top</span>
+		</button>
+	</nav>
 </div>
