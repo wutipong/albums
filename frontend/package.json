@@ -18,7 +18,6 @@
 		"codegen": "bun run kysely && bun run protoc",
 		"pwa:generate": "pwa-assets-generator && pwa-assets-generator -c pwa-favicon.config.ts",
 		"better-auth-migrate": "bunx @better-auth/cli@latest migrate"
-		
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.1.0",

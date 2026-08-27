@@ -13,10 +13,10 @@
 	let thumbnailLoading = $state(true);
 	let previewLoading = $state(true);
 
-	let rootElement: HTMLElement| undefined = $state()
+	let rootElement: HTMLElement | undefined = $state();
 
-	export function scrollIntoView(arg?: boolean | ScrollIntoViewOptions){
-		rootElement?.scrollIntoView(arg)
+	export function scrollIntoView(arg?: boolean | ScrollIntoViewOptions) {
+		rootElement?.scrollIntoView(arg);
 	}
 </script>
 
