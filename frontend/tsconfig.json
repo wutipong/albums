@@ -12,6 +12,7 @@
 		"strict": true,
 		"moduleResolution": "bundler",
 		"types": [
+			"bun",
 			"vidstack/svelte",
 			"vite-plugin-pwa/svelte",
 			"vite-plugin-pwa/info",
