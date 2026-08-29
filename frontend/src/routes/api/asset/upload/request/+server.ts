@@ -15,7 +15,6 @@ export const POST: RequestHandler = async ({ request }) => {
 	const albumId = req.album_id;
 	const filename = req.filename;
 	const checksum = req.checksum;
-	const network = req.network ?? 'private';
 
 	const contentType = mime.contentType(path.basename(filename));
 
@@ -24,7 +23,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	const extension = mime.extension(mime.lookup(filename) || '');
-	const key = `pending/${randomUUID()}.${extension}`;
+	const key = `public/${randomUUID()}.${extension}`;
 
 	const type = contentType.substring(0, contentType.indexOf('/'));
 
