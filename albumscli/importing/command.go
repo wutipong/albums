@@ -110,7 +110,6 @@ func Process(
 			slog.Any("matchalbums", matchingAlbums),
 		)
 
-		existing := false
 		var album types.Album
 		if !force && len(matchingAlbums) > 0 {
 			slog.Warn(
@@ -120,7 +119,6 @@ func Process(
 			)
 
 			album = matchingAlbums[0]
-			existing = true
 		} else {
 			slog.Info("creating album",
 				slog.String("name", path),
@@ -161,18 +159,6 @@ func Process(
 				return err
 			}
 			continue
-		}
-
-		if !existing {
-			slog.Info("notify populate album cover",
-				slog.String("album", album.Name),
-				slog.String("id", album.ID),
-			)
-
-			_, err = api.PopulateAlbumCover(ctx, server, album.ID)
-			if err != nil {
-				return fmt.Errorf("failed to queue populate album cover: %w", err)
-			}
 		}
 	}
 
