@@ -49,7 +49,7 @@ const handleAdmin: Handle = async ({ event, resolve }) => {
 	}
 
 	const user = event.locals.user;
-	if (user.role !== 'admin') {
+	if (!user.role || user.role !== 'admin') {
 		error(403, 'forbidden.');
 	}
 
