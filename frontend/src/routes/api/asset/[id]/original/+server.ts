@@ -1,10 +1,9 @@
 import { db } from '$lib/server/db';
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { GetObjectCommand } from '@aws-sdk/client-s3';
-import { env } from '$env/dynamic/private';
 import { s3 } from '$lib/server/s3';
 import mime from 'mime-types';
+import path from 'node:path';
 
 export const GET: RequestHandler = async ({ params }) => {
 	const { id } = params;
@@ -20,25 +19,17 @@ export const GET: RequestHandler = async ({ params }) => {
 		return error(404, 'Asset not found.');
 	}
 
-	const command = new GetObjectCommand({
-		Bucket: env.S3_BUCKET,
-		Key: asset.original
-	});
-
-	const response = await s3.send(command);
-	if (!response.Body) {
-		return error(404, 'Asset not found in S3.');
-	}
-
-	const byteArray = await response.Body.transformToByteArray();
+	const file = s3.file(asset.original);
+	const stat = await file.stat();
 	const mimetype = mime.lookup(asset.filename) || 'application/octet-stream';
 
-	return new Response(byteArray as BodyInit, {
+	return new Response(await file.arrayBuffer(), {
 		headers: {
 			'Content-Type': mimetype,
-			'Content-Length': response.ContentLength?.toString() || '',
-			'Last-Modified': response.LastModified?.toUTCString() || '',
-			ETag: response.ETag || ''
+			'Content-Disposition': `attachment; filename="${path.basename(asset.filename)}"`,
+			'Content-Length': stat.size.toString() || '',
+			'Last-Modified': stat.lastModified.toISOString() || '',
+			ETag: stat.etag || ''
 		}
 	});
 };

@@ -1,8 +1,7 @@
 import type { PageServerLoad } from './$types';
-import {SHA256} from 'bun'
+import { SHA256 } from 'bun';
 export const load: PageServerLoad = async ({ locals }) => {
-
-	const hashVal = SHA256.hash(locals.user.email, 'hex')
+	const hashVal = SHA256.hash(locals.user.email, 'hex');
 	const avatarSrc = `https://gravatar.com/avatar/${hashVal} `;
 
 	return {

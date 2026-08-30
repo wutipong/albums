@@ -2,9 +2,8 @@
 	import NavBar from '$lib/components/NavBar.svelte';
 	import { mdiLogout } from '@mdi/js';
 	import Icon from 'mdi-svelte';
-	
-	let { data } = $props();
 
+	let { data } = $props();
 </script>
 
 <svelte:head>

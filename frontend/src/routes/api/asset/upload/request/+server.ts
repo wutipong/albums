@@ -2,12 +2,8 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { s3 } from '$lib/server/s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
 import * as mime from 'mime-types';
-
 import { randomUUID } from 'node:crypto';
-import { env } from '$env/dynamic/private';
 import path from 'node:path';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -78,15 +74,10 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ success: false, error: 'Failed to create asset' }, { status: 500 });
 	}
 
-	const command = new PutObjectCommand({
-		Bucket: env.S3_BUCKET,
-		Key: asset.original,
-		ChecksumCRC32: checksum,
-		ContentType: contentType
-	});
-
-	const url = await getSignedUrl(s3, command, {
-		expiresIn: 3600
+	const url = s3.presign(asset.original, {
+		method: 'PUT',
+		expiresIn: 3600,
+		type: contentType
 	});
 
 	return json({ id: asset.id, url, success: true });
