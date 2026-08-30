@@ -5,8 +5,9 @@ import { admin, genericOAuth } from 'better-auth/plugins';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { apiKey } from '@better-auth/api-key';
 import { Pool } from 'pg';
+import { building, dev } from '$app/environment';
 
-export const auth = betterAuth({
+export const auth = (dev || building)? undefined:  betterAuth({
 	secret: env.BETTER_AUTH_SECRET || 'placeholder-secret',
 	database: new Pool({
 		connectionString: env.DATABASE_URL
