@@ -97,9 +97,6 @@ func PostAsset(
 	}
 
 	if r.Err != nil {
-		if r.Err.Error() == "duplicate asset" {
-			err = ErrDuplicateAsset
-		}
 		err = fmt.Errorf("request to upload failed: %w", r.Err)
 		return
 	}
