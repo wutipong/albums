@@ -82,7 +82,7 @@ export async function createResponseAssetList(
 						endpoint: env.IMGPROXY_URL,
 						url: `s3://${env.S3_BUCKET}/${asset.view}`,
 						options: {
-							raw: true,
+							raw: true
 						},
 						salt: env.IMGPROXY_SALT,
 						key: env.IMGPROXY_KEY

@@ -19,8 +19,8 @@ export const GET: RequestHandler = async ({ params }) => {
 		return error(404, 'Asset not found.');
 	}
 
-	const file = s3.file(asset.original)
-	const stat = await file.stat()
+	const file = s3.file(asset.original);
+	const stat = await file.stat();
 	const mimetype = mime.lookup(asset.filename) || 'application/octet-stream';
 
 	return new Response(await file.arrayBuffer(), {

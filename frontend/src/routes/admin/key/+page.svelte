@@ -97,15 +97,13 @@
 <dialog class="modal" bind:this={apiKeyModal}>
 	<div class="modal-box">
 		<h3 class="text-lg font-bold">New key added</h3>
-        <div class="alert alert-info my-1">
-            <Icon path={mdiInformation} />
-            <span>The key has been copied to the clipboard.</span>
-        </div>
-		<div role="alert" class="alert alert-warning my-1">
+		<div class="my-1 alert alert-info">
+			<Icon path={mdiInformation} />
+			<span>The key has been copied to the clipboard.</span>
+		</div>
+		<div role="alert" class="my-1 alert alert-warning">
 			<Icon path={mdiAlert} />
-			<span>
-				This API key will never be visible again!
-			</span>
+			<span> This API key will never be visible again! </span>
 		</div>
 		<p class="py-4 font-mono text-wrap break-all">{apiNewKey}</p>
 		<div class="modal-action">

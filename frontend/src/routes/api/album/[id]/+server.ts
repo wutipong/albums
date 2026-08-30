@@ -63,9 +63,7 @@ export const DELETE: RequestHandler = async ({ params }) => {
 	const deletingObjs = Array.from(uniqueKeys).map((key) => ({ Key: key as string }));
 
 	try {
-		for (const obj of deletingObjs) {
-			await s3.delete(obj.Key);
-		}
+		await Promise.all(deletingObjs.map((obj) => Bun.file(obj.Key).delete()));
 	} catch (err) {
 		return json({ error: 'Unable to delete album assets.' }, { status: 400 });
 	}

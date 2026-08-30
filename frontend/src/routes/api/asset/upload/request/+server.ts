@@ -77,7 +77,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const url = s3.presign(asset.original, {
 		method: 'PUT',
 		expiresIn: 3600,
-		type: contentType,
+		type: contentType
 	});
 
 	return json({ id: asset.id, url, success: true });
