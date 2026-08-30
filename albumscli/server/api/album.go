@@ -12,7 +12,11 @@ type AlbumListResponse struct {
 }
 
 func GetAlbumList(ctx context.Context, server ServerConfig) (resp AlbumListResponse, err error) {
-	resp, err = Get[AlbumListResponse](ctx, server, "api/album")
+	c := NewClient(server)
+	c.Get("api/album").
+		SetSuccessResult(&resp).
+		SetErrorResult(err).
+		Do(ctx)
 	return
 }
 
@@ -22,7 +26,11 @@ type AlbumDetailResponse struct {
 }
 
 func GetAlbumDetail(ctx context.Context, server ServerConfig, albumID string) (resp AlbumDetailResponse, err error) {
-	resp, err = Get[AlbumDetailResponse](ctx, server, path.Join("api", "album", albumID))
+	c := NewClient(server)
+	c.Get(path.Join("api", "album", albumID)).
+		SetSuccessResult(&resp).
+		SetErrorResult(err).
+		Do(ctx)
 	return
 }
 
@@ -36,7 +44,16 @@ func CreateAlbum(
 	name string,
 ) (resp types.Album, err error) {
 	req := CreateAlbumRequest{Name: name}
-	resp, err = Post[types.Album](ctx, server, path.Join("api", "album"), req)
+
+	c := NewClient(server)
+	r := c.Post("api/album").
+		SetBodyJsonMarshal(req).
+		SetSuccessResult(&resp).
+		SetErrorResult(err).
+		Do(ctx)
+
+	err = r.Err
+
 	return
 }
 
@@ -49,8 +66,12 @@ func DeleteAlbum(
 	server ServerConfig,
 	id string,
 ) (resp DeleteAlbumResponse, err error) {
+	c := NewClient(server)
+	r := c.Delete(path.Join("api", "album", id)).
+		SetSuccessResult(&resp).
+		Do(ctx)
 
-	resp, err = Delete[DeleteAlbumResponse](ctx, server, path.Join("api", "album", id))
+	err = r.Err
 	return
 }
 
@@ -70,7 +91,14 @@ func PopulateAlbumCover(
 	req := PopulateAlbumCoverRequest{
 		AssetID: "",
 	}
-	resp, err = Post[PopulateAlbumCoverResponse](
-		ctx, server, path.Join("api", "album", albumID, "cover"), req)
+
+	c := NewClient(server)
+	r := c.Post(path.Join("api", "album", albumID, "cover")).
+		SetBodyJsonMarshal(req).
+		SetSuccessResult(&resp).
+		Do(ctx)
+
+	err = r.Err
+
 	return
 }

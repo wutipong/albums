@@ -1,7 +1,6 @@
 package api
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/binary"
@@ -10,7 +9,6 @@ import (
 	"hash/crc32"
 	"io"
 	"log/slog"
-	"net/http"
 	"path/filepath"
 	"time"
 
@@ -63,6 +61,8 @@ func PostAsset(
 		return
 	}
 
+	c := NewClient(server)
+
 	data, err := io.ReadAll(reader)
 	if err != nil {
 		err = fmt.Errorf("unable to read from reader: %w", err)
@@ -76,38 +76,56 @@ func PostAsset(
 
 	assetFileName := filepath.Join(containerPath, path)
 
-	postAssetRequest, err := Post[PostAssetRequestResponse](
-		ctx, server, "/api/asset/upload/request",
-		PostAssetRequestRequest{
+	var postAssetRequest PostAssetRequestResponse
+	var errorResponse ErrorResponse
+	r := c.Post("/api/asset/upload/request").
+		SetBodyJsonMarshal(PostAssetRequestRequest{
 			AlbumID:  albumID,
 			Filename: assetFileName,
 			Checksum: encoded,
-			Network:  server.Network,
-		})
-	if err != nil {
-		if err.Error() == "duplicate asset" {
+		}).
+		SetSuccessResult(&postAssetRequest).
+		SetErrorResult(&errorResponse).
+		Do(ctx)
+
+	if r.IsErrorState() {
+		if errorResponse.Message == "duplicate asset" {
+			err = fmt.Errorf("request to upload failed: %w", ErrDuplicateAsset)
+
+			return
+		}
+	}
+
+	if r.Err != nil {
+		if r.Err.Error() == "duplicate asset" {
 			err = ErrDuplicateAsset
 		}
-		err = fmt.Errorf("request to upload failed: %w", err)
+		err = fmt.Errorf("request to upload failed: %w", r.Err)
 		return
 	}
 
+	r = c.Put(postAssetRequest.URL).
+		SetBodyBytes(data).
+		SetRetryCount(10).
+		Do(ctx)
+
 	success := true
-	err = doPutObject(ctx, postAssetRequest.URL, data, size)
-	if err != nil {
+	if r.Err != nil {
 		slog.Error("put object fails", slog.String("error", err.Error()))
 		success = false
 	}
 
-	postAssetCommit, err := Post[PostAssetCommitResponse](
-		ctx, server, "/api/asset/upload/commit",
-		PostAssetCommitRequest{
+	var postAssetCommit PostAssetCommitResponse
+
+	r = c.Post("/api/asset/upload/commit").
+		SetSuccessResult(&postAssetCommit).
+		SetBodyJsonMarshal(PostAssetCommitRequest{
 			ID:      postAssetRequest.ID,
 			Success: success,
-		})
+		}).Do(ctx)
 
-	if err != nil {
-		err = fmt.Errorf("unable to commit asset upload %s: %w", postAssetRequest.ID, err)
+	if r.Err != nil {
+		err = fmt.Errorf("unable to commit asset upload %s: %w", postAssetRequest.ID, r.Err)
 	}
 
 	result = PostAssetResposnse{
@@ -116,40 +134,6 @@ func PostAsset(
 	}
 
 	return
-}
-
-func doPutObject(ctx context.Context, url string, data []byte, size int64) error {
-	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(data))
-	if err != nil {
-		err = fmt.Errorf("failed to create request for put object: %w", err)
-		return err
-	}
-	req.ContentLength = size
-	for i := range 10 {
-		_, err = http.DefaultClient.Do(req)
-		if err == nil {
-			break
-		}
-
-		slog.Warn("Error occurred when uploading to S3, retrying.",
-			slog.Int("retry", i),
-			slog.String("error", err.Error()),
-		)
-
-		select {
-		case <-ctx.Done():
-			err = fmt.Errorf("context error during put object: %w", ctx.Err())
-			return err
-		case <-time.After(time.Duration(i+1) * 10 * time.Second):
-		}
-	}
-
-	if err != nil {
-		err = fmt.Errorf("failed to put object: %w", err)
-		return err
-	}
-
-	return nil
 }
 
 type PostAssetRequestRequest struct {

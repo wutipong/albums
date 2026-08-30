@@ -12,6 +12,12 @@ type MeResponse struct {
 }
 
 func GetMe(ctx context.Context, server ServerConfig) (resp MeResponse, err error) {
-	resp, err = Get[MeResponse](ctx, server, "api/me")
+	c := NewClient(server)
+	r := c.Get("api/me").
+		SetSuccessResult(&resp).
+		SetErrorResult(err).
+		Do(ctx)
+
+	err = r.Err
 	return
 }

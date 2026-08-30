@@ -12,9 +12,13 @@ func processSingle(ctx context.Context, server api.ServerConfig, dryRun bool, id
 	if dryRun {
 		return nil
 	}
-	_, err := api.Get[any](ctx, server, path.Join("api", "asset", id, "process"))
-	if err != nil {
-		return fmt.Errorf("unable to queue process asset command: %w", err)
+
+	c := api.NewClient(server)
+	resp := c.Get(path.Join("api", "asset", id, "process")).
+		Do(ctx)
+
+	if resp.Err != nil {
+		return fmt.Errorf("unable to queue process asset command: %w", resp.Err)
 	}
 
 	return nil
