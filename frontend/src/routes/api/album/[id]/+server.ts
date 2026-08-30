@@ -2,7 +2,6 @@ import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { s3 } from '$lib/server/s3';
-import { DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import { env } from '$env/dynamic/private';
 
 export const GET: RequestHandler = async ({ params }) => {
@@ -64,14 +63,9 @@ export const DELETE: RequestHandler = async ({ params }) => {
 	const deletingObjs = Array.from(uniqueKeys).map((key) => ({ Key: key as string }));
 
 	try {
-		await s3.send(
-			new DeleteObjectsCommand({
-				Bucket: env.S3_BUCKET,
-				Delete: {
-					Objects: deletingObjs
-				}
-			})
-		);
+		for (const obj of deletingObjs) {
+			await s3.delete(obj.Key);
+		}
 	} catch (err) {
 		return json({ error: 'Unable to delete album assets.' }, { status: 400 });
 	}

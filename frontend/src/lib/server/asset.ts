@@ -1,5 +1,3 @@
-import { GetObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { generateImageUrl } from '@imgproxy/imgproxy-node';
 import type { IPostgresInterval } from 'postgres-interval';
 import { env } from '$env/dynamic/private';
@@ -80,25 +78,21 @@ export async function createResponseAssetList(
 					break;
 
 				case 'video':
-					view_url = await getSignedUrl(
-						s3,
-						new GetObjectCommand({
-							Bucket: env.S3_BUCKET,
-							Key: asset.view
-						})
-					);
+					view_url = generateImageUrl({
+						endpoint: env.IMGPROXY_URL,
+						url: `s3://${env.S3_BUCKET}/${asset.view}`,
+						options: {
+							raw: true,
+						},
+						salt: env.IMGPROXY_SALT,
+						key: env.IMGPROXY_KEY
+					});
 					break;
 			}
 
 			const copy_url = asset.type === 'video' ? '' : `/api/asset/${asset.id}/original/`;
 
-			const original_url = await getSignedUrl(
-				s3,
-				new GetObjectCommand({
-					Bucket: env.S3_BUCKET,
-					Key: asset.original
-				})
-			);
+			const original_url = s3.presign(asset.original);
 			const out = {
 				...asset,
 				video_duration,
