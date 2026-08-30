@@ -56,6 +56,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		asset.original = key;
 		asset.type = type;
 		asset.process_status = 'uploading';
+
+		await db.updateTable('assets').set(asset).execute()
 	} else {
 		asset = await db
 			.insertInto('assets')
