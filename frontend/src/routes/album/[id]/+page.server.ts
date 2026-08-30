@@ -1,8 +1,6 @@
 import { db } from '$lib/server/db';
 import type { PageServerLoad } from './$types';
-
 import { createResponseAssetList } from '$lib/server/asset';
-import { auth } from '$lib/server/auth';
 
 export const ssr = false;
 

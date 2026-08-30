@@ -1,6 +1,6 @@
 import { sequence } from '@sveltejs/kit/hooks';
-import { error, redirect, type Handle, type ServerInit } from '@sveltejs/kit';
-import { auth } from '$lib/server/auth';
+import { error, type Handle, type ServerInit } from '@sveltejs/kit';
+import { getAuth } from '$lib/server/auth';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 import { dev, building } from '$app/environment';
 import { getMigrations } from 'better-auth/db/migration';
@@ -8,7 +8,7 @@ import { getMigrations } from 'better-auth/db/migration';
 export const init: ServerInit = async () => {
 	if (!dev && !building) {
 		try {
-			const { runMigrations: execute } = await getMigrations(auth.options);
+			const { runMigrations: execute } = await getMigrations(getAuth().options);
 			await execute();
 			console.log('Better Auth database migrations applied.');
 		} catch (e) {
@@ -19,6 +19,7 @@ export const init: ServerInit = async () => {
 };
 
 const handleBetterAuth: Handle = async ({ event, resolve }) => {
+	const auth = getAuth();
 	const session = await auth.api.getSession({ headers: event.request.headers });
 
 	if (session) {
