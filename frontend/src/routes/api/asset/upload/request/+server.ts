@@ -43,20 +43,20 @@ export const POST: RequestHandler = async ({ request }) => {
 		return json({ success: false, error: 'Album not found' }, { status: 404 });
 	}
 
-	const existed = await db
+	const existing = await db
 		.selectFrom('assets')
 		.where('album_id', '=', albumId)
 		.where('filename', '=', filename)
 		.selectAll()
 		.limit(1)
 		.executeTakeFirst();
-	if (existed && existed.process_status != 'uploading' && existed.process_status != 'failed') {
+	if (existing && existing.process_status != 'uploading' && existing.process_status != 'failed') {
 		return json({ success: false, error: 'duplicate asset' }, { status: 409 });
 	}
 
 	let asset = null;
-	if (existed) {
-		asset = existed;
+	if (existing) {
+		asset = existing;
 		asset.original = key;
 		asset.type = type;
 		asset.process_status = 'uploading';
