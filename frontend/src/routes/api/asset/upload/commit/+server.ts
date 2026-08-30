@@ -1,9 +1,6 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { s3 } from '$lib/server/s3';
-import { CopyObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
-import { env } from '$env/dynamic/private';
 import * as mime from 'mime-types';
 import { notifyProcessAsset } from '$lib/server/grpc/worker';
 
@@ -24,10 +21,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	if (success) {
-		const oldKey = asset.original;
-		const newKey = oldKey.replace('pending', 'public');
 		asset.process_status = 'pending';
-		asset.original = newKey;
 
 		const mimetype = mime.lookup(asset.filename);
 		if (!mimetype) {
@@ -38,28 +32,6 @@ export const POST: RequestHandler = async ({ request }) => {
 			asset.type = 'image';
 		} else if (mimetype.startsWith('video')) {
 			asset.type = 'video';
-		}
-
-		try {
-			// 1. Copy the object to the permanent location
-			const r1 = await s3.send(
-				new CopyObjectCommand({
-					Bucket: env.S3_BUCKET,
-					Key: newKey,
-					CopySource: `${env.S3_BUCKET}/${oldKey}`
-				})
-			);
-
-			// 2. Delete the original "pending" file
-			const r2 = await s3.send(
-				new DeleteObjectCommand({
-					Bucket: env.S3_BUCKET,
-					Key: oldKey
-				})
-			);
-		} catch (error) {
-			console.log(error);
-			return json({ success: false, error: 'Failed to move asset.' }, { status: 500 });
 		}
 	} else {
 		asset.process_status = 'failed';
