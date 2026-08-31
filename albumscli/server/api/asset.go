@@ -76,6 +76,8 @@ func PostAsset(
 
 	assetFileName := filepath.Join(containerPath, path)
 
+	slog.Debug("upload request", slog.String("album_id", albumID), slog.String("filename", assetFileName), slog.String("checksum", encoded))
+
 	var postAssetRequest PostAssetRequestResponse
 	var errorResponse ErrorResponse
 	r := c.Post("/api/asset/upload/request").
@@ -89,6 +91,7 @@ func PostAsset(
 		Do(ctx)
 
 	if r.IsErrorState() {
+		slog.Debug("upload request error", slog.String("error", errorResponse.Message))
 		if errorResponse.Message == "duplicate asset" {
 			err = fmt.Errorf("request to upload failed: %w", ErrDuplicateAsset)
 
@@ -101,10 +104,20 @@ func PostAsset(
 		return
 	}
 
+	slog.Debug("upload request results",
+		slog.String("ID", postAssetRequest.ID),
+		slog.String("url", postAssetRequest.URL),
+		slog.Bool("success", postAssetRequest.Success),
+	)
+
+	slog.Debug("put object", slog.Int("size", len(data)), slog.String("url", postAssetRequest.URL))
+
 	r = c.Put(postAssetRequest.URL).
 		SetBodyBytes(data).
 		SetRetryCount(10).
 		Do(ctx)
+
+	slog.Debug("put object response", slog.String("status", r.Status))
 
 	success := true
 	if r.Err != nil {
@@ -113,6 +126,8 @@ func PostAsset(
 	}
 
 	var postAssetCommit PostAssetCommitResponse
+
+	slog.Debug("upload commit", slog.String("id", postAssetRequest.ID), slog.String("url", postAssetRequest.URL))
 
 	r = c.Post("/api/asset/upload/commit").
 		SetSuccessResult(&postAssetCommit).
