@@ -31,7 +31,7 @@ func PostAsset(
 	path string,
 	reader io.Reader,
 	size int64,
-) (result PostAssetResposnse, err error) {
+) (asset types.Asset, err error) {
 	start := time.Now()
 	defer func() {
 		slog.Info("PostAsset completed",
@@ -49,10 +49,8 @@ func PostAsset(
 			"Dry run: skipping asset upload",
 			slog.String("path", path),
 		)
-		result = PostAssetResposnse{
-			Asset: types.Asset{
-				ID: uuid.NewString(),
-			},
+		asset = types.Asset{
+			ID: uuid.NewString(),
 		}
 
 		return
@@ -92,11 +90,7 @@ func PostAsset(
 
 	slog.Debug("upload commit", slog.String("id", postAssetRequest.ID), slog.String("url", postAssetRequest.URL))
 
-	asset, err := doCommitAsset(ctx, c, success, postAssetRequest.ID)
-
-	result = PostAssetResposnse{
-		Asset: asset,
-	}
+	asset, err = doCommitAsset(ctx, c, success, postAssetRequest.ID)
 
 	return
 }

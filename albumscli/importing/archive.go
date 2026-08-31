@@ -222,7 +222,7 @@ func uploadArchiveAsset(
 		return
 	}
 
-	resp, err := api.PostAsset(
+	asset, err = api.PostAsset(
 		ctx,
 		server,
 		albumID,
@@ -235,6 +235,6 @@ func uploadArchiveAsset(
 		err = fmt.Errorf("failed to upload asset %s/%s: %w", archivePath, filename, err)
 		return
 	}
-	asset = resp.Asset
+
 	return
 }
