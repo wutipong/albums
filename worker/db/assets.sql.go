@@ -385,6 +385,59 @@ func (q *Queries) GetAssetsByType(ctx context.Context, type_ AssetTypeT) ([]Asse
 	return items, nil
 }
 
+const getAssetsWithObjects = `-- name: GetAssetsWithObjects :many
+SELECT id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
+    FROM assets
+    WHERE (original <> '' OR view <> '' OR thumbnail <> '' OR preview <> '')
+    ORDER BY assets.id
+    LIMIT $1 OFFSET $2
+`
+
+type GetAssetsWithObjectsParams struct {
+	Limit  int64
+	Offset int64
+}
+
+func (q *Queries) GetAssetsWithObjects(ctx context.Context, arg GetAssetsWithObjectsParams) ([]Asset, error) {
+	rows, err := q.db.Query(ctx, getAssetsWithObjects, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Asset
+	for rows.Next() {
+		var i Asset
+		if err := rows.Scan(
+			&i.ID,
+			&i.AlbumID,
+			&i.Filename,
+			&i.CreatedAt,
+			&i.ModifiedAt,
+			&i.DeletedAt,
+			&i.Type,
+			&i.Original,
+			&i.Preview,
+			&i.Thumbnail,
+			&i.View,
+			&i.ProcessStatus,
+			&i.ThumbnailWidth,
+			&i.ThumbnailHeight,
+			&i.ViewWidth,
+			&i.ViewHeight,
+			&i.ImageFrames,
+			&i.VideoDuration,
+			&i.ImageEmbedding,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAssetsWithoutUploading = `-- name: GetAssetsWithoutUploading :many
 SELECT id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 FROM assets
@@ -615,6 +668,21 @@ func (q *Queries) GetRandomAlbumAsset(ctx context.Context, albumID pgtype.UUID) 
 		&i.ImageEmbedding,
 	)
 	return i, err
+}
+
+const isObjectInUse = `-- name: IsObjectInUse :one
+SELECT EXISTS (
+    SELECT 1
+        FROM assets
+        WHERE original = $1 OR view = $1 OR thumbnail = $1 OR preview = $1
+)
+`
+
+func (q *Queries) IsObjectInUse(ctx context.Context, original string) (bool, error) {
+	row := q.db.QueryRow(ctx, isObjectInUse, original)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
 }
 
 const updateAlbumThumbnail = `-- name: UpdateAlbumThumbnail :one
