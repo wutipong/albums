@@ -15,12 +15,11 @@ type ServerConfig struct {
 }
 
 type ErrorResponse struct {
-	Success string `json:"success"`
-	Message string `json:"error"`
+	Status string `json:"status"`
 }
 
 func (err ErrorResponse) Error() string {
-	return err.Message
+	return err.Status
 }
 
 type SlogAdapter struct {

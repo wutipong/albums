@@ -10,12 +10,11 @@ export const POST: RequestHandler = async ({ request }) => {
 	const req = await request.json();
 	const albumId = req.album_id;
 	const filename = req.filename;
-	const checksum = req.checksum;
 
 	const contentType = mime.contentType(path.basename(filename));
 
 	if (!contentType) {
-		return json({ success: false, error: 'Failed to recognize filetype' }, { status: 400 });
+		return json({status: 'Failed to recognize filetype' }, { status: 400 });
 	}
 
 	const extension = mime.extension(mime.lookup(filename) || '');
@@ -24,7 +23,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const type = contentType.substring(0, contentType.indexOf('/'));
 
 	if (type != 'image' && type != 'video') {
-		return json({ success: false, error: 'Unsupported asset type.' }, { status: 400 });
+		return json({ status: 'Unsupported asset type.' }, { status: 400 });
 	}
 
 	const album = await db
@@ -36,7 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		.executeTakeFirst();
 
 	if (!album) {
-		return json({ success: false, error: 'Album not found' }, { status: 404 });
+		return json({ status: 'Album not found' }, { status: 404 });
 	}
 
 	const existing = await db
@@ -47,7 +46,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		.limit(1)
 		.executeTakeFirst();
 	if (existing && existing.process_status != 'uploading' && existing.process_status != 'failed') {
-		return json({ success: false, error: 'duplicate asset' }, { status: 409 });
+		return json({ status: 'duplicate asset' }, { status: 409 });
 	}
 
 	let asset = null;
@@ -73,7 +72,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	if (!asset) {
-		return json({ success: false, error: 'Failed to create asset' }, { status: 500 });
+		return json({ status: 'Failed to create asset' }, { status: 500 });
 	}
 
 	const url = s3.presign(asset.original, {

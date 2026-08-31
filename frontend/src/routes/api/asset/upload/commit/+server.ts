@@ -17,7 +17,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		.executeTakeFirst();
 
 	if (!asset) {
-		return json({ success: false, error: 'Failed to get asset' }, { status: 500 });
+		return json({ status: 'asset record not found.' }, { status: 404 });
 	}
 
 	if (success) {
@@ -25,7 +25,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const mimetype = mime.lookup(asset.filename);
 		if (!mimetype) {
-			return json({ success: false, error: 'invalid content type' }, { status: 400 });
+			return json({ status: 'invalid content type' }, { status: 400 });
 		}
 
 		if (mimetype.startsWith('image/')) {
@@ -44,16 +44,23 @@ export const POST: RequestHandler = async ({ request }) => {
 		.executeTakeFirst();
 
 	if (!resp) {
-		return json({ success: false, error: 'Failed to update asset' }, { status: 500 });
+		return json({ status: 'Failed to update asset' }, { status: 503 });
 	}
 
 	if (success) {
 		try {
 			await notifyProcessAsset(asset.id);
 		} catch (error) {
-			return json({ success: false, error: 'Failed to notify asset processing' }, { status: 500 });
+			return json(
+				{ asset, status: 'asset is commited, but it is not queued to processing.' },
+				{ status: 200 }
+			);
 		}
+		return json({ asset: asset, status: 'asset is accepted' }, { status: 201 });
+	} else {
+		return json(
+			{ status: 'asset status is updated, but the upload failed.' },
+			{ status: 200 }
+		);
 	}
-
-	return json({ asset: asset, success: true });
 };
