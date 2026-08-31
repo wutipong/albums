@@ -36,3 +36,7 @@ export async function updateAllAlbumThumbnail(onlyMissing: boolean = true) {
 export async function notifyProcessAllAssets(onlyMissing: boolean = true) {
 	return await client.notifyProcessAllAssets({ onlyMissing: onlyMissing });
 }
+
+export async function notifyPurgeObject(){
+	return await client.purgeUnusedObject({})
+}

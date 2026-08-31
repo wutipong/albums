@@ -103,6 +103,14 @@ export interface NotifyProcessAllAssetsRequest {
 export interface NotifyProcessAllAssetsResponse {
 }
 
+/** empty */
+export interface PurgeUnusedObjectRequest {
+}
+
+/** empty */
+export interface PurgeUnusedObjectResponse {
+}
+
 function createBaseNotifyProcessAssetResquest(): NotifyProcessAssetResquest {
   return { id: "" };
 }
@@ -804,6 +812,92 @@ export const NotifyProcessAllAssetsResponse: MessageFns<NotifyProcessAllAssetsRe
   },
 };
 
+function createBasePurgeUnusedObjectRequest(): PurgeUnusedObjectRequest {
+  return {};
+}
+
+export const PurgeUnusedObjectRequest: MessageFns<PurgeUnusedObjectRequest> = {
+  encode(_: PurgeUnusedObjectRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PurgeUnusedObjectRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePurgeUnusedObjectRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): PurgeUnusedObjectRequest {
+    return {};
+  },
+
+  toJSON(_: PurgeUnusedObjectRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<PurgeUnusedObjectRequest>): PurgeUnusedObjectRequest {
+    return PurgeUnusedObjectRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<PurgeUnusedObjectRequest>): PurgeUnusedObjectRequest {
+    const message = createBasePurgeUnusedObjectRequest();
+    return message;
+  },
+};
+
+function createBasePurgeUnusedObjectResponse(): PurgeUnusedObjectResponse {
+  return {};
+}
+
+export const PurgeUnusedObjectResponse: MessageFns<PurgeUnusedObjectResponse> = {
+  encode(_: PurgeUnusedObjectResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PurgeUnusedObjectResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePurgeUnusedObjectResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): PurgeUnusedObjectResponse {
+    return {};
+  },
+
+  toJSON(_: PurgeUnusedObjectResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<PurgeUnusedObjectResponse>): PurgeUnusedObjectResponse {
+    return PurgeUnusedObjectResponse.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<PurgeUnusedObjectResponse>): PurgeUnusedObjectResponse {
+    const message = createBasePurgeUnusedObjectResponse();
+    return message;
+  },
+};
+
 /** Worker service definition. */
 export type WorkerServiceDefinition = typeof WorkerServiceDefinition;
 export const WorkerServiceDefinition = {
@@ -864,6 +958,15 @@ export const WorkerServiceDefinition = {
       responseStream: false,
       options: {},
     },
+    /** Notify woker to remove unused s3 object */
+    purgeUnusedObject: {
+      name: "PurgeUnusedObject",
+      requestType: PurgeUnusedObjectRequest as typeof PurgeUnusedObjectRequest,
+      requestStream: false,
+      responseType: PurgeUnusedObjectResponse as typeof PurgeUnusedObjectResponse,
+      responseStream: false,
+      options: {},
+    },
   },
 } as const;
 
@@ -898,6 +1001,11 @@ export interface WorkerServiceImplementation<CallContextExt = {}> {
     request: UpdateAllAlbumThumbnailRequest,
     context: CallContext & CallContextExt,
   ): Promise<DeepPartial<UpdateAllAlbumThumbnailResponse>>;
+  /** Notify woker to remove unused s3 object */
+  purgeUnusedObject(
+    request: PurgeUnusedObjectRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<PurgeUnusedObjectResponse>>;
 }
 
 export interface WorkerServiceClient<CallOptionsExt = {}> {
@@ -931,6 +1039,11 @@ export interface WorkerServiceClient<CallOptionsExt = {}> {
     request: DeepPartial<UpdateAllAlbumThumbnailRequest>,
     options?: CallOptions & CallOptionsExt,
   ): Promise<UpdateAllAlbumThumbnailResponse>;
+  /** Notify woker to remove unused s3 object */
+  purgeUnusedObject(
+    request: DeepPartial<PurgeUnusedObjectRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<PurgeUnusedObjectResponse>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
