@@ -78,6 +78,10 @@ func Init(ctx context.Context) error {
 				minioClient,
 				j.Payload["assetId"].(string),
 			)
+
+		case "purge-object":
+
+			err = PurgeUnusedObjectfunc(ctx, minioClient)
 		}
 
 		if err != nil {
@@ -155,6 +159,31 @@ func EnqueueUpdateAlbumCover(ctx context.Context, albumId string, assetId string
 		slog.String("albumId", albumId),
 		slog.String("assetId", assetId),
 		slog.String("command", "populate-album-cover"),
+	)
+
+	return nil
+}
+
+func EnqueuePurgeUnsedObject(ctx context.Context) error {
+	maxRetries := MAX_RETRIES
+	j := &jobs.Job{
+		Queue: "asset-processing",
+		Payload: map[string]any{
+			"command":    "purge-object",
+			"created_at": time.Now().UTC(),
+		},
+		MaxRetries: &maxRetries,
+	}
+
+	jobId, err := queue.Enqueue(ctx, j)
+	if err != nil {
+		return fmt.Errorf("unable to add job: %w", err)
+	}
+
+	slog.Info(
+		"job added",
+		slog.String("job", jobId),
+		slog.String("command", "purge-object"),
 	)
 
 	return nil

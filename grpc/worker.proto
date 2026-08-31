@@ -22,6 +22,9 @@ service WorkerService {
 
   // Update all album thumbnail
   rpc UpdateAllAlbumThumbnail(UpdateAllAlbumThumbnailRequest) returns (UpdateAllAlbumThumbnailResponse);
+
+  // Notify woker to remove unused s3 object
+  rpc PurgeUnusedObject(PurgeUnusedObjectRequest) returns (PurgeUnusedObjectResponse);
 }
 
 //Status of the asset.
@@ -84,4 +87,12 @@ message NotifyProcessAllAssetsRequest {
 
 message NotifyProcessAllAssetsResponse {
   //empty
+}
+
+message PurgeUnusedObjectRequest{
+  //empty
+}
+
+message PurgeUnusedObjectResponse{
+  // empty
 }

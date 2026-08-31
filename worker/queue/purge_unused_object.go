@@ -14,7 +14,7 @@ import (
 const OBJECT_LIMIT = 100
 
 func PurgeUnusedObjectfunc(
-	ctx context.Context, minioClient *minio.Client, id string,
+	ctx context.Context, minioClient *minio.Client,
 ) error {
 
 	slog.Info("Purge unused object from s3")

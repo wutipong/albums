@@ -147,3 +147,11 @@ func (s *WorkerServiceServer) NotifyProcessAllAssets(
 	err = queue.EnqueueProcessAllAssets(ctx, req.OnlyMissing)
 	return
 }
+
+func (s *WorkerServiceServer) PurgeUnsedObject(
+	ctx context.Context,
+	req *pb.PurgeUnusedObjectRequest,
+) (resp *pb.PurgeUnusedObjectResponse, err error) {
+	err = queue.EnqueuePurgeUnsedObject(ctx)
+	return
+}
