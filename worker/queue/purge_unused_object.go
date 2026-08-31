@@ -46,7 +46,7 @@ func PurgeUnusedObjectfunc(
 		defer close(objectsCh)
 		for object := range minioClient.ListObjects(
 			ctx, os.Getenv("S3_BUCKET"),
-			minio.ListObjectsOptions{Recursive: false},
+			minio.ListObjectsOptions{Recursive: true},
 		) {
 			slog.Debug("current object", slog.String("key", object.Key))
 			if object.Err != nil {

@@ -44,12 +44,12 @@
 		try {
 			const resp = await fetch(`/api/asset/purge-object`);
 			if (resp.ok) {
-				toast.add('Asset processing request has been made.', 'info');
+				toast.add('Object purge request has been made.', 'info');
 			} else {
-				toast.add('Asset processing  request fails.', 'error');
+				toast.add('Object purge request fails.', 'error');
 			}
 		} catch (e) {
-			toast.add('Asset processing  request fails.', 'error');
+			toast.add('Object purge request fails.', 'error');
 		}
 	}
 </script>
@@ -160,7 +160,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td>Purge unsed S3 Object</td>
+				<td>Purge unused S3 Object</td>
 				<td>
 					<button class="btn-small btn btn-primary" onclick={() => notifyPurgeObject()}>
 						<Icon path={mdiPlayCircle} />

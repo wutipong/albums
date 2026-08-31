@@ -148,7 +148,7 @@ func (s *WorkerServiceServer) NotifyProcessAllAssets(
 	return
 }
 
-func (s *WorkerServiceServer) PurgeUnsedObject(
+func (s *WorkerServiceServer) PurgeUnusedObject(
 	ctx context.Context,
 	req *pb.PurgeUnusedObjectRequest,
 ) (resp *pb.PurgeUnusedObjectResponse, err error) {
