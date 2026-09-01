@@ -39,6 +39,19 @@
 			toast.add('Asset processing  request fails.', 'error');
 		}
 	}
+
+	async function notifyPurgeObject(){
+		try {
+			const resp = await fetch(`/api/asset/purge-object`);
+			if (resp.ok) {
+				toast.add('Object purge request has been made.', 'info');
+			} else {
+				toast.add('Object purge request fails.', 'error');
+			}
+		} catch (e) {
+			toast.add('Object purge request fails.', 'error');
+		}
+	}
 </script>
 
 <svelte:head>
@@ -144,6 +157,20 @@
 				<td colspan="2" class="italic">
 					Reprocess items that marked as 'failed' and 'new' items to update the assets information.
 					Avoid repettively triggering this action as it can causes massive jobs being queued.
+				</td>
+			</tr>
+			<tr>
+				<td>Purge unused S3 Object</td>
+				<td>
+					<button class="btn-small btn btn-primary" onclick={() => notifyPurgeObject()}>
+						<Icon path={mdiPlayCircle} />
+						Start
+					</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="italic">
+					Delete unused objects that might be leftover from various process.
 				</td>
 			</tr>
 		</tbody>

@@ -49,6 +49,20 @@ WHERE
     AND deleted_at IS NULL
     AND image_embedding IS NULL;
 
+-- name: GetAssetsWithObjects :many
+SELECT *
+    FROM assets
+    WHERE (original <> '' OR view <> '' OR thumbnail <> '' OR preview <> '')
+    ORDER BY assets.id
+    LIMIT $1 OFFSET $2;
+
+-- name: IsObjectInUse :one
+SELECT EXISTS (
+    SELECT 1
+        FROM assets
+        WHERE original = $1 OR view = $1 OR thumbnail = $1 OR preview = $1
+);
+
 -- name: UpdateAsset :one
 UPDATE assets
 SET
