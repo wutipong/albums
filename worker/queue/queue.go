@@ -78,6 +78,13 @@ func Init(ctx context.Context) error {
 				minioClient,
 				j.Payload["assetId"].(string),
 			)
+
+		case "delete-album":
+			err = DeleteAlbum(
+				ctx,
+				minioClient,
+				j.Payload["id"].(string),
+			)
 		}
 
 		if err != nil {
@@ -240,6 +247,33 @@ func EnqueuePopulateAlbumsCover(ctx context.Context, missingOnly bool) error {
 		}
 
 	}
+
+	return nil
+}
+
+func EnqueueDeleteAlbum(ctx context.Context, id string) error {
+	maxRetries := MAX_RETRIES
+	j := &jobs.Job{
+		Queue: "asset-processing",
+		Payload: map[string]any{
+			"command":    "delete-album",
+			"id":         id,
+			"created_at": time.Now().UTC(),
+		},
+		MaxRetries: &maxRetries,
+	}
+
+	jobId, err := queue.Enqueue(ctx, j)
+	if err != nil {
+		return fmt.Errorf("unable to add job: %w", err)
+	}
+
+	slog.Info(
+		"job added",
+		slog.String("job", jobId),
+		slog.String("album_id", id),
+		slog.String("command", "delete-album"),
+	)
 
 	return nil
 }

@@ -10,3 +10,6 @@ bun.lockb
 
 #protoc generated.
 /src/lib/server/grpc/proto
+
+#kysely generated.
+/src/lib/server/db_types.d.ts

@@ -147,3 +147,11 @@ func (s *WorkerServiceServer) NotifyProcessAllAssets(
 	err = queue.EnqueueProcessAllAssets(ctx, req.OnlyMissing)
 	return
 }
+
+func (s *WorkerServiceServer) DeleteAlbum(
+	ctx context.Context,
+	req *pb.DeleteAlbumRequest,
+) (resp *pb.DeleteAlbumResponse, err error) {
+	err = queue.EnqueueDeleteAlbum(ctx, req.Id)
+	return
+}

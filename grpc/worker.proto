@@ -22,6 +22,9 @@ service WorkerService {
 
   // Update all album thumbnail
   rpc UpdateAllAlbumThumbnail(UpdateAllAlbumThumbnailRequest) returns (UpdateAllAlbumThumbnailResponse);
+
+  // Delete an album
+  rpc DeleteAlbum(DeleteAlbumRequest) returns (DeleteAlbumResponse);
 }
 
 //Status of the asset.
@@ -84,4 +87,12 @@ message NotifyProcessAllAssetsRequest {
 
 message NotifyProcessAllAssetsResponse {
   //empty
+}
+
+message DeleteAlbumRequest{
+  string id = 1;
+}
+
+message DeleteAlbumResponse {
+  // empty
 }
