@@ -2,8 +2,11 @@ package queue
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"log/slog"
+	"os"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/wutipong/albums/worker/db"
@@ -22,13 +25,35 @@ func PopulateAlbumCover(ctx context.Context, albumId string, assetId string) err
 
 	album, err := queries.GetAlbum(ctx, albumIdUUID)
 
-	var assetIdUUID pgtype.UUID
-	err = assetIdUUID.Scan(assetId)
-	if err != nil {
-		return fmt.Errorf("unable to parse asset id: %w", err)
-	}
-	asset, err := queries.GetAsset(ctx, assetIdUUID)
+	var asset db.Asset
+	if assetId == "" {
+		if album.Cover != "" {
+			slog.Info("album already has a cover, skipping",
+				slog.String("albumId", albumId),
+				slog.String("cover", album.Cover),
+			)
+			return nil
+		}
 
+		if os.Getenv("COVER_ASPECT") == "portrait" {
+			asset, err = queries.GetAlbumPortraitAssetForCover(ctx, albumIdUUID)
+		} else {
+			asset, err = queries.GetAlbumLandscapeAssetForCover(ctx, albumIdUUID)
+		}
+		if errors.Is(err, sql.ErrNoRows) {
+			asset, err = queries.GetAlbumAssetForCover(ctx, albumIdUUID)
+		}
+		if err != nil {
+			return fmt.Errorf("unable to find asset for cover: %w", err)
+		}
+	} else {
+		var assetIdUUID pgtype.UUID
+		err = assetIdUUID.Scan(assetId)
+		if err != nil {
+			return fmt.Errorf("unable to parse asset id: %w", err)
+		}
+		asset, err = queries.GetAsset(ctx, assetIdUUID)
+	}
 	if err != nil {
 		return fmt.Errorf("unable to find asset :%w", err)
 	}

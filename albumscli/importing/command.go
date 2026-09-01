@@ -160,6 +160,19 @@ func Process(
 			}
 			continue
 		}
+
+		slog.Info("populating album cover",
+			slog.String("album", album.Name),
+		)
+
+		_, err = api.PopulateAlbumCover(ctx, server, album.ID)
+		if err != nil {
+			slog.Error(
+				"failed to populate album cover.",
+				slog.String("error", err.Error()),
+				slog.String("album", album.Name),
+			)
+		}
 	}
 
 	return err
