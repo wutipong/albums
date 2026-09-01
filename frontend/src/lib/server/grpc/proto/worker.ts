@@ -111,6 +111,14 @@ export interface PurgeUnusedObjectRequest {
 export interface PurgeUnusedObjectResponse {
 }
 
+export interface DeleteAlbumRequest {
+  id: string;
+}
+
+/** empty */
+export interface DeleteAlbumResponse {
+}
+
 function createBaseNotifyProcessAssetResquest(): NotifyProcessAssetResquest {
   return { id: "" };
 }
@@ -898,6 +906,107 @@ export const PurgeUnusedObjectResponse: MessageFns<PurgeUnusedObjectResponse> = 
   },
 };
 
+function createBaseDeleteAlbumRequest(): DeleteAlbumRequest {
+  return { id: "" };
+}
+
+export const DeleteAlbumRequest: MessageFns<DeleteAlbumRequest> = {
+  encode(message: DeleteAlbumRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== "") {
+      writer.uint32(10).string(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteAlbumRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteAlbumRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.id = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeleteAlbumRequest {
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+  },
+
+  toJSON(message: DeleteAlbumRequest): unknown {
+    const obj: any = {};
+    if (message.id !== "") {
+      obj.id = message.id;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DeleteAlbumRequest>): DeleteAlbumRequest {
+    return DeleteAlbumRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeleteAlbumRequest>): DeleteAlbumRequest {
+    const message = createBaseDeleteAlbumRequest();
+    message.id = object.id ?? "";
+    return message;
+  },
+};
+
+function createBaseDeleteAlbumResponse(): DeleteAlbumResponse {
+  return {};
+}
+
+export const DeleteAlbumResponse: MessageFns<DeleteAlbumResponse> = {
+  encode(_: DeleteAlbumResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteAlbumResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteAlbumResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): DeleteAlbumResponse {
+    return {};
+  },
+
+  toJSON(_: DeleteAlbumResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<DeleteAlbumResponse>): DeleteAlbumResponse {
+    return DeleteAlbumResponse.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<DeleteAlbumResponse>): DeleteAlbumResponse {
+    const message = createBaseDeleteAlbumResponse();
+    return message;
+  },
+};
+
 /** Worker service definition. */
 export type WorkerServiceDefinition = typeof WorkerServiceDefinition;
 export const WorkerServiceDefinition = {
@@ -967,6 +1076,15 @@ export const WorkerServiceDefinition = {
       responseStream: false,
       options: {},
     },
+    /** Delete an album */
+    deleteAlbum: {
+      name: "DeleteAlbum",
+      requestType: DeleteAlbumRequest as typeof DeleteAlbumRequest,
+      requestStream: false,
+      responseType: DeleteAlbumResponse as typeof DeleteAlbumResponse,
+      responseStream: false,
+      options: {},
+    },
   },
 } as const;
 
@@ -1006,6 +1124,11 @@ export interface WorkerServiceImplementation<CallContextExt = {}> {
     request: PurgeUnusedObjectRequest,
     context: CallContext & CallContextExt,
   ): Promise<DeepPartial<PurgeUnusedObjectResponse>>;
+  /** Delete an album */
+  deleteAlbum(
+    request: DeleteAlbumRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<DeleteAlbumResponse>>;
 }
 
 export interface WorkerServiceClient<CallOptionsExt = {}> {
@@ -1044,6 +1167,11 @@ export interface WorkerServiceClient<CallOptionsExt = {}> {
     request: DeepPartial<PurgeUnusedObjectRequest>,
     options?: CallOptions & CallOptionsExt,
   ): Promise<PurgeUnusedObjectResponse>;
+  /** Delete an album */
+  deleteAlbum(
+    request: DeepPartial<DeleteAlbumRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<DeleteAlbumResponse>;
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;

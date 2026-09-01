@@ -64,24 +64,6 @@ func (q *Queries) CreateAsset(ctx context.Context, arg CreateAssetParams) (Asset
 	return i, err
 }
 
-const getAlbum = `-- name: GetAlbum :one
-SELECT id, name, created_at, modified_at, deleted_at, cover FROM albums WHERE id = $1 and deleted_at IS NULL
-`
-
-func (q *Queries) GetAlbum(ctx context.Context, id pgtype.UUID) (Album, error) {
-	row := q.db.QueryRow(ctx, getAlbum, id)
-	var i Album
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.CreatedAt,
-		&i.ModifiedAt,
-		&i.DeletedAt,
-		&i.Cover,
-	)
-	return i, err
-}
-
 const getAlbumAssetForCover = `-- name: GetAlbumAssetForCover :one
 SELECT id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 FROM assets
@@ -122,26 +104,46 @@ func (q *Queries) GetAlbumAssetForCover(ctx context.Context, albumID pgtype.UUID
 }
 
 const getAlbumAssets = `-- name: GetAlbumAssets :many
-SELECT id
+SELECT id, album_id, filename, created_at, modified_at, deleted_at, type, original, preview, thumbnail, view, process_status, thumbnail_width, thumbnail_height, view_width, view_height, image_frames, video_duration, image_embedding
 FROM assets
 WHERE
     album_id = $1
     and deleted_at IS NULL
 `
 
-func (q *Queries) GetAlbumAssets(ctx context.Context, albumID pgtype.UUID) ([]pgtype.UUID, error) {
+func (q *Queries) GetAlbumAssets(ctx context.Context, albumID pgtype.UUID) ([]Asset, error) {
 	rows, err := q.db.Query(ctx, getAlbumAssets, albumID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []pgtype.UUID
+	var items []Asset
 	for rows.Next() {
-		var id pgtype.UUID
-		if err := rows.Scan(&id); err != nil {
+		var i Asset
+		if err := rows.Scan(
+			&i.ID,
+			&i.AlbumID,
+			&i.Filename,
+			&i.CreatedAt,
+			&i.ModifiedAt,
+			&i.DeletedAt,
+			&i.Type,
+			&i.Original,
+			&i.Preview,
+			&i.Thumbnail,
+			&i.View,
+			&i.ProcessStatus,
+			&i.ThumbnailWidth,
+			&i.ThumbnailHeight,
+			&i.ViewWidth,
+			&i.ViewHeight,
+			&i.ImageFrames,
+			&i.VideoDuration,
+			&i.ImageEmbedding,
+		); err != nil {
 			return nil, err
 		}
-		items = append(items, id)
+		items = append(items, i)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -227,68 +229,6 @@ func (q *Queries) GetAlbumPortraitAssetForCover(ctx context.Context, albumID pgt
 		&i.ImageEmbedding,
 	)
 	return i, err
-}
-
-const getAlbumsWithoutCover = `-- name: GetAlbumsWithoutCover :many
-SELECT id, name, created_at, modified_at, deleted_at, cover FROM albums WHERE cover = '' and deleted_at IS NULL
-`
-
-func (q *Queries) GetAlbumsWithoutCover(ctx context.Context) ([]Album, error) {
-	rows, err := q.db.Query(ctx, getAlbumsWithoutCover)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Album
-	for rows.Next() {
-		var i Album
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.CreatedAt,
-			&i.ModifiedAt,
-			&i.DeletedAt,
-			&i.Cover,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getAllAlbum = `-- name: GetAllAlbum :many
-SELECT id, name, created_at, modified_at, deleted_at, cover FROM albums WHERE deleted_at IS NULL
-`
-
-func (q *Queries) GetAllAlbum(ctx context.Context) ([]Album, error) {
-	rows, err := q.db.Query(ctx, getAllAlbum)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Album
-	for rows.Next() {
-		var i Album
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.CreatedAt,
-			&i.ModifiedAt,
-			&i.DeletedAt,
-			&i.Cover,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }
 
 const getAsset = `-- name: GetAsset :one

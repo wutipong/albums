@@ -25,6 +25,9 @@ service WorkerService {
 
   // Notify woker to remove unused s3 object
   rpc PurgeUnusedObject(PurgeUnusedObjectRequest) returns (PurgeUnusedObjectResponse);
+  
+  // Delete an album
+  rpc DeleteAlbum(DeleteAlbumRequest) returns (DeleteAlbumResponse);
 }
 
 //Status of the asset.
@@ -94,5 +97,12 @@ message PurgeUnusedObjectRequest{
 }
 
 message PurgeUnusedObjectResponse{
+  //empty
+}
+message DeleteAlbumRequest{
+  string id = 1;
+}
+
+message DeleteAlbumResponse {
   // empty
 }

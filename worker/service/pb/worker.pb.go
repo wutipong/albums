@@ -659,6 +659,86 @@ func (*PurgeUnusedObjectResponse) Descriptor() ([]byte, []int) {
 	return file_worker_proto_rawDescGZIP(), []int{13}
 }
 
+type DeleteAlbumRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteAlbumRequest) Reset() {
+	*x = DeleteAlbumRequest{}
+	mi := &file_worker_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAlbumRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAlbumRequest) ProtoMessage() {}
+
+func (x *DeleteAlbumRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_worker_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAlbumRequest.ProtoReflect.Descriptor instead.
+func (*DeleteAlbumRequest) Descriptor() ([]byte, []int) {
+	return file_worker_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *DeleteAlbumRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeleteAlbumResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteAlbumResponse) Reset() {
+	*x = DeleteAlbumResponse{}
+	mi := &file_worker_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAlbumResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAlbumResponse) ProtoMessage() {}
+
+func (x *DeleteAlbumResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_worker_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAlbumResponse.ProtoReflect.Descriptor instead.
+func (*DeleteAlbumResponse) Descriptor() ([]byte, []int) {
+	return file_worker_proto_rawDescGZIP(), []int{15}
+}
+
 var File_worker_proto protoreflect.FileDescriptor
 
 const file_worker_proto_rawDesc = "" +
@@ -687,12 +767,15 @@ const file_worker_proto_rawDesc = "" +
 	"\fonly_missing\x18\x01 \x01(\bR\vonlyMissing\" \n" +
 	"\x1eNotifyProcessAllAssetsResponse\"\x1a\n" +
 	"\x18PurgeUnusedObjectRequest\"\x1b\n" +
-	"\x19PurgeUnusedObjectResponse*9\n" +
+	"\x19PurgeUnusedObjectResponse\"$\n" +
+	"\x12DeleteAlbumRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x15\n" +
+	"\x13DeleteAlbumResponse*9\n" +
 	"\vAssetStatus\x12\v\n" +
 	"\aPENDING\x10\x00\x12\x0e\n" +
 	"\n" +
 	"PROCESSING\x10\x01\x12\r\n" +
-	"\tPROCESSED\x10\x022\xdd\x04\n" +
+	"\tPROCESSED\x10\x022\x97\x05\n" +
 	"\rWorkerService\x12N\n" +
 	"\x12NotifyProcessAsset\x12\x1b.NotifyProcessAssetResquest\x1a\x1b.NotifyProcessAssetResponse\x12Y\n" +
 	"\x16NotifyProcessAllAssets\x12\x1e.NotifyProcessAllAssetsRequest\x1a\x1f.NotifyProcessAllAssetsResponse\x12D\n" +
@@ -700,7 +783,8 @@ const file_worker_proto_rawDesc = "" +
 	"\x14UpdateAlbumThumbnail\x12\x1c.UpdateAlbumThumbnailRequest\x1a\x1d.UpdateAlbumThumbnailResponse\x12\\\n" +
 	"\x17UpdateAllImageEmbedding\x12\x1f.UpdateAllImageEmbeddingRequest\x1a .UpdateAllImageEmbeddingResponse\x12\\\n" +
 	"\x17UpdateAllAlbumThumbnail\x12\x1f.UpdateAllAlbumThumbnailRequest\x1a .UpdateAllAlbumThumbnailResponse\x12J\n" +
-	"\x11PurgeUnusedObject\x12\x19.PurgeUnusedObjectRequest\x1a\x1a.PurgeUnusedObjectResponseB\rZ\v/service/pbb\x06proto3"
+	"\x11PurgeUnusedObject\x12\x19.PurgeUnusedObjectRequest\x1a\x1a.PurgeUnusedObjectResponse\x128\n" +
+	"\vDeleteAlbum\x12\x13.DeleteAlbumRequest\x1a\x14.DeleteAlbumResponseB\rZ\v/service/pbb\x06proto3"
 
 var (
 	file_worker_proto_rawDescOnce sync.Once
@@ -715,7 +799,7 @@ func file_worker_proto_rawDescGZIP() []byte {
 }
 
 var file_worker_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_worker_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_worker_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_worker_proto_goTypes = []any{
 	(AssetStatus)(0),                        // 0: AssetStatus
 	(*NotifyProcessAssetResquest)(nil),      // 1: NotifyProcessAssetResquest
@@ -732,6 +816,8 @@ var file_worker_proto_goTypes = []any{
 	(*NotifyProcessAllAssetsResponse)(nil),  // 12: NotifyProcessAllAssetsResponse
 	(*PurgeUnusedObjectRequest)(nil),        // 13: PurgeUnusedObjectRequest
 	(*PurgeUnusedObjectResponse)(nil),       // 14: PurgeUnusedObjectResponse
+	(*DeleteAlbumRequest)(nil),              // 15: DeleteAlbumRequest
+	(*DeleteAlbumResponse)(nil),             // 16: DeleteAlbumResponse
 }
 var file_worker_proto_depIdxs = []int32{
 	0,  // 0: NotifyProcessAssetResponse.status:type_name -> AssetStatus
@@ -742,15 +828,17 @@ var file_worker_proto_depIdxs = []int32{
 	7,  // 5: WorkerService.UpdateAllImageEmbedding:input_type -> UpdateAllImageEmbeddingRequest
 	9,  // 6: WorkerService.UpdateAllAlbumThumbnail:input_type -> UpdateAllAlbumThumbnailRequest
 	13, // 7: WorkerService.PurgeUnusedObject:input_type -> PurgeUnusedObjectRequest
-	2,  // 8: WorkerService.NotifyProcessAsset:output_type -> NotifyProcessAssetResponse
-	12, // 9: WorkerService.NotifyProcessAllAssets:output_type -> NotifyProcessAllAssetsResponse
-	4,  // 10: WorkerService.NotifyScanCache:output_type -> NotifyScanCacheResponse
-	6,  // 11: WorkerService.UpdateAlbumThumbnail:output_type -> UpdateAlbumThumbnailResponse
-	8,  // 12: WorkerService.UpdateAllImageEmbedding:output_type -> UpdateAllImageEmbeddingResponse
-	10, // 13: WorkerService.UpdateAllAlbumThumbnail:output_type -> UpdateAllAlbumThumbnailResponse
-	14, // 14: WorkerService.PurgeUnusedObject:output_type -> PurgeUnusedObjectResponse
-	8,  // [8:15] is the sub-list for method output_type
-	1,  // [1:8] is the sub-list for method input_type
+	15, // 8: WorkerService.DeleteAlbum:input_type -> DeleteAlbumRequest
+	2,  // 9: WorkerService.NotifyProcessAsset:output_type -> NotifyProcessAssetResponse
+	12, // 10: WorkerService.NotifyProcessAllAssets:output_type -> NotifyProcessAllAssetsResponse
+	4,  // 11: WorkerService.NotifyScanCache:output_type -> NotifyScanCacheResponse
+	6,  // 12: WorkerService.UpdateAlbumThumbnail:output_type -> UpdateAlbumThumbnailResponse
+	8,  // 13: WorkerService.UpdateAllImageEmbedding:output_type -> UpdateAllImageEmbeddingResponse
+	10, // 14: WorkerService.UpdateAllAlbumThumbnail:output_type -> UpdateAllAlbumThumbnailResponse
+	14, // 15: WorkerService.PurgeUnusedObject:output_type -> PurgeUnusedObjectResponse
+	16, // 16: WorkerService.DeleteAlbum:output_type -> DeleteAlbumResponse
+	9,  // [9:17] is the sub-list for method output_type
+	1,  // [1:9] is the sub-list for method input_type
 	1,  // [1:1] is the sub-list for extension type_name
 	1,  // [1:1] is the sub-list for extension extendee
 	0,  // [0:1] is the sub-list for field type_name
@@ -767,7 +855,7 @@ func file_worker_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_worker_proto_rawDesc), len(file_worker_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   14,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

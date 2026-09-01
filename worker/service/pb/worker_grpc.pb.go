@@ -26,6 +26,7 @@ const (
 	WorkerService_UpdateAllImageEmbedding_FullMethodName = "/WorkerService/UpdateAllImageEmbedding"
 	WorkerService_UpdateAllAlbumThumbnail_FullMethodName = "/WorkerService/UpdateAllAlbumThumbnail"
 	WorkerService_PurgeUnusedObject_FullMethodName       = "/WorkerService/PurgeUnusedObject"
+	WorkerService_DeleteAlbum_FullMethodName             = "/WorkerService/DeleteAlbum"
 )
 
 // WorkerServiceClient is the client API for WorkerService service.
@@ -48,6 +49,8 @@ type WorkerServiceClient interface {
 	UpdateAllAlbumThumbnail(ctx context.Context, in *UpdateAllAlbumThumbnailRequest, opts ...grpc.CallOption) (*UpdateAllAlbumThumbnailResponse, error)
 	// Notify woker to remove unused s3 object
 	PurgeUnusedObject(ctx context.Context, in *PurgeUnusedObjectRequest, opts ...grpc.CallOption) (*PurgeUnusedObjectResponse, error)
+	// Delete an album
+	DeleteAlbum(ctx context.Context, in *DeleteAlbumRequest, opts ...grpc.CallOption) (*DeleteAlbumResponse, error)
 }
 
 type workerServiceClient struct {
@@ -128,6 +131,16 @@ func (c *workerServiceClient) PurgeUnusedObject(ctx context.Context, in *PurgeUn
 	return out, nil
 }
 
+func (c *workerServiceClient) DeleteAlbum(ctx context.Context, in *DeleteAlbumRequest, opts ...grpc.CallOption) (*DeleteAlbumResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteAlbumResponse)
+	err := c.cc.Invoke(ctx, WorkerService_DeleteAlbum_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkerServiceServer is the server API for WorkerService service.
 // All implementations must embed UnimplementedWorkerServiceServer
 // for forward compatibility.
@@ -148,6 +161,8 @@ type WorkerServiceServer interface {
 	UpdateAllAlbumThumbnail(context.Context, *UpdateAllAlbumThumbnailRequest) (*UpdateAllAlbumThumbnailResponse, error)
 	// Notify woker to remove unused s3 object
 	PurgeUnusedObject(context.Context, *PurgeUnusedObjectRequest) (*PurgeUnusedObjectResponse, error)
+	// Delete an album
+	DeleteAlbum(context.Context, *DeleteAlbumRequest) (*DeleteAlbumResponse, error)
 	mustEmbedUnimplementedWorkerServiceServer()
 }
 
@@ -178,6 +193,9 @@ func (UnimplementedWorkerServiceServer) UpdateAllAlbumThumbnail(context.Context,
 }
 func (UnimplementedWorkerServiceServer) PurgeUnusedObject(context.Context, *PurgeUnusedObjectRequest) (*PurgeUnusedObjectResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method PurgeUnusedObject not implemented")
+}
+func (UnimplementedWorkerServiceServer) DeleteAlbum(context.Context, *DeleteAlbumRequest) (*DeleteAlbumResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteAlbum not implemented")
 }
 func (UnimplementedWorkerServiceServer) mustEmbedUnimplementedWorkerServiceServer() {}
 func (UnimplementedWorkerServiceServer) testEmbeddedByValue()                       {}
@@ -326,6 +344,24 @@ func _WorkerService_PurgeUnusedObject_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkerService_DeleteAlbum_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAlbumRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkerServiceServer).DeleteAlbum(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkerService_DeleteAlbum_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkerServiceServer).DeleteAlbum(ctx, req.(*DeleteAlbumRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkerService_ServiceDesc is the grpc.ServiceDesc for WorkerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -360,6 +396,10 @@ var WorkerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PurgeUnusedObject",
 			Handler:    _WorkerService_PurgeUnusedObject_Handler,
+		},
+		{
+			MethodName: "DeleteAlbum",
+			Handler:    _WorkerService_DeleteAlbum_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

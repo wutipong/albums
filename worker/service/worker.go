@@ -155,3 +155,11 @@ func (s *WorkerServiceServer) PurgeUnusedObject(
 	err = queue.EnqueuePurgeUnsedObject(ctx)
 	return
 }
+
+func (s *WorkerServiceServer) DeleteAlbum(
+	ctx context.Context,
+	req *pb.DeleteAlbumRequest,
+) (resp *pb.DeleteAlbumResponse, err error) {
+	err = queue.EnqueueDeleteAlbum(ctx, req.Id)
+	return
+}
