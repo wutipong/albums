@@ -103,21 +103,20 @@ export interface NotifyProcessAllAssetsRequest {
 export interface NotifyProcessAllAssetsResponse {
 }
 
-<<<<<<< HEAD
 /** empty */
 export interface PurgeUnusedObjectRequest {
 }
 
 /** empty */
 export interface PurgeUnusedObjectResponse {
-=======
+}
+
 export interface DeleteAlbumRequest {
   id: string;
 }
 
 /** empty */
 export interface DeleteAlbumResponse {
->>>>>>> 6e57f20 (feat(albums): implement delete album functionality with gRPC support)
 }
 
 function createBaseNotifyProcessAssetResquest(): NotifyProcessAssetResquest {
@@ -821,7 +820,6 @@ export const NotifyProcessAllAssetsResponse: MessageFns<NotifyProcessAllAssetsRe
   },
 };
 
-<<<<<<< HEAD
 function createBasePurgeUnusedObjectRequest(): PurgeUnusedObjectRequest {
   return {};
 }
@@ -835,7 +833,79 @@ export const PurgeUnusedObjectRequest: MessageFns<PurgeUnusedObjectRequest> = {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePurgeUnusedObjectRequest();
-=======
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): PurgeUnusedObjectRequest {
+    return {};
+  },
+
+  toJSON(_: PurgeUnusedObjectRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<PurgeUnusedObjectRequest>): PurgeUnusedObjectRequest {
+    return PurgeUnusedObjectRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<PurgeUnusedObjectRequest>): PurgeUnusedObjectRequest {
+    const message = createBasePurgeUnusedObjectRequest();
+    return message;
+  },
+};
+
+function createBasePurgeUnusedObjectResponse(): PurgeUnusedObjectResponse {
+  return {};
+}
+
+export const PurgeUnusedObjectResponse: MessageFns<PurgeUnusedObjectResponse> = {
+  encode(_: PurgeUnusedObjectResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PurgeUnusedObjectResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePurgeUnusedObjectResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): PurgeUnusedObjectResponse {
+    return {};
+  },
+
+  toJSON(_: PurgeUnusedObjectResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<PurgeUnusedObjectResponse>): PurgeUnusedObjectResponse {
+    return PurgeUnusedObjectResponse.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<PurgeUnusedObjectResponse>): PurgeUnusedObjectResponse {
+    const message = createBasePurgeUnusedObjectResponse();
+    return message;
+  },
+};
+
 function createBaseDeleteAlbumRequest(): DeleteAlbumRequest {
   return { id: "" };
 }
@@ -907,7 +977,6 @@ export const DeleteAlbumResponse: MessageFns<DeleteAlbumResponse> = {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDeleteAlbumResponse();
->>>>>>> 6e57f20 (feat(albums): implement delete album functionality with gRPC support)
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -920,79 +989,20 @@ export const DeleteAlbumResponse: MessageFns<DeleteAlbumResponse> = {
     return message;
   },
 
-<<<<<<< HEAD
-  fromJSON(_: any): PurgeUnusedObjectRequest {
-    return {};
-  },
-
-  toJSON(_: PurgeUnusedObjectRequest): unknown {
-=======
   fromJSON(_: any): DeleteAlbumResponse {
     return {};
   },
 
   toJSON(_: DeleteAlbumResponse): unknown {
->>>>>>> 6e57f20 (feat(albums): implement delete album functionality with gRPC support)
     const obj: any = {};
     return obj;
   },
 
-<<<<<<< HEAD
-  create(base?: DeepPartial<PurgeUnusedObjectRequest>): PurgeUnusedObjectRequest {
-    return PurgeUnusedObjectRequest.fromPartial(base ?? {});
-  },
-  fromPartial(_: DeepPartial<PurgeUnusedObjectRequest>): PurgeUnusedObjectRequest {
-    const message = createBasePurgeUnusedObjectRequest();
-    return message;
-  },
-};
-
-function createBasePurgeUnusedObjectResponse(): PurgeUnusedObjectResponse {
-  return {};
-}
-
-export const PurgeUnusedObjectResponse: MessageFns<PurgeUnusedObjectResponse> = {
-  encode(_: PurgeUnusedObjectResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): PurgeUnusedObjectResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePurgeUnusedObjectResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): PurgeUnusedObjectResponse {
-    return {};
-  },
-
-  toJSON(_: PurgeUnusedObjectResponse): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create(base?: DeepPartial<PurgeUnusedObjectResponse>): PurgeUnusedObjectResponse {
-    return PurgeUnusedObjectResponse.fromPartial(base ?? {});
-  },
-  fromPartial(_: DeepPartial<PurgeUnusedObjectResponse>): PurgeUnusedObjectResponse {
-    const message = createBasePurgeUnusedObjectResponse();
-=======
   create(base?: DeepPartial<DeleteAlbumResponse>): DeleteAlbumResponse {
     return DeleteAlbumResponse.fromPartial(base ?? {});
   },
   fromPartial(_: DeepPartial<DeleteAlbumResponse>): DeleteAlbumResponse {
     const message = createBaseDeleteAlbumResponse();
->>>>>>> 6e57f20 (feat(albums): implement delete album functionality with gRPC support)
     return message;
   },
 };
@@ -1057,21 +1067,21 @@ export const WorkerServiceDefinition = {
       responseStream: false,
       options: {},
     },
-<<<<<<< HEAD
     /** Notify woker to remove unused s3 object */
     purgeUnusedObject: {
       name: "PurgeUnusedObject",
       requestType: PurgeUnusedObjectRequest as typeof PurgeUnusedObjectRequest,
       requestStream: false,
       responseType: PurgeUnusedObjectResponse as typeof PurgeUnusedObjectResponse,
-=======
+      responseStream: false,
+      options: {},
+    },
     /** Delete an album */
     deleteAlbum: {
       name: "DeleteAlbum",
       requestType: DeleteAlbumRequest as typeof DeleteAlbumRequest,
       requestStream: false,
       responseType: DeleteAlbumResponse as typeof DeleteAlbumResponse,
->>>>>>> 6e57f20 (feat(albums): implement delete album functionality with gRPC support)
       responseStream: false,
       options: {},
     },
@@ -1109,19 +1119,16 @@ export interface WorkerServiceImplementation<CallContextExt = {}> {
     request: UpdateAllAlbumThumbnailRequest,
     context: CallContext & CallContextExt,
   ): Promise<DeepPartial<UpdateAllAlbumThumbnailResponse>>;
-<<<<<<< HEAD
   /** Notify woker to remove unused s3 object */
   purgeUnusedObject(
     request: PurgeUnusedObjectRequest,
     context: CallContext & CallContextExt,
   ): Promise<DeepPartial<PurgeUnusedObjectResponse>>;
-=======
   /** Delete an album */
   deleteAlbum(
     request: DeleteAlbumRequest,
     context: CallContext & CallContextExt,
   ): Promise<DeepPartial<DeleteAlbumResponse>>;
->>>>>>> 6e57f20 (feat(albums): implement delete album functionality with gRPC support)
 }
 
 export interface WorkerServiceClient<CallOptionsExt = {}> {
@@ -1155,19 +1162,16 @@ export interface WorkerServiceClient<CallOptionsExt = {}> {
     request: DeepPartial<UpdateAllAlbumThumbnailRequest>,
     options?: CallOptions & CallOptionsExt,
   ): Promise<UpdateAllAlbumThumbnailResponse>;
-<<<<<<< HEAD
   /** Notify woker to remove unused s3 object */
   purgeUnusedObject(
     request: DeepPartial<PurgeUnusedObjectRequest>,
     options?: CallOptions & CallOptionsExt,
   ): Promise<PurgeUnusedObjectResponse>;
-=======
   /** Delete an album */
   deleteAlbum(
     request: DeepPartial<DeleteAlbumRequest>,
     options?: CallOptions & CallOptionsExt,
   ): Promise<DeleteAlbumResponse>;
->>>>>>> 6e57f20 (feat(albums): implement delete album functionality with gRPC support)
 }
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
