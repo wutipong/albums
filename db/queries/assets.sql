@@ -92,17 +92,12 @@ RETURNING
     *;
 
 -- name: GetAlbumAssets :many
-SELECT id
+SELECT *
 FROM assets
 WHERE
     album_id = $1
     and deleted_at IS NULL;
 
--- name: GetAlbum :one
-SELECT * FROM albums WHERE id = $1 and deleted_at IS NULL;
-
--- name: GetAllAlbum :many
-SELECT * FROM albums WHERE deleted_at IS NULL;
 
 -- name: UpdateAlbumThumbnail :one
 UPDATE albums
@@ -114,9 +109,6 @@ WHERE
     AND deleted_at IS NULL
 RETURNING
     *;
-
--- name: GetAlbumsWithoutCover :many
-SELECT * FROM albums WHERE cover = '' and deleted_at IS NULL;
 
 -- name: GetRandomAlbumAsset :one
 SELECT *
@@ -163,3 +155,8 @@ WHERE
     AND deleted_at IS NULL
 ORDER BY filename ASC
 LIMIT 1;
+
+-- name: MarkAssetsDeleted :batchexec
+UPDATE assets
+SET deleted_at = now()
+WHERE id = $1;
