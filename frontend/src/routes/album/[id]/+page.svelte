@@ -209,7 +209,7 @@
 			<Icon path={mdiAlert} />
 			<span>Deleting album will also delete the associated assets.</span>
 		</div>
-		<p class="py-4">Delete the album {data.name}??</p>
+		<p class="py-4">Schedule the album deleting task: {data.name}??</p>
 		<div class="modal-action">
 			<form method="dialog">
 				<button class="btn btn-soft btn-error" onclick={() => doDeleteAlbum(data.id)}>

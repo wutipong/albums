@@ -59,14 +59,16 @@ func DeleteAlbum(ctx context.Context, minioClient *minio.Client, albumId string)
 		}
 	}
 
-	err = minioClient.RemoveObject(ctx, os.Getenv("S3_BUCKET"), album.Cover, minio.RemoveObjectOptions{})
-	if err != nil {
-		slog.Error("failed to delete object",
-			slog.String("key", album.Cover),
-			slog.String("error", err.Error()),
-		)
+	if album.Cover != "" {
+		err = minioClient.RemoveObject(ctx, os.Getenv("S3_BUCKET"), album.Cover, minio.RemoveObjectOptions{})
+		if err != nil {
+			slog.Error("failed to delete object",
+				slog.String("key", album.Cover),
+				slog.String("error", err.Error()),
+			)
 
-		return fmt.Errorf("failed to delete album cover object (%s): %w", album.Cover, err)
+			return fmt.Errorf("failed to delete album cover object (%s): %w", album.Cover, err)
+		}
 	}
 
 	err = queries.MarkAlbumDeleted(ctx, albumIdUUID)
