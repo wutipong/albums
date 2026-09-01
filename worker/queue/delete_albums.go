@@ -20,8 +20,6 @@ func DeleteAlbum(ctx context.Context, minioClient *minio.Client, albumId string)
 		return fmt.Errorf("unable to parse album id: %w", err)
 	}
 
-	minio.ToObjectInfo(os.Getenv("S3_Bucket"))
-
 	album, err := queries.GetAlbum(ctx, albumIdUUID)
 
 	assets, err := queries.GetAlbumAssets(ctx, albumIdUUID)

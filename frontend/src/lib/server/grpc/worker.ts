@@ -40,3 +40,7 @@ export async function notifyProcessAllAssets(onlyMissing: boolean = true) {
 export async function notifyPurgeObject(){
 	return await client.purgeUnusedObject({})
 }
+
+export async function deleteAlbum(id: string) {
+	return await client.deleteAlbum({ id });
+}
