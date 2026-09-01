@@ -6,6 +6,7 @@ sql:
   - engine: "postgresql"
     queries: 
       - "../db/queries/assets.sql"
+      - "../db/queries/albums.sql"
     schema: "../db/migrations/"
     database:
       managed: true
