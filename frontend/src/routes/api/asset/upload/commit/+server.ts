@@ -30,7 +30,11 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		if (mimetype.startsWith('image/')) {
 			asset.type = 'image';
-		} else if (mimetype.startsWith('video')) {
+
+			asset.view = asset.original;
+			asset.preview = asset.original;
+			asset.thumbnail = asset.original;
+		} else if (mimetype.startsWith('video/')) {
 			asset.type = 'video';
 		}
 	} else {
