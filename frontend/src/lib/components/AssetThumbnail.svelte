@@ -25,7 +25,7 @@
 	onclick={() => {
 		onclick(asset);
 	}}
-	disabled={asset.process_status != 'processed'}
+	disabled={asset.view == ''}
 >
 	<div class="relative h-full w-full">
 		<div

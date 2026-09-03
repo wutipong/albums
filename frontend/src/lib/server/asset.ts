@@ -29,91 +29,88 @@ export async function createResponseAssetList(
 ) {
 	const outAssets = [];
 	for (const asset of assets) {
-		if (asset.process_status === 'processed') {
-			const video_duration = Temporal.Duration.from(asset.video_duration.toISOString());
+		const outAsset = {
+			...asset,
+			video_duration: 0,
+			thumbnail_url: '',
+			preview_url: '',
+			view_url: '',
+			original_url: ''
+		};
+		const video_duration = Temporal.Duration.from(asset.video_duration.toISOString());
 
-			const bypass = asset.image_frames > 1 || asset.type == 'video';
+		const bypass = asset.image_frames > 1 || asset.type == 'video';
 
-			const thumbnail_url = generateImageUrl({
-				endpoint: env.IMGPROXY_URL,
-				url: `s3://${env.S3_BUCKET}/${asset.thumbnail}`,
-				options: {
-					raw: bypass,
-					resizing_type: 'auto',
-					height: 200,
-					enlarge: 1
-				},
-				salt: env.IMGPROXY_SALT,
-				key: env.IMGPROXY_KEY
-			});
+		const thumbnail_url = asset.thumbnail === ''? '' : generateImageUrl({
+			endpoint: env.IMGPROXY_URL,
+			url: `s3://${env.S3_BUCKET}/${asset.thumbnail}`,
+			options: {
+				raw: bypass,
+				resizing_type: 'auto',
+				height: 200,
+				enlarge: 1
+			},
+			salt: env.IMGPROXY_SALT,
+			key: env.IMGPROXY_KEY
+		});
 
-			const preview_url = generateImageUrl({
-				endpoint: env.IMGPROXY_URL,
-				url: `s3://${env.S3_BUCKET}/${asset.preview}`,
-				options: {
-					raw: bypass,
-					resizing_type: 'auto',
-					height: 200,
-					enlarge: 1
-				},
-				salt: env.IMGPROXY_SALT,
-				key: env.IMGPROXY_KEY
-			});
+		const preview_url = asset.preview === ''? '' : generateImageUrl({
+			endpoint: env.IMGPROXY_URL,
+			url: `s3://${env.S3_BUCKET}/${asset.preview}`,
+			options: {
+				raw: bypass,
+				resizing_type: 'auto',
+				height: 200,
+				enlarge: 1
+			},
+			salt: env.IMGPROXY_SALT,
+			key: env.IMGPROXY_KEY
+		});
 
-			let view_url = '';
-			switch (asset.type) {
-				case 'image':
-					view_url = generateImageUrl({
-						endpoint: env.IMGPROXY_URL,
-						url: `s3://${env.S3_BUCKET}/${asset.view}`,
-						options: {
-							raw: bypass,
-							resizing_type: 'auto',
-							height: 2000,
-							enlarge: 1
-						},
-						salt: env.IMGPROXY_SALT,
-						key: env.IMGPROXY_KEY
-					});
-					break;
+		let view_url = '';
+		switch (asset.type) {
+			case 'image':
+				view_url = asset.view === ''? '' : generateImageUrl({
+					endpoint: env.IMGPROXY_URL,
+					url: `s3://${env.S3_BUCKET}/${asset.view}`,
+					options: {
+						raw: bypass,
+						resizing_type: 'auto',
+						height: 2000,
+						enlarge: 1
+					},
+					salt: env.IMGPROXY_SALT,
+					key: env.IMGPROXY_KEY
+				});
+				break;
 
-				case 'video':
-					view_url = generateImageUrl({
-						endpoint: env.IMGPROXY_URL,
-						url: `s3://${env.S3_BUCKET}/${asset.view}`,
-						options: {
-							raw: true
-						},
-						salt: env.IMGPROXY_SALT,
-						key: env.IMGPROXY_KEY
-					});
-					break;
-			}
-
-			const copy_url = asset.type === 'video' ? '' : `/api/asset/${asset.id}/original/`;
-
-			const original_url = s3.presign(asset.original);
-			const out = {
-				...asset,
-				video_duration,
-				thumbnail_url,
-				preview_url,
-				view_url,
-				original_url,
-				copy_url
-			};
-			outAssets.push(out);
-		} else {
-			const out = {
-				...asset,
-				video_duration: 0,
-				thumbnail_url: '',
-				preview_url: '',
-				view_url: '',
-				original_url: ''
-			};
-			outAssets.push(out);
+			case 'video':
+				view_url = asset.view === ''? '' : generateImageUrl({
+					endpoint: env.IMGPROXY_URL,
+					url: `s3://${env.S3_BUCKET}/${asset.view}`,
+					options: {
+						raw: true
+					},
+					salt: env.IMGPROXY_SALT,
+					key: env.IMGPROXY_KEY
+				});
+				break;
 		}
+
+		const copy_url = asset.type === 'video' ? '' : `/api/asset/${asset.id}/original/`;
+
+		const original_url = s3.presign(asset.original);
+		const out = {
+			...asset,
+			video_duration,
+			thumbnail_url,
+			preview_url,
+			view_url,
+			original_url,
+			copy_url
+		};
+
+		outAssets.push(out);
 	}
 	return outAssets;
 }
