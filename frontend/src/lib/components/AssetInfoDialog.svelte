@@ -53,7 +53,7 @@
 			</button>
 		</form>
 		<h3 class="text-lg font-bold">Infomation</h3>
-		<div class="py-4">
+		<div class="py-4 height-64 overflow-y-auto">
 			<table class="table w-full">
 				<tbody>
 					<tr>
@@ -91,6 +91,10 @@
 					<tr>
 						<th>Original </th>
 						<td>{asset.original}</td>
+					</tr>
+					<tr>
+						<th>View </th>
+						<td>{asset.view}</td>
 					</tr>
 					<tr>
 						<th>Preview </th>
