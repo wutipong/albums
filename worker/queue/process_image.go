@@ -27,11 +27,7 @@ func processImageAsset(ctx context.Context, minioClient *minio.Client, asset *db
 	}
 
 	slog.Info("getting object from S3.", slog.String("id", asset.Original))
-	object, err := minioClient.GetObject(
-		ctx, os.Getenv("S3_BUCKET"),
-		asset.Original,
-		minio.GetObjectOptions{},
-	)
+	object, err := getObject(ctx, minioClient, asset.Original)
 
 	if err != nil {
 		return fmt.Errorf("unable to get object from s3: %w", err)
@@ -54,9 +50,18 @@ func processImageAsset(ctx context.Context, minioClient *minio.Client, asset *db
 	}
 	defer original.Close()
 
-	slog.Info("original", slog.Any("image", original), slog.Bool("available", original != nil), slog.Int("width", original.Width()))
+	var view *vips.Image
+	if original.Width()*original.Height() > MAX_VIEW_PIXEL {
+		view, err = original.Copy(nil)
+		if err != nil {
+			return fmt.Errorf("unable to copy original image: %w", err)
+		}
+		defer view.Close()
+	} else {
+		view = original
+	}
 
-	view, err := populateView(ctx, minioClient, asset, original)
+	err = populateView(ctx, minioClient, asset, view, view != original)
 	if err != nil {
 		return fmt.Errorf("unable to populate view image: %e", err)
 	}
@@ -90,45 +95,24 @@ func populateView(
 	ctx context.Context,
 	minioClient *minio.Client,
 	asset *db.Asset,
-	original *vips.Image,
-) (view *vips.Image, err error) {
+	view *vips.Image,
+	requireProcessing bool,
+) error {
 	slog.Info("populating view media for asset", slog.String("id", asset.ID.String()))
 
-	err = ctx.Err()
+	err := ctx.Err()
 	if err != nil {
-		err = fmt.Errorf("context cancelled: %w", err)
-		return
+		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	if original == nil {
-		err = fmt.Errorf("Invalid image")
-		return
-	}
-
-	asset.ViewWidth = int32(original.Width())
-	asset.ViewHeight = int32(original.Height())
-	if original.Pages() > 1 {
-		asset.ViewHeight = int32(original.PageHeight())
-		asset.ImageFrames = int32(view.Pages())
-	}
-
-	if asset.ViewWidth*asset.ViewHeight < MAX_VIEW_PIXEL {
-		return
-	}
-
-	view, err = original.Copy(nil)
-	if err != nil {
-		err = fmt.Errorf("unable to copy original image: %w", err)
-		return
-	}
-
-	err = view.ThumbnailImage(1_000_000, &vips.ThumbnailImageOptions{
-		Height: VIEW_HEIGHT,
-		Size:   vips.SizeDown,
-	})
-	if err != nil {
-		err = fmt.Errorf("unable to create thumbnail image: %w", err)
-		return
+	if requireProcessing {
+		err = view.ThumbnailImage(1_000_000, &vips.ThumbnailImageOptions{
+			Height: VIEW_HEIGHT,
+			Size:   vips.SizeDown,
+		})
+		if err != nil {
+			return fmt.Errorf("unable to process view image: %w", err)
+		}
 	}
 
 	asset.ViewWidth = int32(view.Width())
@@ -139,10 +123,14 @@ func populateView(
 		asset.ViewHeight = int32(view.PageHeight())
 	}
 
+	if !requireProcessing {
+		asset.View = asset.Original
+		return nil
+	}
+
 	buf, err := view.WebpsaveBuffer(nil)
 	if err != nil {
-		err = fmt.Errorf("unable to save to webp image: %w", err)
-		return
+		return fmt.Errorf("unable to save to webp image: %w", err)
 	}
 
 	if asset.View == "" || asset.View == asset.Original {
@@ -150,13 +138,11 @@ func populateView(
 	}
 
 	err = putObject(ctx, err, minioClient, asset.View, buf)
-
 	if err != nil {
-		err = fmt.Errorf("unable to put object to S3: %w", err)
-		return
+		return fmt.Errorf("unable to put object to S3: %w", err)
 	}
 
-	return
+	return nil
 }
 
 func populatePreview(
@@ -217,6 +203,20 @@ func populatePreview(
 	}
 
 	return nil
+}
+
+func getObject(ctx context.Context, minioClient *minio.Client, key string) (obj *minio.Object, err error) {
+	obj, err = minioClient.GetObject(
+		ctx, os.Getenv("S3_BUCKET"),
+		key,
+		minio.GetObjectOptions{},
+	)
+
+	if err != nil {
+		err = fmt.Errorf("unable to get object from s3: %w", err)
+	}
+
+	return
 }
 
 func putObject(ctx context.Context, err error, minioClient *minio.Client, key string, buf []byte) error {
