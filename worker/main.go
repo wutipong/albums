@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/lmittmann/tint"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/urfave/cli/v3"
@@ -25,6 +26,8 @@ func main() {
 	id := ""
 	processPending := false
 	debug := false
+	prettyLogs := false
+
 	cmd := &cli.Command{
 		Name:  "worker",
 		Usage: "process assets to albums",
@@ -43,17 +46,32 @@ func main() {
 				Usage:       "enable debug logging.",
 				Destination: &debug,
 			},
+			&cli.BoolFlag{
+				Name: "pretty",
+				Usage: "enable human readable logs. " +
+					"By default, logs are in JSON format.",
+				Value:       false,
+				Destination: &prettyLogs,
+			},
 		},
 		Before: func(ctx context.Context, c *cli.Command) (cctx context.Context, err error) {
 			level := slog.LevelInfo
 			if debug {
 				level = slog.LevelDebug
 			}
-			slog.SetDefault(slog.New(
-				slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-					Level: level,
-				}),
-			))
+			if prettyLogs {
+				slog.SetDefault(slog.New(
+					tint.NewTextHandler(os.Stdout, &tint.Options{
+						Level: level,
+					}),
+				))
+			} else {
+				slog.SetDefault(slog.New(
+					slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+						Level: level,
+					}),
+				))
+			}
 
 			return
 		},
