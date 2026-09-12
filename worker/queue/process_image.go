@@ -57,55 +57,7 @@ func processImageAsset(ctx context.Context, minioClient *minio.Client, asset *db
 			return fmt.Errorf("unable to copy original image: %w", err)
 		}
 		defer view.Close()
-	} else {
-		view = original
-	}
 
-	err = populateView(ctx, minioClient, asset, view, view != original)
-	if err != nil {
-		return fmt.Errorf("unable to populate view image: %e", err)
-	}
-
-	if view == nil {
-		view = original
-	} else {
-		defer view.Close()
-	}
-
-	err = populatePreview(ctx, minioClient, asset, view)
-	if err != nil {
-		return fmt.Errorf("unable to populate preview image: %e", err)
-	}
-
-	err = populateThumbnail(ctx, minioClient, asset, view)
-	if err != nil {
-		return fmt.Errorf("unable to populate thumbnail: %e", err)
-	}
-
-	embedding, err := GetImageEmbedding(ctx, original)
-	if err == nil {
-		asset.ImageEmbedding = &embedding
-	} else {
-		slog.Warn("Unable to populate embedding. Skip.")
-	}
-	return nil
-}
-
-func populateView(
-	ctx context.Context,
-	minioClient *minio.Client,
-	asset *db.Asset,
-	view *vips.Image,
-	requireProcessing bool,
-) error {
-	slog.Info("populating view media for asset", slog.String("id", asset.ID.String()))
-
-	err := ctx.Err()
-	if err != nil {
-		return fmt.Errorf("context cancelled: %w", err)
-	}
-
-	if requireProcessing {
 		err = view.ThumbnailImage(1_000_000, &vips.ThumbnailImageOptions{
 			Height: VIEW_HEIGHT,
 			Size:   vips.SizeDown,
@@ -113,6 +65,132 @@ func populateView(
 		if err != nil {
 			return fmt.Errorf("unable to process view image: %w", err)
 		}
+
+		buf, err := view.WebpsaveBuffer(nil)
+		if err != nil {
+			return fmt.Errorf("unable to save to webp image: %w", err)
+		}
+
+		if asset.View == "" || asset.View == asset.Original {
+			asset.View = createAssetKey("webp")
+		}
+
+		err = putObject(ctx, err, minioClient, asset.View, buf)
+		if err != nil {
+			return fmt.Errorf("unable to put object to S3: %w", err)
+		}
+
+	} else {
+		view = original
+		asset.View = asset.Original
+	}
+
+	err = populateView(ctx, asset, view)
+	if err != nil {
+		return fmt.Errorf("unable to populate view image: %w", err)
+	}
+
+	var preview *vips.Image
+	if (original.Pages() > 1 && original.PageHeight() > THUMBNAIL_HEIGHT) ||
+		(original.Pages() == 1 && original.Height() > THUMBNAIL_HEIGHT) {
+		preview, err = original.Copy(nil)
+		if err != nil {
+			return fmt.Errorf("unable to copy original image: %w", err)
+		}
+		defer preview.Close()
+
+		err = preview.ThumbnailImage(1_000_000, &vips.ThumbnailImageOptions{
+			Height: THUMBNAIL_HEIGHT,
+		})
+		if err != nil {
+			return fmt.Errorf("unable to process preview image: %w", err)
+		}
+
+		buf, err := preview.WebpsaveBuffer(nil)
+		if err != nil {
+			return fmt.Errorf("unable to save to webp image: %w", err)
+		}
+
+		if asset.Preview == "" || asset.Preview == asset.Original {
+			asset.Preview = createAssetKey("webp")
+		}
+
+		err = putObject(ctx, err, minioClient, asset.Preview, buf)
+		if err != nil {
+			return fmt.Errorf("unable to put object to S3: %w", err)
+		}
+	} else {
+		preview = original
+		asset.Preview = asset.Original
+	}
+
+	err = populatePreview(ctx, asset, view)
+	if err != nil {
+		return fmt.Errorf("unable to populate preview image: %w", err)
+	}
+
+	var thumbnail *vips.Image
+	if original.Pages() > 1 || (original.Pages() == 1 && original.Height() > THUMBNAIL_HEIGHT) {
+		thumbnail, err = original.Copy(nil)
+		if err != nil {
+			return fmt.Errorf("unable to copy original image: %w", err)
+		}
+		defer thumbnail.Close()
+
+		if thumbnail.Pages() > 1 {
+			thumbnail.SetPages(1)
+			thumbnail.ExtractArea(0, 0, thumbnail.Width(), thumbnail.PageHeight())
+		}
+
+		err = thumbnail.ThumbnailImage(1_000_000, &vips.ThumbnailImageOptions{
+			Height: THUMBNAIL_HEIGHT,
+		})
+		if err != nil {
+			return fmt.Errorf("unable to process preview image: %w", err)
+		}
+
+		buf, err := thumbnail.WebpsaveBuffer(nil)
+		if err != nil {
+			return fmt.Errorf("unable to save to webp image: %w", err)
+		}
+
+		if asset.Thumbnail == "" || asset.Thumbnail == asset.Original {
+			asset.Thumbnail = createAssetKey("webp")
+		}
+
+		err = putObject(ctx, err, minioClient, asset.Thumbnail, buf)
+		if err != nil {
+			return fmt.Errorf("unable to put object to S3: %w", err)
+		}
+	} else {
+		thumbnail = original
+		asset.Thumbnail = asset.Original
+	}
+
+	err = populateThumbnail(ctx, asset, thumbnail)
+	if err != nil {
+		return fmt.Errorf("unable to populate thumbnail: %w", err)
+	}
+
+	embedding, err := GetImageEmbedding(ctx, original)
+	if err == nil {
+		asset.ImageEmbedding = &embedding
+	} else {
+		slog.Warn("unable to populate embedding. Skip.")
+	}
+	return nil
+}
+
+func populateView(
+	ctx context.Context,
+	asset *db.Asset,
+	view *vips.Image,
+) error {
+	slog.Info("populating view media for asset", slog.String("id", asset.ID.String()))
+
+	err := ctx.Err()
+	if err != nil {
+		return fmt.Errorf("context cancelled: %w", err)
 	}
 
 	asset.ViewWidth = int32(view.Width())
@@ -123,33 +201,13 @@ func populateView(
 		asset.ViewHeight = int32(view.PageHeight())
 	}
 
-	if !requireProcessing {
-		asset.View = asset.Original
-		return nil
-	}
-
-	buf, err := view.WebpsaveBuffer(nil)
-	if err != nil {
-		return fmt.Errorf("unable to save to webp image: %w", err)
-	}
-
-	if asset.View == "" || asset.View == asset.Original {
-		asset.View = createAssetKey("webp")
-	}
-
-	err = putObject(ctx, err, minioClient, asset.View, buf)
-	if err != nil {
-		return fmt.Errorf("unable to put object to S3: %w", err)
-	}
-
 	return nil
 }
 
 func populatePreview(
 	ctx context.Context,
-	minioClient *minio.Client,
 	asset *db.Asset,
-	view *vips.Image,
+	preview *vips.Image,
 ) error {
 	slog.Info(
 		"populating preview media for asset",
@@ -161,46 +219,7 @@ func populatePreview(
 		return fmt.Errorf("context cancelled: %w", err)
 	}
 
-	asset.ImageFrames = int32(view.Pages())
-
-	if asset.ImageFrames == 1 {
-		asset.Preview = asset.View
-
-		return nil
-	}
-
-	preview, err := view.Copy(nil)
-	if err != nil {
-		return err
-	}
-
-	defer preview.Close()
-
-	err = preview.ThumbnailImage(1_000_000, &vips.ThumbnailImageOptions{
-		Height: THUMBNAIL_HEIGHT,
-	})
-	if err != nil {
-		return fmt.Errorf("unable to create preview image: %w", err)
-	}
-
-	params := vips.DefaultWebpsaveBufferOptions()
-	params.Q = THUMBNAIL_QUALITY
-	params.PageHeight = preview.PageHeight()
-
-	buf, err := preview.WebpsaveBuffer(params)
-	if err != nil {
-		return fmt.Errorf("unable to write preview image: %w", err)
-	}
-
-	if asset.Preview == "" || asset.Preview == asset.View {
-		asset.Preview = createAssetKey("webp")
-	}
-
-	err = putObject(ctx, err, minioClient, asset.Preview, buf)
-
-	if err != nil {
-		return fmt.Errorf("unable to put preview object to S3: %w", err)
-	}
+	asset.ImageFrames = int32(preview.Pages())
 
 	return nil
 }
@@ -234,29 +253,14 @@ func putObject(ctx context.Context, err error, minioClient *minio.Client, key st
 
 func populateThumbnail(
 	ctx context.Context,
-	minioClient *minio.Client,
 	asset *db.Asset,
-	view *vips.Image,
+	thumbnail *vips.Image,
 ) error {
 	slog.Info("populating thumbnail media for asset", slog.String("id", asset.ID.String()))
 
 	err := ctx.Err()
 	if err != nil {
 		return fmt.Errorf("context cancelled: %w", err)
-	}
-
-	thumbnail, err := view.Copy(nil)
-	if err != nil {
-		return fmt.Errorf("unable to create thumbnail copy: %w", err)
-	}
-	defer thumbnail.Close()
-	thumbnail.SetPages(1)
-
-	err = thumbnail.ThumbnailImage(1_000_000, &vips.ThumbnailImageOptions{
-		Height: THUMBNAIL_HEIGHT,
-	})
-	if err != nil {
-		return fmt.Errorf("unable to create thumbnail image: %w", err)
 	}
 
 	asset.ThumbnailWidth = int32(thumbnail.Width())
@@ -266,23 +270,6 @@ func populateThumbnail(
 		asset.ThumbnailHeight = int32(thumbnail.PageHeight())
 
 		return nil
-	}
-
-	params := vips.DefaultWebpsaveBufferOptions()
-	params.Q = THUMBNAIL_QUALITY
-
-	buf, err := thumbnail.WebpsaveBuffer(params)
-	if err != nil {
-		return fmt.Errorf("unable to write preview image: %w", err)
-	}
-
-	if asset.Thumbnail == "" || asset.Thumbnail == asset.Original {
-		asset.Thumbnail = createAssetKey("webp")
-	}
-
-	err = putObject(ctx, err, minioClient, asset.Thumbnail, buf)
-	if err != nil {
-		return fmt.Errorf("unable to put object to S3: %w", err)
 	}
 
 	return nil
