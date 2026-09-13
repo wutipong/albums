@@ -3,6 +3,7 @@
 	import Icon from 'mdi-svelte';
 	import type { PageProps } from './$types';
 	import Toast from '$lib/components/Toast.svelte';
+	import log from '$lib/log';
 
 	let { data }: PageProps = $props();
 	const formatter = new Intl.NumberFormat('en-US', {
@@ -18,6 +19,8 @@
 	async function notifyPopulateMissingCover(missingOnly: boolean) {
 		try {
 			const resp = await fetch(`/api/album/cover?missingOnly=${missingOnly}`);
+			log.debug({ resp }, 'Album cover update request response:');
+
 			if (resp.ok) {
 				toast.add('Album cover update request has been made.', 'info');
 			} else {

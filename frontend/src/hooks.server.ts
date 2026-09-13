@@ -4,15 +4,16 @@ import { getAuth } from '$lib/server/auth';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 import { dev, building } from '$app/environment';
 import { getMigrations } from 'better-auth/db/migration';
+import log from '$lib/log';
 
 export const init: ServerInit = async () => {
 	if (!dev && !building) {
 		try {
 			const { runMigrations: execute } = await getMigrations(getAuth().options);
 			await execute();
-			console.log('Better Auth database migrations applied.');
+			log.info('Better Auth database migrations applied.');
 		} catch (e) {
-			console.error('Better Auth migration failed:', e);
+			log.error({ error: e }, 'Better Auth migration failed:');
 			process.exit(1);
 		}
 	}
