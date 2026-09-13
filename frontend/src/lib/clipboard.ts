@@ -1,3 +1,5 @@
+import log from '$lib/log';
+
 export async function copyImageToClipboard(imageUrl: string | URL) {
 	// 1. Load the JPEG image into an Image object
 	const img = new Image();
@@ -31,6 +33,7 @@ export async function copyImageToClipboard(imageUrl: string | URL) {
 			console.log('JPEG successfully converted and copied as PNG!');
 		} catch (err) {
 			console.error('Clipboard write failed:', err);
+			log.error({ error: err }, 'Clipboard write failed:');
 		}
 	}, 'image/png'); // Forces the output to be a PNG
 }

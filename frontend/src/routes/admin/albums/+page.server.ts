@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
-import { sql } from 'kysely';
 import type { PageServerLoad } from '../asset/$types';
+import log from '$lib/log';
 
 export const load: PageServerLoad = async () => {
 	const album_count = await db
@@ -9,12 +9,16 @@ export const load: PageServerLoad = async () => {
 		.where('deleted_at', 'is', null)
 		.executeTakeFirst();
 
+	log.debug({ album_count }, 'Album count query result.');
+
 	const missing_cover = await db
 		.selectFrom('albums')
 		.select((eb) => [eb.fn.countAll().as('count')])
 		.where('albums.cover', '=', '')
 		.where('deleted_at', 'is', null)
 		.executeTakeFirst();
+
+	log.debug({ missing_cover }, 'Missing cover query result.');
 
 	return {
 		total: album_count ? BigInt(album_count.count) : 0n,
