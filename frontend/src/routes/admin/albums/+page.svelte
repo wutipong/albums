@@ -19,7 +19,7 @@
 	async function notifyPopulateMissingCover(missingOnly: boolean) {
 		try {
 			const resp = await fetch(`/api/album/cover?missingOnly=${missingOnly}`);
-			log.debug({ resp }, 'Album cover update request response:');
+			log.debug({ response: resp }, 'Album cover update');
 
 			if (resp.ok) {
 				toast.add('Album cover update request has been made.', 'info');

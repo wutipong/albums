@@ -9,7 +9,7 @@ export const load: PageServerLoad = async () => {
 		.where('deleted_at', 'is', null)
 		.executeTakeFirst();
 
-	log.debug({ album_count }, 'Album count query result:');
+	log.debug({ album_count }, 'Album count query result.');
 
 	const missing_cover = await db
 		.selectFrom('albums')
@@ -18,7 +18,7 @@ export const load: PageServerLoad = async () => {
 		.where('deleted_at', 'is', null)
 		.executeTakeFirst();
 
-	log.debug({ missing_cover }, 'Missing cover query result:');
+	log.debug({ missing_cover }, 'Missing cover query result.');
 
 	return {
 		total: album_count ? BigInt(album_count.count) : 0n,
