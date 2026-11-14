@@ -1,3 +1,7 @@
+# Deprecation Notice.
+
+The project is now supersed by [albums2](https://github.com/wutipong/albums2). The repository is now archived.
+
 # Workspace Overview
 
 This workspace contains the full application stack for the photo and video album platform.
